@@ -25,11 +25,6 @@ test("TrackMCPServer initializes, lists tools, and returns track status", async 
     "get_pitwall_overview",
     "get_pitwall_detail",
     "get_pitwall_owner_load",
-    "start_track_task",
-    "complete_track_task",
-    "block_track_task",
-    "unblock_track_task",
-    "advance_track_checkpoint",
   ]);
 
   const result = await server.handle({
@@ -40,6 +35,20 @@ test("TrackMCPServer initializes, lists tools, and returns track status", async 
   });
   const payload = (result?.result as { structuredContent: { summary: { projectName: string } } }).structuredContent;
   assert.equal(payload.summary.projectName, "Track");
+});
+
+test("TrackMCPServer exposes write tools only when allowWrite is enabled", async () => {
+  const server = new TrackMCPServer({
+    allowWrite: true,
+    repoRoot: path.resolve("."),
+    workspaceRoot: path.resolve(".."),
+  });
+
+  const tools = await server.handle({ jsonrpc: "2.0", id: 20, method: "tools/list", params: {} });
+  const toolNames = ((tools?.result as { tools: Array<{ name: string }> }).tools).map((tool) => tool.name);
+
+  assert.ok(toolNames.includes("start_track_task"));
+  assert.ok(toolNames.includes("advance_track_checkpoint"));
 });
 
 test("TrackMCPServer returns track map and pitwall detail", async () => {
@@ -126,6 +135,7 @@ test("TrackMCPServer write tools persist state changes and append events", async
   );
 
   const server = new TrackMCPServer({
+    allowWrite: true,
     repoRoot: tempRoot,
     workspaceRoot: tempRoot,
   });
@@ -216,7 +226,7 @@ test("runStdioServer handles initialize and validation errors", async () => {
       jsonrpc: "2.0",
       id: 2,
       method: "tools/call",
-      params: { name: "get_pitwall_detail", arguments: { root: tempRoot } },
+      params: { name: "get_pitwall_detail", arguments: {} },
     })}\n`
   );
   input.end();

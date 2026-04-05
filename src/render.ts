@@ -1,4 +1,5 @@
 import { createPalette, type RenderOptions } from "./ansi.js";
+import { sanitizeInlineText } from "./security.js";
 import type { TrackSummary } from "./types.js";
 
 export function renderStatus(summary: TrackSummary, options?: RenderOptions): string {
@@ -6,27 +7,27 @@ export function renderStatus(summary: TrackSummary, options?: RenderOptions): st
   const lines = [
     palette.header("TRACK // DRIVER HUD"),
     palette.divider(divider()),
-    `PROJECT  ${summary.projectName}`,
-    `TITLE    ${summary.title}`,
-    `MODE     ${summary.mode}`,
+    `PROJECT  ${sanitizeInlineText(summary.projectName, "unknown")}`,
+    `TITLE    ${sanitizeInlineText(summary.title, "Untitled track")}`,
+    `MODE     ${sanitizeInlineText(summary.mode, "circuit")}`,
     `FLAG     ${palette.health(summary.health, summary.health.toUpperCase())}`,
-    `LAP      ${palette.active(summary.activeLapLabel)}`,
-    `CP       ${palette.active(summary.activeCheckpointTitle)}`,
+    `LAP      ${palette.active(sanitizeInlineText(summary.activeLapLabel, "No laps defined"))}`,
+    `CP       ${palette.active(sanitizeInlineText(summary.activeCheckpointTitle, "No active checkpoint"))}`,
     `BAR      ${progressBar(summary.percentComplete, summary.health, palette)} ${palette.label(
       padLeft(`${summary.percentComplete}%`, 4)
     )}`,
-    `OWNER    ${palette.info(summary.currentOwner ?? "unassigned")}`,
-    `NEXT     ${palette.label(summary.nextAction)}`,
+    `OWNER    ${palette.info(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"))}`,
+    `NEXT     ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`,
   ];
 
   if (summary.blockedReason) {
-    lines.push(`BLOCK    ${palette.danger(summary.blockedReason)}`);
+    lines.push(`BLOCK    ${palette.danger(sanitizeInlineText(summary.blockedReason))}`);
   }
 
   if (summary.openFlags.length) {
     lines.push(
       `FLAGS    ${summary.openFlags
-        .map((flag) => palette.health(flag.level, `${flag.level.toUpperCase()} ${flag.title}`))
+        .map((flag) => palette.health(flag.level, `${flag.level.toUpperCase()} ${sanitizeInlineText(flag.title, "Flag")}`))
         .join(" | ")}`
     );
   }
@@ -35,7 +36,7 @@ export function renderStatus(summary: TrackSummary, options?: RenderOptions): st
     lines.push(palette.divider(divider()));
     lines.push(palette.header("RECENT"));
     for (const event of summary.recentEvents) {
-      lines.push(`> ${palette.muted(event.summary)}`);
+      lines.push(`> ${palette.muted(sanitizeInlineText(event.summary, "Event"))}`);
     }
   }
 
@@ -48,13 +49,13 @@ export function renderNext(summary: TrackSummary, options?: RenderOptions): stri
     palette.header("TRACK // NEXT MOVE"),
     palette.divider(divider()),
     `FLAG     ${palette.health(summary.health, summary.health.toUpperCase())}`,
-    `CP       ${palette.active(summary.activeCheckpointTitle)}`,
-    `OWNER    ${palette.info(summary.currentOwner ?? "unassigned")}`,
-    `NEXT     ${palette.label(summary.nextAction)}`,
+    `CP       ${palette.active(sanitizeInlineText(summary.activeCheckpointTitle, "No active checkpoint"))}`,
+    `OWNER    ${palette.info(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"))}`,
+    `NEXT     ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`,
   ];
 
   if (summary.blockedReason) {
-    lines.push(`BLOCK    ${palette.danger(summary.blockedReason)}`);
+    lines.push(`BLOCK    ${palette.danger(sanitizeInlineText(summary.blockedReason))}`);
   }
 
   return lines.join("\n");

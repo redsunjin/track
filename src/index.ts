@@ -1,7 +1,7 @@
 export { applyTrackMutation } from "./actions.js";
 export { renderBuddy } from "./buddy.js";
 export { generateTrackMap, renderTrackMap } from "./generator.js";
-export { MCPError, TOOLS, TrackMCPServer, runStdioServer } from "./mcp.js";
+export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServer } from "./mcp.js";
 export {
   advanceCheckpoint,
   applyEventToState,
@@ -23,6 +23,7 @@ export {
   scanPitwall,
 } from "./pitwall.js";
 export { renderNext, renderStatus } from "./render.js";
+export { sanitizeInlineText } from "./security.js";
 export { summarizeTrack } from "./summary.js";
 export type {
   MutationResult,

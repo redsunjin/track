@@ -34,6 +34,17 @@ V1 is a plugin-first architecture:
 - `lab` shorthand that maps to Track and Pitwall terminal surfaces
 - optional VS Code companion panel and compact corner widget
 
+## Security defaults
+
+Track now ships with conservative defaults intended for open-source and local-agent use:
+
+- explicit `state` and `roadmap` file paths must stay inside repo-local `.track/`
+- MCP starts in read-only mode by default
+- MCP writes require `--allow-write` or `TRACK_MCP_WRITE=1`
+- state writes use a simple lock file plus atomic rename
+- terminal surfaces sanitize ANSI escapes and control characters
+- live `.track/events.ndjson` is treated as runtime data and should stay out of Git
+
 ## Non-goals for V1
 
 - generic project management replacement
@@ -43,12 +54,13 @@ V1 is a plugin-first architecture:
 
 ## Concept links
 
-- Local repo survey: [docs/local-repo-survey-2026-04-05.md](/Users/Agent/ps-workspace/track/docs/local-repo-survey-2026-04-05.md)
-- Deep dive: [docs/deep-dive-report.md](/Users/Agent/ps-workspace/track/docs/deep-dive-report.md)
-- Harness guide: [docs/HARNESS_MASTER_GUIDE.md](/Users/Agent/ps-workspace/track/docs/HARNESS_MASTER_GUIDE.md)
-- MCP contract: [docs/MCP_CONTRACT.md](/Users/Agent/ps-workspace/track/docs/MCP_CONTRACT.md)
-- Pitwall concept: [docs/pitwall-concept.md](/Users/Agent/ps-workspace/track/docs/pitwall-concept.md)
-- Track generator: [docs/track-generator-method.md](/Users/Agent/ps-workspace/track/docs/track-generator-method.md)
-- Runtime requirements: [docs/runtime-feature-matrix.md](/Users/Agent/ps-workspace/track/docs/runtime-feature-matrix.md)
-- Visual direction: [docs/visual-direction.md](/Users/Agent/ps-workspace/track/docs/visual-direction.md)
-- State example: [examples/track-state.example.yaml](/Users/Agent/ps-workspace/track/examples/track-state.example.yaml)
+- Local repo survey: [docs/local-repo-survey-2026-04-05.md](docs/local-repo-survey-2026-04-05.md)
+- Deep dive: [docs/deep-dive-report.md](docs/deep-dive-report.md)
+- Harness guide: [docs/HARNESS_MASTER_GUIDE.md](docs/HARNESS_MASTER_GUIDE.md)
+- MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
+- Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
+- Pitwall concept: [docs/pitwall-concept.md](docs/pitwall-concept.md)
+- Track generator: [docs/track-generator-method.md](docs/track-generator-method.md)
+- Runtime requirements: [docs/runtime-feature-matrix.md](docs/runtime-feature-matrix.md)
+- Visual direction: [docs/visual-direction.md](docs/visual-direction.md)
+- State example: [examples/track-state.example.yaml](examples/track-state.example.yaml)

@@ -1,4 +1,5 @@
 import { createPalette, type RenderOptions } from "./ansi.js";
+import { sanitizeInlineText } from "./security.js";
 import type {
   Checkpoint,
   DifficultyProfile,
@@ -43,8 +44,8 @@ export function renderTrackMap(projectName: string, segments: TrackSegment[], op
   const lines = [
     palette.header("TRACK // MAP GENERATOR"),
     palette.divider("------------------------------------------------------------"),
-    `PROJECT  ${projectName}`,
-    `ACTIVE   ${active ? palette.active(active.label) : palette.muted("none")}`,
+    `PROJECT  ${sanitizeInlineText(projectName, "unknown")}`,
+    `ACTIVE   ${active ? palette.active(sanitizeInlineText(active.label, active.id)) : palette.muted("none")}`,
     `COURSE   ${segments.map((segment) => renderSegmentGlyph(segment, palette)).join(palette.divider("-"))}`,
     palette.divider("------------------------------------------------------------"),
     palette.header("IDX  TYPE      DFF  SLP  PAC  ST   LABEL"),
@@ -56,10 +57,10 @@ export function renderTrackMap(projectName: string, segments: TrackSegment[], op
     const stateCell = palette.segment(segment.type, segment.progressState, pad(segment.progressState.toUpperCase(), 7));
     const label =
       segment.progressState === "active"
-        ? palette.active(segment.label)
+        ? palette.active(sanitizeInlineText(segment.label, segment.id))
         : segment.progressState === "done"
-          ? palette.success(segment.label)
-          : segment.label;
+          ? palette.success(sanitizeInlineText(segment.label, segment.id))
+          : sanitizeInlineText(segment.label, segment.id);
     lines.push(
       `${padLeft(String(index + 1), 2)}   ${typeCell} ${padLeft(segment.difficultyScore.toFixed(1), 3)}  ${padLeft(
         segment.slopeScore.toFixed(1),
@@ -67,7 +68,7 @@ export function renderTrackMap(projectName: string, segments: TrackSegment[], op
       )}  ${padLeft(segment.paceScore.toFixed(1), 3)}  ${stateCell} ${label}`
     );
     if (segment.notes.length) {
-      lines.push(`     NOTES  ${palette.muted(segment.notes.join(" | "))}`);
+      lines.push(`     NOTES  ${palette.muted(sanitizeInlineText(segment.notes.join(" | "), "No notes"))}`);
     }
   }
 

@@ -26,9 +26,9 @@
 ## 3. Record System
 
 - source_of_truth_docs:
-  - [TODO.md](/Users/Agent/ps-workspace/track/TODO.md)
-  - [NEXT_SESSION_PLAN.md](/Users/Agent/ps-workspace/track/NEXT_SESSION_PLAN.md)
-  - [MCP_CONTRACT.md](/Users/Agent/ps-workspace/track/docs/MCP_CONTRACT.md)
+  - [TODO.md](../../TODO.md)
+  - [NEXT_SESSION_PLAN.md](../../NEXT_SESSION_PLAN.md)
+  - [MCP_CONTRACT.md](../MCP_CONTRACT.md)
 - execution_doc:
   - this worksheet
 - state_files_touched:

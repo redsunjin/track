@@ -1,5 +1,6 @@
 import { createPalette, type RenderOptions } from "./ansi.js";
 import { generateTrackMap } from "./generator.js";
+import { sanitizeInlineText } from "./security.js";
 import type { TrackRoadmapFile, TrackStateFile, TrackSummary } from "./types.js";
 
 export function renderBuddy(
@@ -19,10 +20,10 @@ export function renderBuddy(
     "|----------------------------|",
     `| ${moodTone(palette, mood, pad(face, 28))}|`,
     `| FLAG  ${palette.health(summary.health, pad(summary.health.toUpperCase(), 16))}|`,
-    `| LAP   ${palette.active(pad(trim(summary.activeLapLabel, 16), 16))}|`,
-    `| CP    ${palette.active(pad(trim(summary.activeCheckpointTitle, 16), 16))}|`,
+    `| LAP   ${palette.active(pad(trim(sanitizeInlineText(summary.activeLapLabel, "No laps"), 16), 16))}|`,
+    `| CP    ${palette.active(pad(trim(sanitizeInlineText(summary.activeCheckpointTitle, "No checkpoint"), 16), 16))}|`,
     `| BAR   ${styleBuddyStrip(pad(trim(rawStrip, 16), 16), palette)}|`,
-    `| NEXT  ${palette.label(pad(trim(summary.nextAction, 16), 16))}|`,
+    `| NEXT  ${palette.label(pad(trim(sanitizeInlineText(summary.nextAction, "No next action"), 16), 16))}|`,
     ".----------------------------.",
   ];
 

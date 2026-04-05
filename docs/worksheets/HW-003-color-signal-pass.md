@@ -28,9 +28,9 @@
 ## 3. Record System
 
 - source_of_truth_docs:
-  - [TODO.md](/Users/Agent/ps-workspace/track/TODO.md)
-  - [NEXT_SESSION_PLAN.md](/Users/Agent/ps-workspace/track/NEXT_SESSION_PLAN.md)
-  - [visual-direction.md](/Users/Agent/ps-workspace/track/docs/visual-direction.md)
+  - [TODO.md](../../TODO.md)
+  - [NEXT_SESSION_PLAN.md](../../NEXT_SESSION_PLAN.md)
+  - [visual-direction.md](../visual-direction.md)
 - execution_doc:
   - this worksheet
 - state_files_touched:

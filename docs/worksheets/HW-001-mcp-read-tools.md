@@ -27,10 +27,10 @@
 ## 3. Record System
 
 - source_of_truth_docs:
-  - [TODO.md](/Users/Agent/ps-workspace/track/TODO.md)
-  - [NEXT_SESSION_PLAN.md](/Users/Agent/ps-workspace/track/NEXT_SESSION_PLAN.md)
-  - [plugin-architecture.md](/Users/Agent/ps-workspace/track/docs/plugin-architecture.md)
-  - [runtime-feature-matrix.md](/Users/Agent/ps-workspace/track/docs/runtime-feature-matrix.md)
+  - [TODO.md](../../TODO.md)
+  - [NEXT_SESSION_PLAN.md](../../NEXT_SESSION_PLAN.md)
+  - [plugin-architecture.md](../plugin-architecture.md)
+  - [runtime-feature-matrix.md](../runtime-feature-matrix.md)
 - execution_doc:
   - this worksheet
 - state_files_touched:

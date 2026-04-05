@@ -8,6 +8,7 @@ import type {
   TrackStateFile,
   TrackStatus,
 } from "./types.js";
+import { sanitizeInlineText } from "./security.js";
 
 const AUTO_BLOCK_SOURCE = "track:auto-block";
 
@@ -19,7 +20,7 @@ export function startTask(state: TrackStateFile, taskId: string, actor = "track"
   normalizeState(next);
   return {
     state: next,
-    event: createEvent("task.started", actor, `Started ${task.title}`),
+    event: createEvent("task.started", actor, `Started ${sanitizeInlineText(task.title, task.id)}`),
   };
 }
 
@@ -31,7 +32,7 @@ export function completeTask(state: TrackStateFile, taskId: string, actor = "tra
   normalizeState(next);
   return {
     state: next,
-    event: createEvent("task.completed", actor, `Completed ${task.title}`),
+    event: createEvent("task.completed", actor, `Completed ${sanitizeInlineText(task.title, task.id)}`),
   };
 }
 
@@ -43,12 +44,17 @@ export function blockTask(
 ): MutationResult {
   const next = cloneState(state);
   const task = requireTask(next, taskId);
+  const normalizedReason = sanitizeInlineText(reason, "Blocked");
   task.status = "blocked";
-  upsertAutoBlockFlag(next, taskId, task.title, reason);
+  upsertAutoBlockFlag(next, taskId, task.title, normalizedReason);
   normalizeState(next);
   return {
     state: next,
-    event: createEvent("task.blocked", actor, `Blocked ${task.title}: ${reason}`),
+    event: createEvent(
+      "task.blocked",
+      actor,
+      `Blocked ${sanitizeInlineText(task.title, task.id)}: ${normalizedReason}`
+    ),
   };
 }
 
@@ -60,7 +66,7 @@ export function unblockTask(state: TrackStateFile, taskId: string, actor = "trac
   normalizeState(next);
   return {
     state: next,
-    event: createEvent("task.unblocked", actor, `Unblocked ${task.title}`),
+    event: createEvent("task.unblocked", actor, `Unblocked ${sanitizeInlineText(task.title, task.id)}`),
   };
 }
 
@@ -86,7 +92,11 @@ export function advanceCheckpoint(
   normalizeState(next);
   return {
     state: next,
-    event: createEvent("checkpoint.advanced", actor, `Advanced checkpoint ${checkpoint.title}`),
+    event: createEvent(
+      "checkpoint.advanced",
+      actor,
+      `Advanced checkpoint ${sanitizeInlineText(checkpoint.title, checkpoint.id)}`
+    ),
   };
 }
 
@@ -187,23 +197,24 @@ function deriveActiveLap(laps: Lap[]): number | undefined {
 function deriveNextAction(state: TrackStateFile): string {
   const blockedTask = (state.tasks ?? []).find((task) => task.status === "blocked");
   if (blockedTask) {
-    return `Resolve blocker on ${blockedTask.title}`;
+    return sanitizeInlineText(`Resolve blocker on ${blockedTask.title}`, "Resolve blocker");
   }
   const doingTask = (state.tasks ?? []).find((task) => task.status === "doing");
   if (doingTask) {
-    return doingTask.title;
+    return sanitizeInlineText(doingTask.title, doingTask.id);
   }
   const nextTask = (state.tasks ?? []).find((task) => task.status === "todo");
   if (nextTask) {
-    return nextTask.title;
+    return sanitizeInlineText(nextTask.title, nextTask.id);
   }
   const nextCheckpoint = findActiveOrNextCheckpoint(state);
-  return nextCheckpoint?.title ?? "No next action recorded";
+  return sanitizeInlineText(nextCheckpoint?.title, "No next action recorded");
 }
 
 function deriveBlockedReason(flags: Flag[]): string | null {
   const autoBlock = flags.find((flag) => flag.source === AUTO_BLOCK_SOURCE);
-  return autoBlock?.detail ?? flags.find((flag) => flag.level === "red")?.detail ?? null;
+  const detail = autoBlock?.detail ?? flags.find((flag) => flag.level === "red")?.detail ?? null;
+  return detail ? sanitizeInlineText(detail) : null;
 }
 
 function deriveHealth(flags: Flag[], blockedReason: string | null): "green" | "yellow" | "red" {
@@ -264,17 +275,18 @@ function requireTask(state: TrackStateFile, taskId: string): Task {
 function upsertAutoBlockFlag(state: TrackStateFile, taskId: string, taskTitle: string, reason: string): void {
   const flags = state.flags ?? [];
   const id = autoBlockFlagId(taskId);
+  const normalizedTitle = sanitizeInlineText(taskTitle, taskId);
   const existing = flags.find((flag) => flag.id === id);
   if (existing) {
     existing.level = "red";
-    existing.title = `Blocked ${taskTitle}`;
+    existing.title = `Blocked ${normalizedTitle}`;
     existing.detail = reason;
     existing.source = AUTO_BLOCK_SOURCE;
   } else {
     flags.push({
       id,
       level: "red",
-      title: `Blocked ${taskTitle}`,
+      title: `Blocked ${normalizedTitle}`,
       detail: reason,
       source: AUTO_BLOCK_SOURCE,
     });

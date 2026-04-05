@@ -8,7 +8,7 @@
 
 Reference pattern:
 
-- [trunk_rag HARNESS_MASTER_GUIDE.md](/Users/Agent/ps-workspace/trunk_rag/docs/HARNESS_MASTER_GUIDE.md)
+- `trunk_rag/docs/HARNESS_MASTER_GUIDE.md` in the local workspace
 
 This document is not a copy.
 It is a `Track`-specific version.
@@ -33,9 +33,9 @@ If the repo does not run on a clear harness, the product will drift from its own
 
 Current control-plane docs:
 
-- [TODO.md](/Users/Agent/ps-workspace/track/TODO.md)
-- [NEXT_SESSION_PLAN.md](/Users/Agent/ps-workspace/track/NEXT_SESSION_PLAN.md)
-- [AGENTS.md](/Users/Agent/ps-workspace/track/AGENTS.md)
+- [TODO.md](../TODO.md)
+- [NEXT_SESSION_PLAN.md](../NEXT_SESSION_PLAN.md)
+- [AGENTS.md](../AGENTS.md)
 
 Rule:
 
@@ -46,12 +46,12 @@ Rule:
 
 These are the current boundary docs:
 
-- [README.md](/Users/Agent/ps-workspace/track/README.md)
-- [plugin-architecture.md](/Users/Agent/ps-workspace/track/docs/plugin-architecture.md)
-- [runtime-feature-matrix.md](/Users/Agent/ps-workspace/track/docs/runtime-feature-matrix.md)
-- [pitwall-concept.md](/Users/Agent/ps-workspace/track/docs/pitwall-concept.md)
-- [track-generator-method.md](/Users/Agent/ps-workspace/track/docs/track-generator-method.md)
-- [visual-direction.md](/Users/Agent/ps-workspace/track/docs/visual-direction.md)
+- [README.md](../README.md)
+- [plugin-architecture.md](./plugin-architecture.md)
+- [runtime-feature-matrix.md](./runtime-feature-matrix.md)
+- [pitwall-concept.md](./pitwall-concept.md)
+- [track-generator-method.md](./track-generator-method.md)
+- [visual-direction.md](./visual-direction.md)
 
 Rule:
 
@@ -123,9 +123,9 @@ Purpose:
 
 Artifacts:
 
-- [TODO.md](/Users/Agent/ps-workspace/track/TODO.md)
-- [NEXT_SESSION_PLAN.md](/Users/Agent/ps-workspace/track/NEXT_SESSION_PLAN.md)
-- [AGENTS.md](/Users/Agent/ps-workspace/track/AGENTS.md)
+- [TODO.md](../TODO.md)
+- [NEXT_SESSION_PLAN.md](../NEXT_SESSION_PLAN.md)
+- [AGENTS.md](../AGENTS.md)
 
 ### Layer 2. Product Boundary
 
@@ -135,10 +135,10 @@ Purpose:
 
 Artifacts:
 
-- [README.md](/Users/Agent/ps-workspace/track/README.md)
-- [plugin-architecture.md](/Users/Agent/ps-workspace/track/docs/plugin-architecture.md)
-- [runtime-feature-matrix.md](/Users/Agent/ps-workspace/track/docs/runtime-feature-matrix.md)
-- [pitwall-concept.md](/Users/Agent/ps-workspace/track/docs/pitwall-concept.md)
+- [README.md](../README.md)
+- [plugin-architecture.md](./plugin-architecture.md)
+- [runtime-feature-matrix.md](./runtime-feature-matrix.md)
+- [pitwall-concept.md](./pitwall-concept.md)
 
 ### Layer 3. Evaluator / Gate
 
@@ -199,11 +199,11 @@ Future candidate:
 
 Use the worksheet template for any non-trivial slice:
 
-- [HARNESS_WORKSHEET_TEMPLATE.md](/Users/Agent/ps-workspace/track/docs/HARNESS_WORKSHEET_TEMPLATE.md)
+- [HARNESS_WORKSHEET_TEMPLATE.md](./HARNESS_WORKSHEET_TEMPLATE.md)
 
 Current active worksheet:
 
-- [HW-004-vscode-companion.md](/Users/Agent/ps-workspace/track/docs/worksheets/HW-004-vscode-companion.md)
+- [HW-004-vscode-companion.md](./worksheets/HW-004-vscode-companion.md)
 
 ## Adoption Rules
 

@@ -5,6 +5,7 @@ import { applyTrackMutation } from "./actions.js";
 import { generateTrackMap } from "./generator.js";
 import { loadPitwallDetail, loadPitwallOwnerLoad, scanPitwall } from "./pitwall.js";
 import { loadTrackRoadmap } from "./roadmap.js";
+import { resolveWorkspacePath } from "./security.js";
 import { loadTrackState } from "./state.js";
 import { summarizeTrack } from "./summary.js";
 
@@ -26,7 +27,7 @@ function schema(properties: Record<string, JSONValue>, required?: string[]): JSO
   return payload;
 }
 
-export const TOOLS: JSONDict[] = [
+export const READ_TOOLS: JSONDict[] = [
   {
     name: "get_track_status",
     title: "Get Track status",
@@ -71,6 +72,9 @@ export const TOOLS: JSONDict[] = [
       root: { type: "string" },
     }),
   },
+];
+
+export const WRITE_TOOLS: JSONDict[] = [
   {
     name: "start_track_task",
     title: "Start Track task",
@@ -129,6 +133,16 @@ export const TOOLS: JSONDict[] = [
   },
 ];
 
+export const TOOLS: JSONDict[] = [...READ_TOOLS, ...WRITE_TOOLS];
+
+const WRITE_TOOL_NAMES = new Set([
+  "start_track_task",
+  "complete_track_task",
+  "block_track_task",
+  "unblock_track_task",
+  "advance_track_checkpoint",
+]);
+
 export class MCPError extends Error {
   code: number;
 
@@ -139,10 +153,12 @@ export class MCPError extends Error {
 }
 
 export class TrackMCPServer {
+  allowWrite: boolean;
   repoRoot: string;
   workspaceRoot: string;
 
-  constructor(options?: { repoRoot?: string; workspaceRoot?: string }) {
+  constructor(options?: { allowWrite?: boolean; repoRoot?: string; workspaceRoot?: string }) {
+    this.allowWrite = options?.allowWrite ?? resolveWriteAllowed();
     this.repoRoot = options?.repoRoot ?? process.cwd();
     this.workspaceRoot = options?.workspaceRoot ?? process.cwd();
   }
@@ -176,7 +192,7 @@ export class TrackMCPServer {
       return {
         jsonrpc: "2.0",
         id: requestId,
-        result: { tools: TOOLS },
+        result: { tools: this.allowWrite ? TOOLS : READ_TOOLS },
       };
     }
     if (method === "tools/call") {
@@ -202,8 +218,12 @@ export class TrackMCPServer {
   }
 
   async callTool(name: string, argumentsObject: JSONDict): Promise<JSONDict> {
+    if (WRITE_TOOL_NAMES.has(name) && !this.allowWrite) {
+      throw new MCPError(-32001, "Track MCP write tools are disabled. Start the server with --allow-write or set TRACK_MCP_WRITE=1.");
+    }
+
     if (name === "get_track_status") {
-      const repoRoot = readRepoRoot(argumentsObject, this.repoRoot);
+      const repoRoot = await readRepoRoot(argumentsObject, this.repoRoot, this.workspaceRoot);
       const state = await loadTrackState(repoRoot, readOptionalString(argumentsObject, "state_file"));
       const summary = summarizeTrack(state);
       return {
@@ -213,7 +233,7 @@ export class TrackMCPServer {
     }
 
     if (name === "get_track_map") {
-      const repoRoot = readRepoRoot(argumentsObject, this.repoRoot);
+      const repoRoot = await readRepoRoot(argumentsObject, this.repoRoot, this.workspaceRoot);
       const roadmap = await loadTrackRoadmap(repoRoot, readOptionalString(argumentsObject, "roadmap_file"));
       const state = await loadTrackState(repoRoot, readOptionalString(argumentsObject, "state_file")).catch(() => undefined);
       const segments = generateTrackMap(roadmap, state);
@@ -225,7 +245,7 @@ export class TrackMCPServer {
     }
 
     if (name === "get_pitwall_overview") {
-      const root = readOptionalString(argumentsObject, "root") ?? this.workspaceRoot;
+      const root = await readWorkspaceRoot(argumentsObject, "root", this.workspaceRoot);
       const entries = await scanPitwall(root);
       return {
         root,
@@ -234,7 +254,7 @@ export class TrackMCPServer {
     }
 
     if (name === "get_pitwall_detail") {
-      const root = readOptionalString(argumentsObject, "root") ?? this.workspaceRoot;
+      const root = await readWorkspaceRoot(argumentsObject, "root", this.workspaceRoot);
       const selector = readOptionalString(argumentsObject, "selector");
       if (!selector) {
         throw new MCPError(-32602, "Argument 'selector' is required.");
@@ -247,7 +267,7 @@ export class TrackMCPServer {
     }
 
     if (name === "get_pitwall_owner_load") {
-      const root = readOptionalString(argumentsObject, "root") ?? this.workspaceRoot;
+      const root = await readWorkspaceRoot(argumentsObject, "root", this.workspaceRoot);
       const owners = await loadPitwallOwnerLoad(root);
       return {
         root,
@@ -290,7 +310,7 @@ export class TrackMCPServer {
       checkpointId: readOptionalString(argumentsObject, "checkpoint_id"),
       command,
       reason,
-      repoRoot: readRepoRoot(argumentsObject, this.repoRoot),
+      repoRoot: await readRepoRoot(argumentsObject, this.repoRoot, this.workspaceRoot),
       stateFile: readOptionalString(argumentsObject, "state_file"),
       taskId,
     });
@@ -306,12 +326,14 @@ export class TrackMCPServer {
 }
 
 export async function runStdioServer(options?: {
+  allowWrite?: boolean;
   repoRoot?: string;
   workspaceRoot?: string;
   input?: NodeJS.ReadableStream;
   output?: NodeJS.WritableStream;
 }): Promise<void> {
   const server = new TrackMCPServer({
+    allowWrite: options?.allowWrite,
     repoRoot: options?.repoRoot,
     workspaceRoot: options?.workspaceRoot,
   });
@@ -380,6 +402,19 @@ function readRequiredString(argumentsObject: JSONDict, key: string): string {
   return value;
 }
 
-function readRepoRoot(argumentsObject: JSONDict, fallback: string): string {
-  return readOptionalString(argumentsObject, "repo_path") ?? fallback;
+async function readRepoRoot(argumentsObject: JSONDict, fallback: string, workspaceRoot: string): Promise<string> {
+  const repoPath = readOptionalString(argumentsObject, "repo_path");
+  if (!repoPath) {
+    return fallback;
+  }
+  return resolveWorkspacePath(workspaceRoot, repoPath, "Argument 'repo_path'");
+}
+
+async function readWorkspaceRoot(argumentsObject: JSONDict, key: string, workspaceRoot: string): Promise<string> {
+  return resolveWorkspacePath(workspaceRoot, readOptionalString(argumentsObject, key), `Argument '${key}'`);
+}
+
+function resolveWriteAllowed(): boolean {
+  const value = process.env.TRACK_MCP_WRITE?.trim().toLowerCase();
+  return value === "1" || value === "true" || value === "yes";
 }

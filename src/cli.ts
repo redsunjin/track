@@ -33,11 +33,13 @@ async function main(): Promise<void> {
   const actor = readFlag(args, "--actor") ?? "track";
   const intervalMs = parseInterval(readFlag(args, "--interval"));
   const color = readColorPreference(args);
+  const allowWrite = args.includes("--allow-write");
   const json = args.includes("--json");
   const watch = args.includes("--watch");
 
   if (command === "mcp") {
     await runStdioServer({
+      allowWrite,
       repoRoot: process.cwd(),
       workspaceRoot: root ?? process.cwd(),
     });
@@ -46,6 +48,7 @@ async function main(): Promise<void> {
 
   if (command === "mcp-smoke-test") {
     const server = new TrackMCPServer({
+      allowWrite,
       repoRoot: process.cwd(),
       workspaceRoot: root ?? process.cwd(),
     });

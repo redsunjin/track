@@ -25,8 +25,10 @@ test("loadTrackState reads the example YAML file", async () => {
 test("summarizeTrack returns the active checkpoint and next action", async () => {
   const yaml = await readFile(EXAMPLE_PATH, "utf8");
   const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-summary-"));
-  const statePath = path.join(tempDir, "state.yaml");
+  const trackDir = path.join(tempDir, ".track");
+  const statePath = path.join(trackDir, "state.yaml");
 
+  await mkdir(trackDir, { recursive: true });
   await writeFile(statePath, yaml, "utf8");
 
   const state = await loadTrackState(tempDir, "state.yaml");

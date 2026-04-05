@@ -8,6 +8,10 @@ Current runtime entrypoints:
 
 - `npm run mcp:smoke -- --root /Users/Agent/ps-workspace`
 - `track mcp`
+- `track mcp --allow-write`
+
+Default mode is read-only.
+Write tools are only exposed when `--allow-write` is passed or `TRACK_MCP_WRITE=1` is set.
 
 ## Transport
 
@@ -95,5 +99,7 @@ Every `tools/call` response includes:
 ## Current guardrails
 
 - read and write tools reuse the shared Track mutation path
+- write tools are opt-in and hidden by default
+- explicit MCP paths are constrained to the configured workspace root
 - local `.track` files remain the source of truth
 - MCP wrappers reuse runtime logic instead of copying it

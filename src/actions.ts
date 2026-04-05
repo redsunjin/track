@@ -11,6 +11,7 @@ import {
   loadTrackStateFromPath,
   resolveStatePath,
   saveTrackState,
+  withTrackStateLock,
 } from "./state.js";
 import { summarizeTrack } from "./summary.js";
 import type { TrackEvent, TrackStateFile, TrackSummary } from "./types.js";
@@ -43,29 +44,31 @@ export interface ApplyTrackMutationResult {
 export async function applyTrackMutation(options: ApplyTrackMutationOptions): Promise<ApplyTrackMutationResult> {
   const actor = options.actor ?? "track";
   const stateFilePath = await resolveStatePath(options.repoRoot, options.stateFile);
-  const state = await loadTrackStateFromPath(stateFilePath);
-  const mutation =
-    options.command === "start"
-      ? startTask(state, requireTaskId(options.taskId, options.command), actor)
-      : options.command === "done"
-        ? completeTask(state, requireTaskId(options.taskId, options.command), actor)
-        : options.command === "block"
-          ? blockTask(state, requireTaskId(options.taskId, options.command), requireReason(options.reason), actor)
-          : options.command === "unblock"
-            ? unblockTask(state, requireTaskId(options.taskId, options.command), actor)
-            : advanceCheckpoint(state, options.checkpointId, actor);
+  return withTrackStateLock(stateFilePath, async () => {
+    const state = await loadTrackStateFromPath(stateFilePath);
+    const mutation =
+      options.command === "start"
+        ? startTask(state, requireTaskId(options.taskId, options.command), actor)
+        : options.command === "done"
+          ? completeTask(state, requireTaskId(options.taskId, options.command), actor)
+          : options.command === "block"
+            ? blockTask(state, requireTaskId(options.taskId, options.command), requireReason(options.reason), actor)
+            : options.command === "unblock"
+              ? unblockTask(state, requireTaskId(options.taskId, options.command), actor)
+              : advanceCheckpoint(state, options.checkpointId, actor);
 
-  const stateWithEvent = applyEventToState(mutation.state, mutation.event);
-  await saveTrackState(stateFilePath, stateWithEvent);
-  await appendTrackEventLog(stateFilePath, mutation.event);
+    const stateWithEvent = applyEventToState(mutation.state, mutation.event);
+    await saveTrackState(stateFilePath, stateWithEvent);
+    await appendTrackEventLog(stateFilePath, mutation.event);
 
-  return {
-    event: mutation.event,
-    repoPath: options.repoRoot,
-    state: stateWithEvent,
-    stateFilePath,
-    summary: summarizeTrack(stateWithEvent),
-  };
+    return {
+      event: mutation.event,
+      repoPath: options.repoRoot,
+      state: stateWithEvent,
+      stateFilePath,
+      summary: summarizeTrack(stateWithEvent),
+    };
+  });
 }
 
 function requireTaskId(taskId: string | undefined, command: TrackMutationCommand): string {

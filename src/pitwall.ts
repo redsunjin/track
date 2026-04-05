@@ -4,6 +4,7 @@ import path from "node:path";
 import { createPalette, padVisible, type RenderOptions } from "./ansi.js";
 import { generateTrackMap } from "./generator.js";
 import { loadTrackRoadmap } from "./roadmap.js";
+import { sanitizeInlineText } from "./security.js";
 import { loadTrackState } from "./state.js";
 import { summarizeTrack } from "./summary.js";
 import type {
@@ -61,7 +62,7 @@ export function renderPitwall(root: string, entries: PitwallEntry[], options?: R
   const lines = [
     palette.header("Pitwall // Race Control"),
     palette.divider(divider()),
-    `ROOT     ${root}`,
+    `ROOT     ${sanitizeInlineText(root, ".")}`,
     `SUMMARY  P:${active}  R:${palette.danger(String(red))}  Y:${palette.caution(String(yellow))}  G:${palette.success(
       String(green)
     )}  B:${blocked}`,
@@ -83,18 +84,22 @@ export function renderPitwall(root: string, entries: PitwallEntry[], options?: R
     const age = formatAge(metrics.updateAgeMinutes);
     const pace = formatPace(metrics.paceDeltaPercent);
     lines.push(
-      `${palette.health(summary.health, pad(flagCode(summary.health), 6))} ${pad(name, 18)} ${padVisible(
+      `${palette.health(summary.health, pad(flagCode(summary.health), 6))} ${pad(sanitizeInlineText(name, "unknown"), 18)} ${padVisible(
         progressBar(summary.percentComplete, summary.health, palette),
         22
-      )} ${palette.info(pad(summary.currentOwner ?? "unassigned", 12))} ${highlightCheckpoint(summary.health, summary.activeCheckpointTitle, palette)}`
+      )} ${palette.info(pad(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"), 12))} ${highlightCheckpoint(
+        summary.health,
+        summary.activeCheckpointTitle,
+        palette
+      )}`
     );
-    lines.push(`  LAP    ${palette.active(summary.activeLapLabel)}`);
+    lines.push(`  LAP    ${palette.active(sanitizeInlineText(summary.activeLapLabel, "No laps defined"))}`);
     lines.push(
       `  AGE    ${colorAge(metrics.staleState, age, palette)}  PACE  ${colorPace(metrics.paceDeltaPercent, pace, palette)}`
     );
-    lines.push(`  NEXT   ${palette.label(summary.nextAction)}`);
+    lines.push(`  NEXT   ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`);
     if (summary.blockedReason) {
-      lines.push(`  BLOCK  ${palette.danger(summary.blockedReason)}`);
+      lines.push(`  BLOCK  ${palette.danger(sanitizeInlineText(summary.blockedReason))}`);
     }
     lines.push(palette.divider(divider()));
   }
@@ -114,7 +119,7 @@ export function renderPitwallQueue(root: string, entries: PitwallEntry[], option
   const lines = [
     palette.header("Pitwall // Queue"),
     palette.divider(divider()),
-    `ROOT     ${root}`,
+    `ROOT     ${sanitizeInlineText(root, ".")}`,
     `ITEMS    ${queued.length}`,
     palette.divider(divider()),
   ];
@@ -129,13 +134,16 @@ export function renderPitwallQueue(root: string, entries: PitwallEntry[], option
 
   for (const entry of queued) {
     const name = path.basename(entry.repoPath);
-    const issue = entry.summary.blockedReason ?? entry.summary.nextAction;
+    const issue = sanitizeInlineText(entry.summary.blockedReason ?? entry.summary.nextAction, "No issue recorded");
     const metrics = resolveMetrics(entry);
     const age = formatAge(metrics.updateAgeMinutes);
     const pace = formatPace(metrics.paceDeltaPercent);
     lines.push(
-      `${palette.health(entry.summary.health, pad(flagCode(entry.summary.health), 6))} ${pad(name, 18)} ${palette.info(
-        pad(entry.summary.currentOwner ?? "unassigned", 12)
+      `${palette.health(entry.summary.health, pad(flagCode(entry.summary.health), 6))} ${pad(
+        sanitizeInlineText(name, "unknown"),
+        18
+      )} ${palette.info(
+        pad(sanitizeInlineText(entry.summary.currentOwner ?? "unassigned", "unassigned"), 12)
       )} ${pad(colorAge(metrics.staleState, age, palette), 6)} ${pad(
         colorPace(metrics.paceDeltaPercent, pace, palette),
         6
@@ -204,22 +212,22 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
   const lines = [
     palette.header("Pitwall // Detail"),
     palette.divider(divider()),
-    `PROJECT  ${repoName}`,
-    `PATH     ${detail.repoPath}`,
+    `PROJECT  ${sanitizeInlineText(repoName, "unknown")}`,
+    `PATH     ${sanitizeInlineText(detail.repoPath, ".")}`,
     `FLAG     ${palette.health(detail.summary.health, detail.summary.health.toUpperCase())}`,
-    `LAP      ${palette.active(detail.summary.activeLapLabel)}`,
-    `CP       ${palette.active(detail.summary.activeCheckpointTitle)}`,
+    `LAP      ${palette.active(sanitizeInlineText(detail.summary.activeLapLabel, "No laps defined"))}`,
+    `CP       ${palette.active(sanitizeInlineText(detail.summary.activeCheckpointTitle, "No active checkpoint"))}`,
     `BAR      ${progressBar(detail.summary.percentComplete, detail.summary.health, palette)} ${palette.label(
       padLeft(`${detail.summary.percentComplete}%`, 4)
     )}`,
-    `OWNER    ${palette.info(detail.summary.currentOwner ?? "unassigned")}`,
+    `OWNER    ${palette.info(sanitizeInlineText(detail.summary.currentOwner ?? "unassigned", "unassigned"))}`,
     `AGE      ${colorAge(metrics.staleState, formatAge(metrics.updateAgeMinutes), palette)}`,
     `PACE     ${colorPace(metrics.paceDeltaPercent, formatPace(metrics.paceDeltaPercent), palette)}`,
-    `NEXT     ${palette.label(detail.summary.nextAction)}`,
+    `NEXT     ${palette.label(sanitizeInlineText(detail.summary.nextAction, "No next action recorded"))}`,
   ];
 
   if (detail.summary.blockedReason) {
-    lines.push(`BLOCK    ${palette.danger(detail.summary.blockedReason)}`);
+    lines.push(`BLOCK    ${palette.danger(sanitizeInlineText(detail.summary.blockedReason))}`);
   }
 
   if (detail.segments?.length) {
@@ -233,9 +241,13 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
     lines.push(palette.header("TASKS"));
     for (const task of activeTasks) {
       lines.push(
-        `${palette.status(task.status, pad(task.status.toUpperCase(), 8))} ${pad(task.id, 10)} ${palette.info(
-          pad(task.owner ?? "unassigned", 12)
-        )} ${task.title}`
+        `${palette.status(task.status, pad(task.status.toUpperCase(), 8))} ${pad(
+          sanitizeInlineText(task.id, "task"),
+          10
+        )} ${palette.info(pad(sanitizeInlineText(task.owner ?? "unassigned", "unassigned"), 12))} ${sanitizeInlineText(
+          task.title,
+          "Untitled task"
+        )}`
       );
     }
   }
@@ -245,7 +257,10 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
     lines.push(palette.header("FLAGS"));
     for (const flag of detail.summary.openFlags) {
       lines.push(
-        `${palette.health(flag.level, pad(flag.level.toUpperCase(), 8))} ${flag.title}${flag.detail ? ` :: ${flag.detail}` : ""}`
+        `${palette.health(flag.level, pad(flag.level.toUpperCase(), 8))} ${sanitizeInlineText(
+          flag.title,
+          "Flag"
+        )}${flag.detail ? ` :: ${sanitizeInlineText(flag.detail)}` : ""}`
       );
     }
   }
@@ -254,7 +269,7 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
     lines.push(palette.divider(divider()));
     lines.push(palette.header("RECENT"));
     for (const event of detail.summary.recentEvents) {
-      lines.push(`> ${palette.muted(event.summary)}`);
+      lines.push(`> ${palette.muted(sanitizeInlineText(event.summary, "Event"))}`);
     }
   }
 
@@ -266,7 +281,7 @@ export function renderPitwallOwners(root: string, owners: PitwallOwnerLoad[], op
   const lines = [
     palette.header("Pitwall // Owner Load"),
     palette.divider(divider()),
-    `ROOT     ${root}`,
+    `ROOT     ${sanitizeInlineText(root, ".")}`,
     `OWNERS   ${owners.length}`,
     palette.divider(divider()),
   ];
@@ -279,9 +294,9 @@ export function renderPitwallOwners(root: string, owners: PitwallOwnerLoad[], op
   lines.push(palette.header("OWNER        ACTIVE  BLOCKED  PROJECTS  FOCUS"));
   lines.push(palette.divider(divider()));
   for (const owner of owners) {
-    const focus = owner.checkpoints.slice(0, 2).join(" | ");
+    const focus = sanitizeInlineText(owner.checkpoints.slice(0, 2).join(" | "), "none");
     lines.push(
-      `${palette.info(pad(owner.owner, 12))} ${padLeft(String(owner.activeTasks), 6)}  ${padLeft(
+      `${palette.info(pad(sanitizeInlineText(owner.owner, "unassigned"), 12))} ${padLeft(String(owner.activeTasks), 6)}  ${padLeft(
         String(owner.blockedTasks),
         7
       )}  ${padLeft(String(owner.activeProjects), 8)}  ${owner.blockedTasks ? palette.danger(focus) : palette.label(focus || "none")}`
@@ -461,13 +476,14 @@ function highlightCheckpoint(
   value: string,
   palette: ReturnType<typeof createPalette>
 ): string {
+  const safeValue = sanitizeInlineText(value, "No checkpoint");
   if (health === "red") {
-    return palette.danger(value);
+    return palette.danger(safeValue);
   }
   if (health === "yellow") {
-    return palette.caution(value);
+    return palette.caution(safeValue);
   }
-  return palette.active(value);
+  return palette.active(safeValue);
 }
 
 function resolveMetrics(entry: Pick<PitwallEntry, "metrics" | "summary">): PitwallMetrics {

@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { parse } from "yaml";
 
+import { resolveTrackFilePath } from "./security.js";
 import type { TrackRoadmapFile } from "./types.js";
 
 const DEFAULT_ROADMAP_CANDIDATES = [
@@ -12,7 +13,7 @@ const DEFAULT_ROADMAP_CANDIDATES = [
 
 export async function resolveRoadmapPath(cwd: string, explicitFile?: string): Promise<string> {
   if (explicitFile) {
-    return path.resolve(cwd, explicitFile);
+    return resolveTrackFilePath(cwd, explicitFile, "Track roadmap file");
   }
 
   for (const candidate of DEFAULT_ROADMAP_CANDIDATES) {
