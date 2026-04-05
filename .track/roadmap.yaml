@@ -1,0 +1,84 @@
+version: 1
+project:
+  id: track
+  name: Track
+  mode: sprint
+
+roadmap:
+  phases:
+    - id: phase-1
+      title: Core schema and CLI
+      goal: Load `.track/state.yaml`, compute progress, and show status inside coding tools.
+      kind: build
+      checkpoints:
+        - id: cp-1
+          title: State loader
+          kind: build
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 1
+            coordination: 1
+            risk: 1
+        - id: cp-2
+          title: CLI status and next
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 1
+            coordination: 1
+            risk: 1
+        - id: cp-3
+          title: MCP contract
+          kind: integration
+          difficulty:
+            effort: 4
+            uncertainty: 3
+            dependencies: 4
+            coordination: 3
+            risk: 3
+            approvals: 2
+    - id: phase-2
+      title: MCP adapter
+      goal: Expose Track state and task actions to Claude Code, Codex, and Gemini CLI.
+      kind: integration
+      checkpoints:
+        - id: cp-4
+          title: Claude/Codex/Gemini command adapters
+          kind: integration
+          difficulty:
+            effort: 4
+            uncertainty: 4
+            dependencies: 3
+            coordination: 4
+            risk: 3
+            branch_factor: 2
+    - id: phase-3
+      title: Companion views
+      goal: Add CLI polish and VS Code companion surfaces.
+      kind: ui
+      checkpoints:
+        - id: cp-5
+          title: Signal pass and companion polish
+          kind: ui
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+    - id: phase-4
+      title: VS Code companion
+      goal: Add an extension scaffold and companion panel surface for Track.
+      kind: ui
+      checkpoints:
+        - id: cp-6
+          title: VS Code companion scaffold
+          kind: ui
+          difficulty:
+            effort: 4
+            uncertainty: 3
+            dependencies: 3
+            coordination: 2
+            risk: 2

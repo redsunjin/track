@@ -1,0 +1,8 @@
+{"id":"evt-001","type":"project.created","actor":"codex","timestamp":"2026-04-05T01:10:00+09:00","summary":"Created Track concept and plugin architecture docs"}
+{"id":"evt-002","type":"cli.scaffolded","actor":"codex","timestamp":"2026-04-05T01:35:00+09:00","summary":"Scaffolded state loader, summary logic, and CLI commands"}
+{"id":"evt-2026-04-05T06:06:18.039Z-27h47h","type":"task.completed","actor":"track","timestamp":"2026-04-05T06:06:18.039Z","summary":"Completed Define MCP tools"}
+{"id":"evt-2026-04-05T06:06:48.521Z-kjr8ic","type":"task.started","actor":"track","timestamp":"2026-04-05T06:06:48.521Z","summary":"Started Add MCP write tools"}
+{"id":"evt-2026-04-05T06:13:06.476Z-fibllh","type":"task.completed","actor":"codex","timestamp":"2026-04-05T06:13:06.476Z","summary":"Completed Add MCP write tools"}
+{"id":"evt-2026-04-05T06:19:45.119Z-4rxmz5","type":"task.started","actor":"codex","timestamp":"2026-04-05T06:19:45.119Z","summary":"Started Color and signal pass"}
+{"id":"evt-2026-04-05T06:44:58.634Z-il6way","type":"task.completed","actor":"codex","timestamp":"2026-04-05T06:44:58.634Z","summary":"Completed Color and signal pass"}
+{"id":"evt-2026-04-05T06:44:58.659Z-quzysf","type":"task.started","actor":"codex","timestamp":"2026-04-05T06:44:58.659Z","summary":"Started Scaffold VS Code companion"}

@@ -1,0 +1,130 @@
+version: 1
+project:
+  id: track
+  name: Track
+  mode: sprint
+  current_branch: main
+track:
+  id: track-v1
+  title: Track plugin MVP
+  topology: sprint
+  total_laps: 4
+  active_lap: 4
+  health: green
+  next_action: Scaffold VS Code companion
+  blocked_reason: null
+  percent_complete: 93
+laps:
+  - id: lap-1
+    title: Core schema and CLI
+    status: done
+    checkpoints:
+      - id: cp-1
+        title: State loader
+        status: done
+        weight: 2
+      - id: cp-2
+        title: CLI status and next
+        status: done
+        weight: 2
+      - id: cp-3
+        title: MCP contract
+        status: done
+        weight: 3
+  - id: lap-2
+    title: Agent adapters
+    status: done
+    checkpoints:
+      - id: cp-4
+        title: Claude/Codex/Gemini command adapters
+        status: done
+        weight: 3
+  - id: lap-3
+    title: Companion views
+    status: done
+    checkpoints:
+      - id: cp-5
+        title: Signal pass and companion polish
+        status: done
+        weight: 2
+  - id: lap-4
+    title: VS Code companion
+    status: doing
+    checkpoints:
+      - id: cp-6
+        title: VS Code companion scaffold
+        status: doing
+        weight: 2
+tasks:
+  - id: task-001
+    title: Scaffold core package
+    checkpoint_id: cp-1
+    status: done
+    owner: codex
+  - id: task-002
+    title: Add status summary renderer
+    checkpoint_id: cp-2
+    status: done
+    owner: codex
+  - id: task-003
+    title: Define MCP tools
+    checkpoint_id: cp-3
+    status: done
+    owner: codex
+  - id: task-004
+    title: Add MCP write tools
+    checkpoint_id: cp-4
+    status: done
+    owner: codex
+  - id: task-005
+    title: Color and signal pass
+    checkpoint_id: cp-5
+    status: done
+    owner: codex
+  - id: task-006
+    title: Scaffold VS Code companion
+    checkpoint_id: cp-6
+    status: doing
+    owner: codex
+flags: []
+events:
+  - id: evt-001
+    type: project.created
+    actor: codex
+    timestamp: 2026-04-05T01:10:00+09:00
+    summary: Created Track concept and plugin architecture docs
+  - id: evt-002
+    type: cli.scaffolded
+    actor: codex
+    timestamp: 2026-04-05T01:35:00+09:00
+    summary: Scaffolded state loader, summary logic, and CLI commands
+  - id: evt-2026-04-05T06:06:18.039Z-27h47h
+    type: task.completed
+    actor: track
+    timestamp: 2026-04-05T06:06:18.039Z
+    summary: Completed Define MCP tools
+  - id: evt-2026-04-05T06:06:48.521Z-kjr8ic
+    type: task.started
+    actor: track
+    timestamp: 2026-04-05T06:06:48.521Z
+    summary: Started Add MCP write tools
+  - id: evt-2026-04-05T06:13:06.476Z-fibllh
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-05T06:13:06.476Z
+    summary: Completed Add MCP write tools
+  - id: evt-2026-04-05T06:19:45.119Z-4rxmz5
+    type: task.started
+    actor: codex
+    timestamp: 2026-04-05T06:19:45.119Z
+    summary: Started Color and signal pass
+  - id: evt-2026-04-05T06:44:58.634Z-il6way
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-05T06:44:58.634Z
+    summary: Completed Color and signal pass
+  - id: evt-2026-04-05T06:44:58.659Z-quzysf
+    type: task.started
+    actor: codex
+    timestamp: 2026-04-05T06:44:58.659Z
+    summary: Started Scaffold VS Code companion

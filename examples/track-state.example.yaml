@@ -1,0 +1,102 @@
+version: 1
+project:
+  id: track-demo
+  name: Track Demo
+  mode: rally
+  target_time_hours: 40
+  current_branch: main
+
+track:
+  id: roadmap-v1
+  title: Track MVP
+  topology: rally
+  total_laps: 4
+  active_lap: 2
+  percent_complete: 38
+  health: yellow
+  next_action: "Lock checkpoint weights and event schema"
+  blocked_reason: null
+
+laps:
+  - id: lap-1
+    title: State Model
+    status: done
+    checkpoints:
+      - id: cp-1
+        title: Canonical schema draft
+        status: done
+        weight: 3
+      - id: cp-2
+        title: Event log contract
+        status: done
+        weight: 2
+  - id: lap-2
+    title: CLI and MCP
+    status: doing
+    checkpoints:
+      - id: cp-3
+        title: Text dashboard
+        status: doing
+        weight: 3
+      - id: cp-4
+        title: MCP tool surface
+        status: todo
+        weight: 2
+  - id: lap-3
+    title: VS Code Surface
+    status: todo
+    checkpoints:
+      - id: cp-5
+        title: Tree view
+        status: todo
+        weight: 2
+      - id: cp-6
+        title: Corner widget
+        status: todo
+        weight: 2
+  - id: lap-4
+    title: Control Room
+    status: todo
+    checkpoints:
+      - id: cp-7
+        title: Multi-project wallboard
+        status: todo
+        weight: 3
+
+tasks:
+  - id: task-001
+    title: Define state schema
+    lap_id: lap-1
+    checkpoint_id: cp-1
+    status: done
+    owner: codex
+  - id: task-002
+    title: Build terminal renderer
+    lap_id: lap-2
+    checkpoint_id: cp-3
+    status: doing
+    owner: codex
+  - id: task-003
+    title: Design bottom-right avatar states
+    lap_id: lap-3
+    checkpoint_id: cp-6
+    status: todo
+    owner: human
+
+flags:
+  - id: flag-001
+    level: yellow
+    title: Progress semantics not locked
+    detail: "Percent may drift if checkpoint weights are edited mid-run."
+
+events:
+  - id: evt-001
+    type: checkpoint.completed
+    actor: codex
+    timestamp: "2026-04-05T00:40:00+09:00"
+    summary: "Canonical schema draft completed"
+  - id: evt-002
+    type: task.started
+    actor: codex
+    timestamp: "2026-04-05T00:55:00+09:00"
+    summary: "Started text dashboard implementation"

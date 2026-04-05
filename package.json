@@ -1,0 +1,31 @@
+{
+  "name": "track",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "track": "./src/cli.ts"
+  },
+  "scripts": {
+    "buddy": "node --import tsx ./src/cli.ts buddy",
+    "companion": "node --import tsx ./src/cli.ts companion",
+    "lab": "node --import tsx ./src/cli.ts lab",
+    "mcp:smoke": "node --import tsx ./src/cli.ts mcp-smoke-test",
+    "status": "node --import tsx ./src/cli.ts status",
+    "next": "node --import tsx ./src/cli.ts next",
+    "map": "node --import tsx ./src/cli.ts map",
+    "pitwall": "node --import tsx ./src/cli.ts pitwall",
+    "test": "node --import tsx --test tests/**/*.test.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.3"
+  }
+}
