@@ -1,0 +1,35 @@
+{
+  "name": "track-vscode-companion",
+  "displayName": "Track Companion",
+  "description": "Minimal VS Code companion surface for the Track runtime.",
+  "version": "0.1.0",
+  "publisher": "redsunjin",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:track.openCompanion",
+    "onCommand:track.refreshCompanion",
+    "workspaceContains:.track/state.yaml",
+    "workspaceContains:.track/state.yml",
+    "workspaceContains:.track/state.json"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "track.openCompanion",
+        "title": "Track: Open Companion"
+      },
+      {
+        "command": "track.refreshCompanion",
+        "title": "Track: Refresh Companion"
+      }
+    ]
+  }
+}

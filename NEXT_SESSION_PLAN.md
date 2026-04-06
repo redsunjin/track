@@ -2,23 +2,23 @@
 
 ## Active Slice
 
-- id: `TRK-031`
-- title: `VS Code Companion`
+- id: `none`
+- title: `Select next roadmap slice`
 
 ## Goal
 
-Establish the first IDE-side Track companion:
+Close out the completed VS Code companion milestone and choose the next roadmap version:
 
-- surface the same Track summary inside VS Code
-- preserve the existing local `.track` state model
-- avoid inventing a separate IDE-only status source
+- keep the completed Track MVP milestone at 100%
+- decide what the next roadmap version should contain
+- avoid reopening finished work unless a regression appears
 
 ## First Steps
 
-1. define the signal palette and no-color fallback rule
-2. scaffold the extension manifest and command set
-3. render a minimal companion summary panel
-4. wire the panel to local `.track/state.yaml`
+1. review the current roadmap and decide whether the next slice is adapters, packaging, or release polish
+2. add a new roadmap version before starting fresh task work
+3. promote exactly one new slice into `TODO.md`
+4. update `.track/state.yaml` and `.track/roadmap.yaml` together
 
 ## Constraints
 
@@ -30,6 +30,8 @@ Establish the first IDE-side Track companion:
 
 ```bash
 npm test
+npm run vscode:build
+npm run vscode:check
 ```
 
 Manual checks after implementation:
@@ -42,6 +44,6 @@ npm run pitwall -- --root /Users/Agent/ps-workspace --owners --no-color
 
 ## Exit Condition
 
-- a minimal VS Code companion exists and reflects current Track summary
-- tests still pass
-- docs stay aligned with the active loop
+- one new active slice is selected
+- roadmap and state both reflect that next slice
+- completed TRK-031 stays closed unless a regression is found

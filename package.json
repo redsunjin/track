@@ -15,7 +15,9 @@
     "next": "node --import tsx ./src/cli.ts next",
     "map": "node --import tsx ./src/cli.ts map",
     "pitwall": "node --import tsx ./src/cli.ts pitwall",
-    "test": "node --import tsx --test tests/**/*.test.ts"
+    "test": "node --import tsx --test tests/**/*.test.ts",
+    "vscode:build": "tsc -p vscode-extension/tsconfig.json",
+    "vscode:check": "tsc -p vscode-extension/tsconfig.json --noEmit"
   },
   "engines": {
     "node": ">=20"

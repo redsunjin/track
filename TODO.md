@@ -2,22 +2,8 @@
 
 ## Active
 
-### TRK-031 VS Code Companion
-
-- goal:
-  establish the first real IDE-side companion surface so Track is not limited to terminal-only usage
-- in:
-  - extension scaffold
-  - command registration
-  - companion panel shell
-  - state read path from local `.track`
-- out:
-  - external adapters
-  - browser work
-  - full design polish
-- done_when:
-  - a VS Code companion surface exists and renders live Track summary data
-  - `npm test` passes
+- no active slice selected
+- next selection should start from the next roadmap version, not reopen the completed VS Code companion scaffold
 
 ## Queued
 
@@ -29,6 +15,18 @@
 - Jira/GitHub/Linear adapters
 
 ## Done
+
+### TRK-031 VS Code Companion
+
+- completed:
+  - VS Code extension scaffold
+  - `Track: Open Companion`
+  - `Track: Refresh Companion`
+  - status bar indicator
+  - companion webview panel driven by `track status --json`
+  - mocked extension-host smoke coverage
+  - `npm run vscode:build`
+  - `npm run vscode:check`
 
 ### TRK-019 Pitwall Detail Expansion
 

@@ -58,7 +58,7 @@ test("completeTask and advanceCheckpoint move the track forward", async () => {
 
   assert.equal(advanced.state.laps?.[0]?.checkpoints?.[2]?.status, "done");
   assert.equal(advanced.state.track.active_lap, 4);
-  assert.equal(summary.activeCheckpointTitle, "VS Code companion scaffold");
+  assert.equal(summary.activeCheckpointTitle, "No active checkpoint");
 });
 
 test("applyEventToState appends the event to the in-memory state", async () => {

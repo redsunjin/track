@@ -43,8 +43,11 @@
   - `npm run status -- --no-color`
   - `npm run lab -- --no-color`
   - `npm run pitwall -- --root /Users/Agent/ps-workspace --owners --no-color`
+  - `npm run vscode:build`
+  - `npm run vscode:check`
 - control_surface_checks:
   - the IDE companion renders the same current checkpoint, percent, owner, and next action as terminal Track
+  - the companion refreshes when local `.track/state.yaml` changes
 - regression_gate:
   - terminal Track and Pitwall surfaces still behave unchanged
 

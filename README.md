@@ -32,7 +32,7 @@ V1 is a plugin-first architecture:
 - Claude/Codex/Gemini command patterns
 - CLI progress view with ANSI signal mode and `--no-color` fallback
 - `lab` shorthand that maps to Track and Pitwall terminal surfaces
-- optional VS Code companion panel and compact corner widget
+- minimal VS Code companion scaffold plus room for a later compact corner widget
 
 ## Security defaults
 
@@ -44,6 +44,22 @@ Track now ships with conservative defaults intended for open-source and local-ag
 - state writes use a simple lock file plus atomic rename
 - terminal surfaces sanitize ANSI escapes and control characters
 - live `.track/events.ndjson` is treated as runtime data and should stay out of Git
+
+## VS Code companion
+
+The repo now includes a minimal VS Code extension scaffold under [vscode-extension](vscode-extension/README.md).
+
+Current behavior:
+
+- adds `Track: Open Companion`
+- shows a status bar indicator
+- opens a webview panel with the same summary vocabulary as `track status`
+- refreshes when local `.track/state.yaml` changes
+
+Verification:
+
+- `npm run vscode:build`
+- `npm run vscode:check`
 
 ## Non-goals for V1
 
@@ -59,6 +75,7 @@ Track now ships with conservative defaults intended for open-source and local-ag
 - Harness guide: [docs/HARNESS_MASTER_GUIDE.md](docs/HARNESS_MASTER_GUIDE.md)
 - MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
 - Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
+- VS Code companion scaffold: [vscode-extension/README.md](vscode-extension/README.md)
 - Pitwall concept: [docs/pitwall-concept.md](docs/pitwall-concept.md)
 - Track generator: [docs/track-generator-method.md](docs/track-generator-method.md)
 - Runtime requirements: [docs/runtime-feature-matrix.md](docs/runtime-feature-matrix.md)

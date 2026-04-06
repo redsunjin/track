@@ -19,7 +19,7 @@ test("generateTrackMap derives segment types from roadmap difficulty", async () 
   assert.equal(segments[3]?.type, "fork");
   assert.equal(segments[3]?.progressState, "done");
   assert.equal(segments[4]?.progressState, "done");
-  assert.equal(segments[5]?.progressState, "active");
+  assert.equal(segments[5]?.progressState, "done");
 });
 
 test("renderTrackMap prints a roadmap-derived course overview", async () => {
