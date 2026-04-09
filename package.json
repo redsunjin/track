@@ -9,6 +9,7 @@
   "scripts": {
     "buddy": "node --import tsx ./src/cli.ts buddy",
     "companion": "node --import tsx ./src/cli.ts companion",
+    "import": "node --import tsx ./src/cli.ts import",
     "lab": "node --import tsx ./src/cli.ts lab",
     "mcp:smoke": "node --import tsx ./src/cli.ts mcp-smoke-test",
     "status": "node --import tsx ./src/cli.ts status",

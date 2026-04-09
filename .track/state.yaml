@@ -5,11 +5,11 @@ project:
   mode: sprint
   current_branch: main
 track:
-  id: track-v1
-  title: Track plugin MVP
+  id: track-v2
+  title: Track plugin v2
   topology: sprint
-  total_laps: 4
-  active_lap: 4
+  total_laps: 5
+  active_lap: 5
   health: green
   next_action: Select next roadmap slice
   blocked_reason: null
@@ -55,6 +55,18 @@ laps:
         title: VS Code companion scaffold
         status: done
         weight: 2
+  - id: lap-5
+    title: External adapter core
+    status: done
+    checkpoints:
+      - id: cp-7
+        title: Generic plan import adapter
+        status: done
+        weight: 3
+      - id: cp-8
+        title: Adapter mapping docs
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -84,6 +96,16 @@ tasks:
   - id: task-006
     title: Scaffold VS Code companion
     checkpoint_id: cp-6
+    status: done
+    owner: codex
+  - id: task-007
+    title: Build generic plan import adapter
+    checkpoint_id: cp-7
+    status: done
+    owner: codex
+  - id: task-008
+    title: Document external source mapping rules
+    checkpoint_id: cp-8
     status: done
     owner: codex
 flags: []
@@ -133,3 +155,23 @@ events:
     actor: codex
     timestamp: 2026-04-06T15:07:01.934Z
     summary: Completed Scaffold VS Code companion
+  - id: evt-2026-04-09T10:15:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-09T10:15:00+09:00
+    summary: Selected TRK-032 Generic plan import adapter as the next active slice
+  - id: evt-2026-04-09T10:54:55.833Z-q2rjkq
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-09T10:54:55.833Z
+    summary: Completed Build generic plan import adapter
+  - id: evt-2026-04-09T10:54:55.886Z-fbt4vi
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-09T10:54:55.886Z
+    summary: Completed Document external source mapping rules
+  - id: evt-2026-04-09T10:55:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-09T10:55:00+09:00
+    summary: Completed TRK-032 Generic plan import adapter

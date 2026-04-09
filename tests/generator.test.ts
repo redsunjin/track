@@ -12,7 +12,7 @@ test("generateTrackMap derives segment types from roadmap difficulty", async () 
   const state = await loadTrackState(root, ".track/state.yaml");
   const segments = generateTrackMap(roadmap, state);
 
-  assert.equal(segments.length, 6);
+  assert.equal(segments.length, 8);
   assert.equal(segments[0]?.type, "sprint");
   assert.equal(segments[2]?.type, "climb");
   assert.equal(segments[2]?.progressState, "done");
@@ -20,6 +20,9 @@ test("generateTrackMap derives segment types from roadmap difficulty", async () 
   assert.equal(segments[3]?.progressState, "done");
   assert.equal(segments[4]?.progressState, "done");
   assert.equal(segments[5]?.progressState, "done");
+  assert.equal(segments[6]?.type, "chicane");
+  assert.equal(segments[6]?.progressState, "done");
+  assert.equal(segments[7]?.progressState, "done");
 });
 
 test("renderTrackMap prints a roadmap-derived course overview", async () => {
@@ -32,4 +35,5 @@ test("renderTrackMap prints a roadmap-derived course overview", async () => {
   assert.match(output, /COURSE/);
   assert.match(output, /MCP contract/);
   assert.match(output, /Claude\/Codex\/Gemini command adapters/);
+  assert.match(output, /Generic plan import adapter/);
 });

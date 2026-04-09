@@ -81,6 +81,7 @@ Current evaluator set:
 - `npm run status`
 - `npm run map`
 - `npm run companion`
+- `npm run import -- --source examples/external-plan.example.yaml --dry-run --json`
 - `npm run pitwall -- --root /Users/Agent/ps-workspace`
 - `node --import tsx ./src/cli.ts pitwall --root /Users/Agent/ps-workspace --detail track`
 
@@ -151,6 +152,7 @@ Current gates:
 - tests pass
 - core terminal views still render
 - state mutation flows still work
+- generic import projection still dry-runs cleanly
 - active slice has a worksheet
 
 ### Layer 4. Observability
@@ -203,7 +205,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-004-vscode-companion.md](./worksheets/HW-004-vscode-companion.md)
+- none selected
+
+Last completed worksheet:
+
+- [HW-005-generic-plan-import.md](./worksheets/HW-005-generic-plan-import.md)
 
 ## Adoption Rules
 

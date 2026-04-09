@@ -155,6 +155,42 @@ export interface TrackRoadmapFile {
   };
 }
 
+export interface ExternalPlanCheckpoint extends RoadmapCheckpoint {
+  owner?: string | null;
+  status?: TrackStatus;
+  weight?: number;
+}
+
+export interface ExternalPlanPhase extends RoadmapPhase {
+  status?: TrackStatus;
+  checkpoints?: ExternalPlanCheckpoint[];
+}
+
+export interface ExternalPlanTask extends Task {
+  checkpoint_id: string;
+}
+
+export interface ExternalPlanFile {
+  version: number;
+  project: ProjectInfo;
+  plan: {
+    id?: string;
+    title?: string;
+    topology?: string;
+    phases: ExternalPlanPhase[];
+  };
+  source?: {
+    kind?: string;
+    name?: string;
+  };
+  tasks?: ExternalPlanTask[];
+}
+
+export interface ProjectExternalPlanResult {
+  roadmap: TrackRoadmapFile;
+  state: TrackStateFile;
+}
+
 export type SegmentType =
   | "straight"
   | "sprint"

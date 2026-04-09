@@ -5,6 +5,7 @@ import process from "node:process";
 import { applyTrackMutation } from "./actions.js";
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
+import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
 import {
@@ -34,7 +35,12 @@ async function main(): Promise<void> {
   const intervalMs = parseInterval(readFlag(args, "--interval"));
   const color = readColorPreference(args);
   const allowWrite = args.includes("--allow-write");
+  const dryRun = args.includes("--dry-run");
   const json = args.includes("--json");
+  const preserveProgress = !args.includes("--reset-progress");
+  const sourceFile = readFlag(args, "--source");
+  const stateOutFile = readFlag(args, "--state-out");
+  const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
 
   if (command === "mcp") {
@@ -161,6 +167,28 @@ async function main(): Promise<void> {
       return;
     }
     process.stdout.write(`${renderTrackMap(roadmap.project.name, segments, { color })}\n`);
+    return;
+  }
+
+  if (command === "import") {
+    const existingState = preserveProgress ? await loadTrackState(process.cwd(), file).catch(() => undefined) : undefined;
+    const result = await importExternalPlan({
+      cwd: process.cwd(),
+      dryRun,
+      existingState,
+      preserveProgress,
+      roadmapOutFile,
+      sourceFile,
+      stateOutFile,
+    });
+
+    if (json) {
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      return;
+    }
+
+    process.stdout.write(`${summarizeExternalPlanImport(result)}\n`);
+    process.stdout.write(`${renderStatus(summarizeTrack(result.state), { color })}\n`);
     return;
   }
 

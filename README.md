@@ -31,6 +31,7 @@ V1 is a plugin-first architecture:
 - read/write MCP surface for agent clients
 - Claude/Codex/Gemini command patterns
 - CLI progress view with ANSI signal mode and `--no-color` fallback
+- generic external plan import path
 - `lab` shorthand that maps to Track and Pitwall terminal surfaces
 - minimal VS Code companion scaffold plus room for a later compact corner widget
 
@@ -61,6 +62,20 @@ Verification:
 - `npm run vscode:build`
 - `npm run vscode:check`
 
+## External plan import
+
+Track now includes a vendor-neutral import core for external planning documents.
+
+Current usage:
+
+- `npm run import -- --source examples/external-plan.example.yaml --dry-run --json`
+- `npm run import -- --source plan.yaml`
+
+Reference:
+
+- [docs/external-adapters.md](docs/external-adapters.md)
+- [examples/external-plan.example.yaml](examples/external-plan.example.yaml)
+
 ## Non-goals for V1
 
 - generic project management replacement
@@ -75,6 +90,7 @@ Verification:
 - Harness guide: [docs/HARNESS_MASTER_GUIDE.md](docs/HARNESS_MASTER_GUIDE.md)
 - MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
 - Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
+- External adapters: [docs/external-adapters.md](docs/external-adapters.md)
 - VS Code companion scaffold: [vscode-extension/README.md](vscode-extension/README.md)
 - Pitwall concept: [docs/pitwall-concept.md](docs/pitwall-concept.md)
 - Track generator: [docs/track-generator-method.md](docs/track-generator-method.md)

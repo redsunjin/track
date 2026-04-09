@@ -57,7 +57,7 @@ test("completeTask and advanceCheckpoint move the track forward", async () => {
   const summary = summarizeTrack(advanced.state);
 
   assert.equal(advanced.state.laps?.[0]?.checkpoints?.[2]?.status, "done");
-  assert.equal(advanced.state.track.active_lap, 4);
+  assert.equal(advanced.state.track.active_lap, 5);
   assert.equal(summary.activeCheckpointTitle, "No active checkpoint");
 });
 

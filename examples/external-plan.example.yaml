@@ -1,0 +1,48 @@
+version: 1
+project:
+  id: track
+  name: Track
+  mode: sprint
+
+plan:
+  id: track-v2
+  title: Track plugin v2
+  topology: sprint
+  phases:
+    - id: phase-5
+      title: External adapter core
+      goal: Project external planning sources into Track without vendor lock-in.
+      kind: integration
+      checkpoints:
+        - id: cp-7
+          title: Generic plan import adapter
+          kind: integration
+          weight: 3
+          difficulty:
+            effort: 4
+            uncertainty: 3
+            dependencies: 3
+            coordination: 2
+            risk: 2
+        - id: cp-8
+          title: Adapter mapping docs
+          kind: build
+          weight: 2
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 1
+            coordination: 1
+            risk: 1
+
+tasks:
+  - id: task-007
+    title: Build generic plan import adapter
+    checkpoint_id: cp-7
+    owner: codex
+    status: doing
+  - id: task-008
+    title: Document external source mapping rules
+    checkpoint_id: cp-8
+    owner: codex
+    status: todo

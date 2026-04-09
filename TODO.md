@@ -3,7 +3,6 @@
 ## Active
 
 - no active slice selected
-- next selection should start from the next roadmap version, not reopen the completed VS Code companion scaffold
 
 ## Queued
 
@@ -15,6 +14,16 @@
 - Jira/GitHub/Linear adapters
 
 ## Done
+
+### TRK-032 Generic Plan Import Adapter
+
+- completed:
+  - generic external plan schema
+  - projection into `.track/roadmap.yaml`
+  - projection into `.track/state.yaml`
+  - `track import --source <file>`
+  - example plan and regression coverage
+  - generic adapter contract docs
 
 ### TRK-031 VS Code Companion
 

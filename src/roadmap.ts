@@ -1,6 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 
 import { resolveTrackFilePath } from "./security.js";
 import type { TrackRoadmapFile } from "./types.js";
@@ -38,6 +38,21 @@ export async function loadTrackRoadmap(cwd: string, explicitFile?: string): Prom
 
   validateTrackRoadmap(parsed);
   return parsed;
+}
+
+export async function saveTrackRoadmap(filePath: string, roadmap: TrackRoadmapFile): Promise<void> {
+  const payload = filePath.endsWith(".json") ? `${JSON.stringify(roadmap, null, 2)}\n` : stringify(roadmap);
+  const tempPath = path.join(
+    path.dirname(filePath),
+    `.${path.basename(filePath)}.${Date.now().toString(36)}.${Math.random().toString(36).slice(2, 8)}.tmp`
+  );
+  await mkdir(path.dirname(filePath), { recursive: true });
+  try {
+    await writeFile(tempPath, payload, "utf8");
+    await rename(tempPath, filePath);
+  } finally {
+    await rm(tempPath, { force: true }).catch(() => undefined);
+  }
 }
 
 function validateTrackRoadmap(value: unknown): asserts value is TrackRoadmapFile {

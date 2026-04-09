@@ -1,5 +1,6 @@
 export { applyTrackMutation } from "./actions.js";
 export { renderBuddy } from "./buddy.js";
+export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 export { generateTrackMap, renderTrackMap } from "./generator.js";
 export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServer } from "./mcp.js";
 export {
@@ -27,8 +28,10 @@ export { sanitizeInlineText } from "./security.js";
 export { summarizeTrack } from "./summary.js";
 export type {
   MutationResult,
+  ExternalPlanFile,
   PitwallEntry,
   PitwallMetrics,
+  ProjectExternalPlanResult,
   PitwallOwnerLoad,
   TrackRoadmapFile,
   TrackSegment,
