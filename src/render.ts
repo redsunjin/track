@@ -7,17 +7,18 @@ export function renderStatus(summary: TrackSummary, options?: RenderOptions): st
   const lines = [
     palette.header("TRACK // DRIVER HUD"),
     palette.divider(divider()),
-    `PROJECT  ${sanitizeInlineText(summary.projectName, "unknown")}`,
-    `TITLE    ${sanitizeInlineText(summary.title, "Untitled track")}`,
-    `MODE     ${sanitizeInlineText(summary.mode, "circuit")}`,
-    `FLAG     ${palette.health(summary.health, summary.health.toUpperCase())}`,
+    `SIGNAL   ${palette.health(summary.health, healthSignal(summary.health))}`,
+    `CHECK    ${palette.active(sanitizeInlineText(summary.activeCheckpointTitle, "No active checkpoint"))}`,
+    `NEXT     ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`,
+    `CREW     ${palette.info(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"))}`,
     `LAP      ${palette.active(sanitizeInlineText(summary.activeLapLabel, "No laps defined"))}`,
-    `CP       ${palette.active(sanitizeInlineText(summary.activeCheckpointTitle, "No active checkpoint"))}`,
     `BAR      ${progressBar(summary.percentComplete, summary.health, palette)} ${palette.label(
       padLeft(`${summary.percentComplete}%`, 4)
     )}`,
-    `OWNER    ${palette.info(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"))}`,
-    `NEXT     ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`,
+    palette.divider(divider()),
+    `PROJECT  ${sanitizeInlineText(summary.projectName, "unknown")}`,
+    `TITLE    ${sanitizeInlineText(summary.title, "Untitled track")}`,
+    `MODE     ${sanitizeInlineText(summary.mode, "circuit")}`,
   ];
 
   if (summary.blockedReason) {
@@ -48,9 +49,10 @@ export function renderNext(summary: TrackSummary, options?: RenderOptions): stri
   const lines = [
     palette.header("TRACK // NEXT MOVE"),
     palette.divider(divider()),
-    `FLAG     ${palette.health(summary.health, summary.health.toUpperCase())}`,
-    `CP       ${palette.active(sanitizeInlineText(summary.activeCheckpointTitle, "No active checkpoint"))}`,
-    `OWNER    ${palette.info(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"))}`,
+    `SIGNAL   ${palette.health(summary.health, healthSignal(summary.health))}`,
+    `CHECK    ${palette.active(sanitizeInlineText(summary.activeCheckpointTitle, "No active checkpoint"))}`,
+    `CREW     ${palette.info(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"))}`,
+    `LAP      ${palette.active(sanitizeInlineText(summary.activeLapLabel, "No laps defined"))}`,
     `NEXT     ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`,
   ];
 
@@ -63,6 +65,16 @@ export function renderNext(summary: TrackSummary, options?: RenderOptions): stri
 
 function divider(): string {
   return "------------------------------------------------------------";
+}
+
+function healthSignal(health: TrackSummary["health"]): string {
+  if (health === "red") {
+    return "RED FLAG";
+  }
+  if (health === "yellow") {
+    return "YELLOW FLAG";
+  }
+  return "GREEN FLAG";
 }
 
 function progressBar(percent: number, health: TrackSummary["health"], palette: ReturnType<typeof createPalette>): string {

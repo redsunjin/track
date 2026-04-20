@@ -8,6 +8,7 @@
   },
   "scripts": {
     "buddy": "node --import tsx ./src/cli.ts buddy",
+    "check:harness": "node --import tsx ./src/cli.ts check:harness",
     "companion": "node --import tsx ./src/cli.ts companion",
     "import": "node --import tsx ./src/cli.ts import",
     "lab": "node --import tsx ./src/cli.ts lab",

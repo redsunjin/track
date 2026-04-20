@@ -63,9 +63,9 @@ export function renderPitwall(root: string, entries: PitwallEntry[], options?: R
     palette.header("Pitwall // Race Control"),
     palette.divider(divider()),
     `ROOT     ${sanitizeInlineText(root, ".")}`,
-    `SUMMARY  P:${active}  R:${palette.danger(String(red))}  Y:${palette.caution(String(yellow))}  G:${palette.success(
-      String(green)
-    )}  B:${blocked}`,
+    `BOARD    ACTIVE ${active}  BLOCKED ${blocked}  RED ${palette.danger(String(red))}  YELLOW ${palette.caution(
+      String(yellow)
+    )}  GREEN ${palette.success(String(green))}`,
     palette.divider(divider()),
   ];
 
@@ -74,7 +74,8 @@ export function renderPitwall(root: string, entries: PitwallEntry[], options?: R
     return lines.join("\n");
   }
 
-  lines.push(palette.header("FLAG   PROJECT            BAR                    OWNER        CHECKPOINT"));
+  lines.push(palette.header("RACE BOARD"));
+  lines.push(palette.header("FLAG    PROJECT            BAR                %     CHECKPOINT"));
   lines.push(palette.divider(divider()));
 
   for (const entry of entries) {
@@ -84,20 +85,26 @@ export function renderPitwall(root: string, entries: PitwallEntry[], options?: R
     const age = formatAge(metrics.updateAgeMinutes);
     const pace = formatPace(metrics.paceDeltaPercent);
     lines.push(
-      `${palette.health(summary.health, pad(flagCode(summary.health), 6))} ${pad(sanitizeInlineText(name, "unknown"), 18)} ${padVisible(
+      `${palette.health(summary.health, pad(boardFlag(summary.health), 7))} ${pad(sanitizeInlineText(name, "unknown"), 18)} ${padVisible(
         progressBar(summary.percentComplete, summary.health, palette),
-        22
-      )} ${palette.info(pad(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"), 12))} ${highlightCheckpoint(
+        18
+      )} ${palette.label(padLeft(`${summary.percentComplete}%`, 5))}  ${highlightCheckpoint(
         summary.health,
         summary.activeCheckpointTitle,
         palette
       )}`
     );
-    lines.push(`  LAP    ${palette.active(sanitizeInlineText(summary.activeLapLabel, "No laps defined"))}`);
     lines.push(
-      `  AGE    ${colorAge(metrics.staleState, age, palette)}  PACE  ${colorPace(metrics.paceDeltaPercent, pace, palette)}`
+      `  CREW   ${palette.info(pad(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"), 12))}  LAP   ${palette.active(
+        sanitizeInlineText(summary.activeLapLabel, "No laps defined")
+      )}`
     );
-    lines.push(`  NEXT   ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`);
+    lines.push(
+      `  NEXT   ${palette.label(sanitizeInlineText(summary.nextAction, "No next action recorded"))}`
+    );
+    lines.push(
+      `  CLOCK  ${colorAge(metrics.staleState, age, palette)}  PACE  ${colorPace(metrics.paceDeltaPercent, pace, palette)}`
+    );
     if (summary.blockedReason) {
       lines.push(`  BLOCK  ${palette.danger(sanitizeInlineText(summary.blockedReason))}`);
     }
@@ -214,16 +221,16 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
     palette.divider(divider()),
     `PROJECT  ${sanitizeInlineText(repoName, "unknown")}`,
     `PATH     ${sanitizeInlineText(detail.repoPath, ".")}`,
-    `FLAG     ${palette.health(detail.summary.health, detail.summary.health.toUpperCase())}`,
+    `SIGNAL   ${palette.health(detail.summary.health, controlSignal(detail.summary.health))}`,
+    `CHECK    ${palette.active(sanitizeInlineText(detail.summary.activeCheckpointTitle, "No active checkpoint"))}`,
+    `NEXT     ${palette.label(sanitizeInlineText(detail.summary.nextAction, "No next action recorded"))}`,
+    `CREW     ${palette.info(sanitizeInlineText(detail.summary.currentOwner ?? "unassigned", "unassigned"))}`,
     `LAP      ${palette.active(sanitizeInlineText(detail.summary.activeLapLabel, "No laps defined"))}`,
-    `CP       ${palette.active(sanitizeInlineText(detail.summary.activeCheckpointTitle, "No active checkpoint"))}`,
     `BAR      ${progressBar(detail.summary.percentComplete, detail.summary.health, palette)} ${palette.label(
       padLeft(`${detail.summary.percentComplete}%`, 4)
     )}`,
-    `OWNER    ${palette.info(sanitizeInlineText(detail.summary.currentOwner ?? "unassigned", "unassigned"))}`,
     `AGE      ${colorAge(metrics.staleState, formatAge(metrics.updateAgeMinutes), palette)}`,
     `PACE     ${colorPace(metrics.paceDeltaPercent, formatPace(metrics.paceDeltaPercent), palette)}`,
-    `NEXT     ${palette.label(sanitizeInlineText(detail.summary.nextAction, "No next action recorded"))}`,
   ];
 
   if (detail.summary.blockedReason) {
@@ -232,13 +239,14 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
 
   if (detail.segments?.length) {
     lines.push(palette.divider(divider()));
+    lines.push(palette.header("COURSE // RACE LINE"));
     lines.push(`COURSE   ${detail.segments.map((segment) => renderSegmentGlyph(segment, palette)).join(palette.divider("-"))}`);
   }
 
   const activeTasks = (detail.state.tasks ?? []).filter((task) => task.status !== "done");
   if (activeTasks.length) {
     lines.push(palette.divider(divider()));
-    lines.push(palette.header("TASKS"));
+    lines.push(palette.header("TASKS // WORK BOARD"));
     for (const task of activeTasks) {
       lines.push(
         `${palette.status(task.status, pad(task.status.toUpperCase(), 8))} ${pad(
@@ -254,7 +262,7 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
 
   if (detail.summary.openFlags.length) {
     lines.push(palette.divider(divider()));
-    lines.push(palette.header("FLAGS"));
+    lines.push(palette.header("FLAGS // SIGNAL BANK"));
     for (const flag of detail.summary.openFlags) {
       lines.push(
         `${palette.health(flag.level, pad(flag.level.toUpperCase(), 8))} ${sanitizeInlineText(
@@ -267,7 +275,7 @@ export function renderPitwallDetail(detail: PitwallDetail, options?: RenderOptio
 
   if (detail.summary.recentEvents.length) {
     lines.push(palette.divider(divider()));
-    lines.push(palette.header("RECENT"));
+    lines.push(palette.header("RECENT // RACE LOG"));
     for (const event of detail.summary.recentEvents) {
       lines.push(`> ${palette.muted(sanitizeInlineText(event.summary, "Event"))}`);
     }
@@ -434,6 +442,26 @@ function flagCode(health: string): string {
     return "YEL";
   }
   return "GRN";
+}
+
+function boardFlag(health: string): string {
+  if (health === "red") {
+    return "RED";
+  }
+  if (health === "yellow") {
+    return "YELLOW";
+  }
+  return "GREEN";
+}
+
+function controlSignal(health: string): string {
+  if (health === "red") {
+    return "RED FLAG";
+  }
+  if (health === "yellow") {
+    return "YELLOW FLAG";
+  }
+  return "GREEN FLAG";
 }
 
 function progressBar(percent: number, health: TrackHealth, palette: ReturnType<typeof createPalette>): string {

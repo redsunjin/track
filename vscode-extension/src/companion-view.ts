@@ -45,6 +45,15 @@ export function renderCompanionDocument(
   const statePath = escapeHtml(options?.statePath ?? ".track/state.yaml");
   const errorMessage = options?.errorMessage ? escapeHtml(options.errorMessage) : "";
   const barValue = snapshot ? `${snapshot.percentComplete}%` : "0%";
+  const progressDigits = String(snapshot?.percentComplete ?? 0).padStart(3, "0");
+  const telemetryStrip = escapeHtml(buildTrackStrip(snapshot?.percentComplete ?? 0));
+  const checkpointTitle = escapeHtml(snapshot?.activeCheckpointTitle ?? "No active checkpoint");
+  const nextAction = escapeHtml(snapshot?.nextAction ?? "No next action recorded");
+  const owner = escapeHtml(snapshot?.currentOwner ?? "unassigned");
+  const lap = escapeHtml(snapshot?.activeLapLabel ?? "No laps defined");
+  const blocker = escapeHtml(snapshot?.blockedReason ?? "clear");
+  const signalLabel = escapeHtml(snapshot ? healthSignal(snapshot.health) : "Offline");
+  const signalClass = snapshot ? `signal-${snapshot.health}` : "signal-offline";
 
   return `<!doctype html>
 <html lang="en">
@@ -54,16 +63,20 @@ export function renderCompanionDocument(
     <title>${escapeHtml(title)}</title>
     <style>
       :root {
-        --bg: #0f1117;
-        --panel: #171a23;
-        --border: #343a4f;
-        --text: #f1f5ff;
-        --muted: #9ea9c7;
-        --green: #6af19b;
-        --yellow: #ffd84d;
-        --red: #ff6c6c;
-        --cyan: #66d7ff;
-        --blue: #74a9ff;
+        --bg: #070b14;
+        --panel: rgba(8, 13, 26, 0.92);
+        --panel-2: rgba(11, 18, 34, 0.88);
+        --border: rgba(111, 205, 255, 0.22);
+        --border-strong: rgba(255, 191, 79, 0.35);
+        --text: #edf4ff;
+        --muted: #8fa3c8;
+        --green: #63f3a6;
+        --yellow: #ffd35c;
+        --red: #ff6f7d;
+        --cyan: #66dcff;
+        --amber: #ffb84d;
+        --grid: rgba(102, 220, 255, 0.07);
+        --shadow: rgba(0, 0, 0, 0.34);
       }
 
       * {
@@ -74,55 +87,100 @@ export function renderCompanionDocument(
         margin: 0;
         min-height: 100vh;
         background:
-          linear-gradient(180deg, rgba(102, 215, 255, 0.08), transparent 35%),
-          radial-gradient(circle at top right, rgba(116, 169, 255, 0.14), transparent 28%),
+          linear-gradient(180deg, rgba(102, 220, 255, 0.1), transparent 24%),
+          radial-gradient(circle at top right, rgba(255, 184, 77, 0.14), transparent 24%),
+          linear-gradient(90deg, transparent 0 8%, rgba(102, 220, 255, 0.05) 8% 8.2%, transparent 8.2% 100%),
           var(--bg);
         color: var(--text);
-        font: 13px/1.5 "Courier New", monospace;
+        font: 13px/1.55 "SFMono-Regular", "IBM Plex Mono", "Cascadia Code", monospace;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(transparent 0 92%, rgba(255, 255, 255, 0.028) 92% 100%),
+          linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 72px),
+          linear-gradient(var(--grid) 0 1px, transparent 1px 54px);
+        background-size: 100% 6px, 72px 100%, 100% 54px;
+        opacity: 0.34;
       }
 
       .shell {
-        max-width: 880px;
+        max-width: 1080px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 24px;
       }
 
       .panel {
+        position: relative;
+        overflow: hidden;
         border: 1px solid var(--border);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 22%), var(--panel);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 18%),
+          linear-gradient(135deg, rgba(255, 184, 77, 0.06), transparent 26%),
+          var(--panel);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.06),
+          0 28px 60px var(--shadow);
+      }
+
+      .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(180deg, rgba(102, 220, 255, 0.08), transparent 38%),
+          linear-gradient(0deg, rgba(255, 184, 77, 0.05), transparent 22%);
       }
 
       .header {
         display: flex;
         justify-content: space-between;
         gap: 16px;
-        padding: 16px 18px;
-        border-bottom: 1px solid var(--border);
+        align-items: flex-start;
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid rgba(102, 220, 255, 0.14);
+        position: relative;
+        z-index: 1;
       }
 
       .eyebrow,
       .meta-label {
         color: var(--muted);
         font-size: 11px;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
       }
 
       .title {
         margin-top: 4px;
-        font-size: 20px;
+        font-size: 24px;
         font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .subtitle {
+        margin-top: 10px;
+        color: var(--muted);
+        max-width: 44ch;
       }
 
       .pill {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 10px;
+        padding: 10px 12px;
         border: 1px solid var(--border);
         color: ${snapshot ? healthColor(snapshot.health) : "var(--muted)"};
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.04);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 700;
       }
 
       .pill::before {
@@ -130,36 +188,127 @@ export function renderCompanionDocument(
         width: 10px;
         height: 10px;
         background: currentColor;
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 14px currentColor;
       }
 
-      .grid {
+      .hero {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        padding: 16px 18px 0;
+        grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.95fr);
+        gap: 18px;
+        padding: 20px 22px 0;
+        position: relative;
+        z-index: 1;
       }
 
-      .card {
-        padding: 12px;
+      .hero-main,
+      .telemetry-bank,
+      .events,
+      .footer {
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-main {
+        padding: 18px;
         border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.02);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 24%),
+          var(--panel-2);
       }
 
-      .card-value {
-        margin-top: 6px;
+      .hero-topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: baseline;
+      }
+
+      .project-chip {
+        color: var(--amber);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .checkpoint-display {
+        margin-top: 18px;
+      }
+
+      .checkpoint-display .meta-label {
+        color: var(--cyan);
+      }
+
+      .checkpoint-title {
+        margin-top: 10px;
+        font-size: clamp(24px, 3.2vw, 40px);
+        line-height: 1.08;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        text-wrap: balance;
+      }
+
+      .next-line {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(102, 220, 255, 0.16);
+      }
+
+      .next-value {
+        margin-top: 8px;
+        color: var(--amber);
         font-size: 16px;
       }
 
-      .bar-shell {
-        padding: 16px 18px 0;
+      .progress-rack {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: end;
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(102, 220, 255, 0.16);
+      }
+
+      .rack-display {
+        text-align: right;
+      }
+
+      .rack-label {
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 11px;
+      }
+
+      .rack-value {
+        font-size: clamp(36px, 4vw, 56px);
+        line-height: 0.95;
+        color: var(--amber);
+        text-shadow: 0 0 18px rgba(255, 184, 77, 0.2);
+      }
+
+      .rack-unit {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 14px;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+      }
+
+      .sector-rail {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+        align-items: center;
       }
 
       .bar-track {
         overflow: hidden;
-        height: 16px;
-        border: 1px solid var(--border);
-        background: #0b0d12;
+        height: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 32%),
+          #050910;
       }
 
       .bar-fill {
@@ -168,16 +317,95 @@ export function renderCompanionDocument(
         background:
           repeating-linear-gradient(
             90deg,
-            ${snapshot ? healthColor(snapshot.health) : "var(--blue)"} 0 10px,
-            rgba(255, 255, 255, 0.22) 10px 11px
+            ${snapshot ? healthColor(snapshot.health) : "var(--cyan)"} 0 12px,
+            rgba(255, 255, 255, 0.22) 12px 13px
           );
       }
 
       .track-strip {
         margin-top: 10px;
-        color: ${snapshot ? healthColor(snapshot.health) : "var(--muted)"};
-        letter-spacing: 0.18em;
+        color: var(--cyan);
+        letter-spacing: 0.28em;
         white-space: pre;
+        font-size: 13px;
+      }
+
+      .telemetry-bank {
+        display: grid;
+        gap: 12px;
+      }
+
+      .bank-panel {
+        padding: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .signal-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--border-strong);
+        background:
+          linear-gradient(90deg, rgba(255, 184, 77, 0.09), transparent 60%),
+          rgba(255, 255, 255, 0.03);
+      }
+
+      .signal-banner .meta-label {
+        color: var(--amber);
+      }
+
+      .signal-word {
+        margin-top: 6px;
+        font-size: 19px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .signal-word.signal-green {
+        color: var(--green);
+      }
+
+      .signal-word.signal-yellow {
+        color: var(--yellow);
+      }
+
+      .signal-word.signal-red {
+        color: var(--red);
+      }
+
+      .signal-word.signal-offline {
+        color: var(--muted);
+      }
+
+      .signal-lamps {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .lamp {
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .lamp-value {
+        margin-top: 6px;
+        font-size: 15px;
+        color: var(--text);
+        word-break: break-word;
+      }
+
+      .lower-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.92fr);
+        gap: 18px;
+        padding: 18px 22px 0;
+        position: relative;
+        z-index: 1;
       }
 
       .events,
@@ -186,8 +414,34 @@ export function renderCompanionDocument(
       }
 
       .events {
-        border-top: 1px solid var(--border);
-        margin-top: 16px;
+        border-top: 1px solid rgba(102, 220, 255, 0.14);
+        margin-top: 18px;
+        background: rgba(255, 255, 255, 0.015);
+      }
+
+      .diagnostic-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .diagnostic-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      }
+
+      .diagnostic-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .diagnostic-value {
+        max-width: 60%;
+        text-align: right;
+        color: var(--cyan);
       }
 
       .event-list {
@@ -200,7 +454,7 @@ export function renderCompanionDocument(
         display: flex;
         justify-content: space-between;
         gap: 12px;
-        padding: 8px 0;
+        padding: 10px 0;
         border-top: 1px dashed rgba(255, 255, 255, 0.08);
       }
 
@@ -231,18 +485,36 @@ export function renderCompanionDocument(
         justify-content: space-between;
         gap: 12px;
         color: var(--muted);
-        border-top: 1px solid var(--border);
+        border-top: 1px solid rgba(102, 220, 255, 0.14);
+      }
+
+      @media (max-width: 860px) {
+        .hero,
+        .lower-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
       @media (max-width: 680px) {
-        .grid {
+        .header,
+        .footer,
+        .event-item,
+        .hero-topline,
+        .diagnostic-row,
+        .signal-banner {
+          flex-direction: column;
+        }
+
+        .signal-lamps {
           grid-template-columns: 1fr;
         }
 
-        .header,
-        .footer,
-        .event-item {
-          flex-direction: column;
+        .progress-rack {
+          grid-template-columns: 1fr;
+        }
+
+        .rack-display {
+          text-align: left;
         }
       }
     </style>
@@ -252,8 +524,9 @@ export function renderCompanionDocument(
       <section class="panel">
         <header class="header">
           <div>
-            <div class="eyebrow">Track Companion</div>
+            <div class="eyebrow">Track Companion // Retro Telemetry</div>
             <div class="title">${escapeHtml(snapshot?.title ?? "Track companion unavailable")}</div>
+            <div class="subtitle">Driver HUD signals first. Decorative retro cues only where they improve scan speed.</div>
           </div>
           <div class="pill">${escapeHtml(snapshot ? snapshot.health.toUpperCase() : "OFFLINE")}</div>
         </header>
@@ -262,49 +535,101 @@ export function renderCompanionDocument(
             ? `<div class="alert">${errorMessage}</div>`
             : ""
         }
-        <div class="grid">
-          <article class="card">
-            <div class="meta-label">Project</div>
-            <div class="card-value">${escapeHtml(snapshot?.projectName ?? "No workspace folder")}</div>
+        <section class="hero">
+          <article class="hero-main">
+            <div class="hero-topline">
+              <div>
+                <div class="meta-label">Project</div>
+                <div class="project-chip">${escapeHtml(snapshot?.projectName ?? "No workspace folder")}</div>
+              </div>
+              <div class="meta-label">Driver Board</div>
+            </div>
+            <div class="checkpoint-display">
+              <div class="meta-label">Current Checkpoint</div>
+              <div class="checkpoint-title">${checkpointTitle}</div>
+            </div>
+            <div class="next-line">
+              <div class="meta-label">Next Action</div>
+              <div class="next-value">${nextAction}</div>
+            </div>
+            <div class="progress-rack">
+              <div>
+                <div class="meta-label">Sector Rail</div>
+                <div class="bar-track">
+                  <div class="bar-fill"></div>
+                </div>
+                <div class="track-strip">${telemetryStrip}</div>
+              </div>
+              <div class="rack-display">
+                <div class="rack-label">Progress</div>
+                <div class="rack-value">${progressDigits}<span class="rack-unit">%</span></div>
+              </div>
+            </div>
           </article>
-          <article class="card">
-            <div class="meta-label">Owner</div>
-            <div class="card-value">${escapeHtml(snapshot?.currentOwner ?? "unassigned")}</div>
-          </article>
-          <article class="card">
-            <div class="meta-label">Lap</div>
-            <div class="card-value">${escapeHtml(snapshot?.activeLapLabel ?? "No laps defined")}</div>
-          </article>
-          <article class="card">
-            <div class="meta-label">Checkpoint</div>
-            <div class="card-value">${escapeHtml(snapshot?.activeCheckpointTitle ?? "No active checkpoint")}</div>
-          </article>
-          <article class="card">
-            <div class="meta-label">Next Action</div>
-            <div class="card-value">${escapeHtml(snapshot?.nextAction ?? "No next action recorded")}</div>
-          </article>
-          <article class="card">
-            <div class="meta-label">Blocker</div>
-            <div class="card-value">${escapeHtml(snapshot?.blockedReason ?? "clear")}</div>
-          </article>
-        </div>
-        <section class="bar-shell">
-          <div class="meta-label">Progress</div>
-          <div class="bar-track">
-            <div class="bar-fill"></div>
-          </div>
-          <div class="track-strip">${escapeHtml(buildTrackStrip(snapshot?.percentComplete ?? 0))}</div>
+          <aside class="telemetry-bank">
+            <section class="signal-banner">
+              <div>
+                <div class="meta-label">Signal Bank</div>
+                <div class="signal-word ${signalClass}">${signalLabel}</div>
+              </div>
+              <div class="meta-label">Live</div>
+            </section>
+            <section class="bank-panel">
+              <div class="meta-label">Telemetry Lamps</div>
+              <div class="signal-lamps">
+                <article class="lamp">
+                  <div class="meta-label">Owner</div>
+                  <div class="lamp-value">${owner}</div>
+                </article>
+                <article class="lamp">
+                  <div class="meta-label">Lap</div>
+                  <div class="lamp-value">${lap}</div>
+                </article>
+                <article class="lamp">
+                  <div class="meta-label">Blocker</div>
+                  <div class="lamp-value">${blocker}</div>
+                </article>
+                <article class="lamp">
+                  <div class="meta-label">State Path</div>
+                  <div class="lamp-value">${statePath}</div>
+                </article>
+              </div>
+            </section>
+          </aside>
         </section>
-        <section class="events">
-          <div class="meta-label">Recent Events</div>
-          <ul class="event-list">
-            ${renderEvents(snapshot?.recentEvents ?? [])}
-          </ul>
+        <section class="lower-grid">
+          <section class="events bank-panel">
+            <div class="meta-label">Recent Events</div>
+            <ul class="event-list">
+              ${renderEvents(snapshot?.recentEvents ?? [])}
+            </ul>
+          </section>
+          <section class="bank-panel">
+            <div class="meta-label">Telemetry Dossier</div>
+            <div class="diagnostic-list">
+              <div class="diagnostic-row">
+                <span class="meta-label">Workspace</span>
+                <span class="diagnostic-value">${repoRoot}</span>
+              </div>
+              <div class="diagnostic-row">
+                <span class="meta-label">Rendered</span>
+                <span class="diagnostic-value">${generatedAt}</span>
+              </div>
+              <div class="diagnostic-row">
+                <span class="meta-label">Checkpoint</span>
+                <span class="diagnostic-value">${checkpointTitle}</span>
+              </div>
+              <div class="diagnostic-row">
+                <span class="meta-label">Next Move</span>
+                <span class="diagnostic-value">${nextAction}</span>
+              </div>
+            </div>
+          </section>
         </section>
         <footer class="footer">
+          <div>Track Companion</div>
+          <div>Telemetry shell active</div>
           <div>Workspace: ${repoRoot}</div>
-          <div>State: ${statePath}</div>
-          <div>Rendered: ${generatedAt}</div>
         </footer>
       </section>
     </main>
@@ -398,6 +723,16 @@ function buildTrackStrip(percent: number): string {
     }
     return index < filled ? "=" : "-";
   }).join("");
+}
+
+function healthSignal(health: CompanionSnapshot["health"]): string {
+  if (health === "red") {
+    return "Red Flag";
+  }
+  if (health === "yellow") {
+    return "Yellow Flag";
+  }
+  return "Green Flag";
 }
 
 function healthColor(health: CompanionSnapshot["health"]): string {

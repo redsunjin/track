@@ -1,4 +1,9 @@
 export { applyTrackMutation } from "./actions.js";
+export { intermediateToExternalPlan } from "./adapters/bridge.js";
+export { MockRoadmapAdapter } from "./adapters/base.js";
+export { FileRoadmapAdapter } from "./adapters/file-adapter.js";
+export { NotionRoadmapAdapter } from "./adapters/notion-adapter.js";
+export { createRoadmapAdapter, listRoadmapAdapterKinds, normalizeRoadmapAdapterKind, resolveRoadmapAdapterSourcePath } from "./adapters/registry.js";
 export { renderBuddy } from "./buddy.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 export { generateTrackMap, renderTrackMap } from "./generator.js";
@@ -38,3 +43,4 @@ export type {
   TrackStateFile,
   TrackSummary,
 } from "./types.js";
+export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "./adapter-schema.js";

@@ -55,10 +55,18 @@ test("completeTask and advanceCheckpoint move the track forward", async () => {
   const completed = completeTask(started.state, "task-003", "test");
   const advanced = advanceCheckpoint(completed.state, "cp-3", "test");
   const summary = summarizeTrack(advanced.state);
+  const nextLapIndex =
+    advanced.state.laps?.findIndex((lap) => lap.status === "doing" || lap.status === "blocked" || lap.status === "todo") ?? -1;
+  const expectedActiveLap = nextLapIndex >= 0 ? nextLapIndex + 1 : advanced.state.laps?.length;
+  const expectedCheckpointTitle =
+    advanced.state.laps
+      ?.flatMap((lap) => lap.checkpoints ?? [])
+      .find((checkpoint) => checkpoint.status === "doing" || checkpoint.status === "blocked" || checkpoint.status === "todo")
+      ?.title ?? "No active checkpoint";
 
   assert.equal(advanced.state.laps?.[0]?.checkpoints?.[2]?.status, "done");
-  assert.equal(advanced.state.track.active_lap, 5);
-  assert.equal(summary.activeCheckpointTitle, "No active checkpoint");
+  assert.equal(advanced.state.track.active_lap, expectedActiveLap);
+  assert.equal(summary.activeCheckpointTitle, expectedCheckpointTitle);
 });
 
 test("applyEventToState appends the event to the in-memory state", async () => {

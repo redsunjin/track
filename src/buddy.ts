@@ -11,19 +11,18 @@ export function renderBuddy(
 ): string {
   const palette = createPalette(options);
   const mood = buddyMood(summary);
-  const face = buddyFace(mood);
   const rawStrip = roadmap ? generateTrackMap(roadmap, state).map(glyphForBuddy).join("") : fallbackStrip(summary.percentComplete);
 
   const lines = [
     ".----------------------------.",
     `| ${palette.header("TRACK COMPANION")} ${moodTone(palette, mood, pad(mood.toUpperCase(), 10))} |`,
     "|----------------------------|",
-    `| ${moodTone(palette, mood, pad(face, 28))}|`,
-    `| FLAG  ${palette.health(summary.health, pad(summary.health.toUpperCase(), 16))}|`,
-    `| LAP   ${palette.active(pad(trim(sanitizeInlineText(summary.activeLapLabel, "No laps"), 16), 16))}|`,
-    `| CP    ${palette.active(pad(trim(sanitizeInlineText(summary.activeCheckpointTitle, "No checkpoint"), 16), 16))}|`,
-    `| BAR   ${styleBuddyStrip(pad(trim(rawStrip, 16), 16), palette)}|`,
-    `| NEXT  ${palette.label(pad(trim(sanitizeInlineText(summary.nextAction, "No next action"), 16), 16))}|`,
+    `| ${moodTone(palette, mood, pad(`SIGNAL ${healthSignal(summary.health)}`, 28))}|`,
+    `| ${palette.active(pad(`CHECK  ${trim(sanitizeInlineText(summary.activeCheckpointTitle, "No checkpoint"), 21)}`, 28))}|`,
+    `| ${palette.info(pad(`CREW   ${trim(sanitizeInlineText(summary.currentOwner ?? "unassigned", "unassigned"), 21)}`, 28))}|`,
+    `| ${palette.active(pad(`LAP    ${trim(sanitizeInlineText(summary.activeLapLabel, "No laps"), 21)}`, 28))}|`,
+    `| BAR   ${styleBuddyStrip(pad(trim(rawStrip, 22), 22), palette)}|`,
+    `| ${palette.label(pad(`NEXT   ${trim(sanitizeInlineText(summary.nextAction, "No next action"), 21)}`, 28))}|`,
     ".----------------------------.",
   ];
 
@@ -41,19 +40,6 @@ function buddyMood(summary: TrackSummary): "cruise" | "push" | "caution" | "bloc
     return "push";
   }
   return "cruise";
-}
-
-function buddyFace(mood: string): string {
-  switch (mood) {
-    case "blocked":
-      return "x_x  [##]";
-    case "caution":
-      return "o_o  [==]";
-    case "push":
-      return "^_^  [>>]";
-    default:
-      return "-_-  [--]";
-  }
 }
 
 function glyphForBuddy(segment: { type: string; progressState: string }): string {
@@ -85,6 +71,16 @@ function fallbackStrip(percent: number): string {
   const total = 12;
   const filled = Math.round((Math.max(0, Math.min(100, percent)) / 100) * total);
   return `${"=".repeat(filled)}@${"-".repeat(Math.max(0, total - filled - 1))}`;
+}
+
+function healthSignal(health: TrackSummary["health"]): string {
+  if (health === "red") {
+    return "RED FLAG";
+  }
+  if (health === "yellow") {
+    return "YELLOW FLAG";
+  }
+  return "GREEN FLAG";
 }
 
 function moodTone(palette: ReturnType<typeof createPalette>, mood: string, value: string): string {

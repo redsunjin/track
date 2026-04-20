@@ -54,7 +54,9 @@ test("renderPitwall prints a terminal summary", async () => {
   assert.match(output, /Pitwall/);
   assert.match(output, /repo-a/);
   assert.match(output, /Text dashboard/);
-  assert.match(output, /AGE/);
+  assert.match(output, /RACE BOARD/);
+  assert.match(output, /CREW/);
+  assert.match(output, /CLOCK/);
   assert.match(output, /PACE/);
 });
 
@@ -132,9 +134,11 @@ test("renderPitwallDetail prints focused project information", async () => {
 
   assert.match(output, /Pitwall \/\/ Detail/);
   assert.match(output, /PROJECT  repo-a/);
+  assert.match(output, /SIGNAL/);
+  assert.match(output, /CHECK/);
   assert.match(output, /COURSE/);
-  assert.match(output, /TASKS/);
-  assert.match(output, /RECENT/);
+  assert.match(output, /WORK BOARD/);
+  assert.match(output, /RACE LOG/);
   assert.match(output, /AGE/);
   assert.match(output, /PACE/);
 });

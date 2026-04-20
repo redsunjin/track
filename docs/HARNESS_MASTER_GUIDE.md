@@ -47,7 +47,9 @@ Rule:
 These are the current boundary docs:
 
 - [README.md](../README.md)
+- [external-adapters.md](./external-adapters.md)
 - [plugin-architecture.md](./plugin-architecture.md)
+- [retro-telemetry-dashboard-plan.md](./retro-telemetry-dashboard-plan.md)
 - [runtime-feature-matrix.md](./runtime-feature-matrix.md)
 - [pitwall-concept.md](./pitwall-concept.md)
 - [track-generator-method.md](./track-generator-method.md)
@@ -78,6 +80,7 @@ Rule:
 Current evaluator set:
 
 - `npm test`
+- `npm run check:harness`
 - `npm run status`
 - `npm run map`
 - `npm run companion`
@@ -137,7 +140,9 @@ Purpose:
 Artifacts:
 
 - [README.md](../README.md)
+- [external-adapters.md](./external-adapters.md)
 - [plugin-architecture.md](./plugin-architecture.md)
+- [retro-telemetry-dashboard-plan.md](./retro-telemetry-dashboard-plan.md)
 - [runtime-feature-matrix.md](./runtime-feature-matrix.md)
 - [pitwall-concept.md](./pitwall-concept.md)
 
@@ -150,6 +155,7 @@ Purpose:
 Current gates:
 
 - tests pass
+- harness consistency check passes
 - core terminal views still render
 - state mutation flows still work
 - generic import projection still dry-runs cleanly
@@ -190,12 +196,14 @@ Purpose:
 Current approach:
 
 - doc review
+- `npm run check:harness`
 - command verification
 - active-loop hygiene
+- semantic parity checks between `.track/roadmap.yaml` and `.track/state.yaml`
 
 Future candidate:
 
-- `npm run check:harness` or equivalent structural validation
+- event-log and control-plane transition checks for active-slice history
 
 ## Workbook
 
@@ -205,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- none selected
+- [HW-008-external-roadmap-adapters.md](./worksheets/HW-008-external-roadmap-adapters.md)
 
 Last completed worksheet:
 
-- [HW-005-generic-plan-import.md](./worksheets/HW-005-generic-plan-import.md)
+- [HW-007-retro-telemetry-dashboard.md](./worksheets/HW-007-retro-telemetry-dashboard.md)
 
 ## Adoption Rules
 

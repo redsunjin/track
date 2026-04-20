@@ -40,7 +40,7 @@ roadmap:
             risk: 3
             approvals: 2
     - id: phase-2
-      title: MCP adapter
+      title: Agent adapters
       goal: Expose Track state and task actions to Claude Code, Codex, and Gemini CLI.
       kind: integration
       checkpoints:
@@ -105,3 +105,99 @@ roadmap:
             dependencies: 1
             coordination: 1
             risk: 1
+    - id: phase-6
+      title: Harness guardrails
+      goal: Add executable checks that catch control-plane drift before Track surfaces diverge.
+      kind: build
+      checkpoints:
+        - id: cp-9
+          title: Harness consistency check
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 1
+            coordination: 1
+            risk: 1
+    - id: phase-7
+      title: Retro telemetry dashboard pass
+      goal: Turn the existing race telemetry language into a sharper retro dashboard system across Track companion and Pitwall surfaces.
+      kind: ui
+      checkpoints:
+        - id: cp-10
+          title: Dashboard direction audit
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-11
+          title: Companion telemetry shell
+          kind: ui
+          difficulty:
+            effort: 4
+            uncertainty: 3
+            dependencies: 3
+            coordination: 2
+            risk: 2
+        - id: cp-12
+          title: Pitwall race-board hierarchy
+          kind: ui
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+        - id: cp-13
+          title: Terminal telemetry alignment
+          kind: ui
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+    - id: phase-8
+      title: External roadmap adapters
+      goal: Normalize external planning sources through adapter contracts and provider-ready baselines without replacing Track's local runtime model.
+      kind: integration
+      checkpoints:
+        - id: cp-14
+          title: Intermediate adapter schema
+          kind: build
+          difficulty:
+            effort: 3
+            uncertainty: 3
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-15
+          title: Adapter-backed file import bridge
+          kind: integration
+          difficulty:
+            effort: 4
+            uncertainty: 3
+            dependencies: 3
+            coordination: 2
+            risk: 2
+        - id: cp-16
+          title: Adapter contract docs and fixtures
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-17
+          title: Source-specific adapter entry points
+          kind: integration
+          difficulty:
+            effort: 4
+            uncertainty: 4
+            dependencies: 3
+            coordination: 3
+            risk: 3

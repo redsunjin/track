@@ -8,12 +8,12 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 5
-  active_lap: 5
+  total_laps: 8
+  active_lap: 8
   health: green
-  next_action: Select next roadmap slice
+  next_action: Add GitHub/Jira/Linear adapter registry hooks
   blocked_reason: null
-  percent_complete: 100
+  percent_complete: 96
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -67,6 +67,54 @@ laps:
         title: Adapter mapping docs
         status: done
         weight: 2
+  - id: lap-6
+    title: Harness guardrails
+    status: done
+    checkpoints:
+      - id: cp-9
+        title: Harness consistency check
+        status: done
+        weight: 2
+  - id: lap-7
+    title: Retro telemetry dashboard pass
+    status: done
+    checkpoints:
+      - id: cp-10
+        title: Dashboard direction audit
+        status: done
+        weight: 2
+      - id: cp-11
+        title: Companion telemetry shell
+        status: done
+        weight: 3
+      - id: cp-12
+        title: Pitwall race-board hierarchy
+        status: done
+        weight: 2
+      - id: cp-13
+        title: Terminal telemetry alignment
+        status: done
+        weight: 2
+  - id: lap-8
+    title: External roadmap adapters
+    status: doing
+    checkpoints:
+      - id: cp-14
+        title: Intermediate adapter schema
+        status: done
+        weight: 3
+      - id: cp-15
+        title: Adapter-backed file import bridge
+        status: done
+        weight: 3
+      - id: cp-16
+        title: Adapter contract docs and fixtures
+        status: done
+        weight: 2
+      - id: cp-17
+        title: Source-specific adapter entry points
+        status: doing
+        weight: 3
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -107,6 +155,66 @@ tasks:
     title: Document external source mapping rules
     checkpoint_id: cp-8
     status: done
+    owner: codex
+  - id: task-009
+    title: Add check:harness CLI validation
+    checkpoint_id: cp-9
+    status: done
+    owner: codex
+  - id: task-010
+    title: Tighten roadmap/state parity checks
+    checkpoint_id: cp-9
+    status: done
+    owner: codex
+  - id: task-011
+    title: Audit current UI direction and gaps
+    checkpoint_id: cp-10
+    status: done
+    owner: codex
+  - id: task-012
+    title: Draft retro telemetry dashboard plan
+    checkpoint_id: cp-10
+    status: done
+    owner: codex
+  - id: task-013
+    title: Prototype retro telemetry companion shell
+    checkpoint_id: cp-11
+    status: done
+    owner: codex
+  - id: task-014
+    title: Tighten pitwall race-board hierarchy
+    checkpoint_id: cp-12
+    status: done
+    owner: codex
+  - id: task-015
+    title: Align terminal telemetry vocabulary
+    checkpoint_id: cp-13
+    status: done
+    owner: codex
+  - id: task-016
+    title: Define intermediate roadmap adapter schema
+    checkpoint_id: cp-14
+    status: done
+    owner: codex
+  - id: task-017
+    title: Route file import through roadmap adapters
+    checkpoint_id: cp-15
+    status: done
+    owner: codex
+  - id: task-018
+    title: Document adapter bridge and fixture contracts
+    checkpoint_id: cp-16
+    status: done
+    owner: codex
+  - id: task-019
+    title: Define first provider-specific adapter entry point
+    checkpoint_id: cp-17
+    status: done
+    owner: codex
+  - id: task-020
+    title: Add GitHub/Jira/Linear adapter registry hooks
+    checkpoint_id: cp-17
+    status: todo
     owner: codex
 flags: []
 events:
@@ -175,3 +283,83 @@ events:
     actor: codex
     timestamp: 2026-04-09T10:55:00+09:00
     summary: Completed TRK-032 Generic plan import adapter
+  - id: evt-2026-04-17T09:15:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-17T09:15:00+09:00
+    summary: Selected TRK-033 Harness guardrails as the next active slice
+  - id: evt-2026-04-17T09:45:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-17T09:45:00+09:00
+    summary: Completed Add check:harness CLI validation
+  - id: evt-2026-04-18T10:30:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-18T10:30:00+09:00
+    summary: Completed Tighten roadmap/state parity checks
+  - id: evt-2026-04-19T09:00:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-19T09:00:00+09:00
+    summary: Completed TRK-033 Harness Guardrails
+  - id: evt-2026-04-19T09:10:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-19T09:10:00+09:00
+    summary: Selected TRK-034 Retro Telemetry Dashboard Pass as the next active slice
+  - id: evt-2026-04-19T09:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-19T09:20:00+09:00
+    summary: Completed Audit current UI direction and gaps
+  - id: evt-2026-04-19T09:30:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-19T09:30:00+09:00
+    summary: Completed Draft retro telemetry dashboard plan
+  - id: evt-2026-04-19T10:05:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-19T10:05:00+09:00
+    summary: Completed Prototype retro telemetry companion shell
+  - id: evt-2026-04-19T11:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-19T11:20:00+09:00
+    summary: Completed Tighten pitwall race-board hierarchy
+  - id: evt-2026-04-20T09:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-20T09:10:00+09:00
+    summary: Completed Align terminal telemetry vocabulary
+  - id: evt-2026-04-20T10:00:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-20T10:00:00+09:00
+    summary: Completed TRK-034 Retro Telemetry Dashboard Pass
+  - id: evt-2026-04-20T10:05:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-20T10:05:00+09:00
+    summary: Selected TRK-030 External Roadmap Adapters as the next active slice
+  - id: evt-2026-04-20T10:15:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-20T10:15:00+09:00
+    summary: Completed Define intermediate roadmap adapter schema
+  - id: evt-2026-04-20T10:25:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-20T10:25:00+09:00
+    summary: Completed Route file import through roadmap adapters
+  - id: evt-2026-04-20T10:40:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-20T10:40:00+09:00
+    summary: Completed Document adapter bridge and fixture contracts
+  - id: evt-2026-04-20T11:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-20T11:20:00+09:00
+    summary: Completed Define first provider-specific adapter entry point

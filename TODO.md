@@ -2,18 +2,29 @@
 
 ## Active
 
-- no active slice selected
+- `TRK-030` External Roadmap Adapters
 
 ## Queued
 
 ## Parked
 
-### TRK-030 External Roadmap Adapters
-
-- Notion ingestion
-- Jira/GitHub/Linear adapters
-
 ## Done
+
+### TRK-034 Retro Telemetry Dashboard Pass
+
+- completed:
+  - durable retro telemetry dashboard plan
+  - VS Code companion telemetry shell
+  - pitwall race-board hierarchy
+  - terminal telemetry vocabulary alignment
+
+### TRK-033 Harness Guardrails
+
+- completed:
+  - `npm run check:harness`
+  - active-loop parity across `TODO.md`, `NEXT_SESSION_PLAN.md`, and the official worksheet
+  - semantic parity checks between `.track/roadmap.yaml` and `.track/state.yaml`
+  - harness regression coverage for control-plane and runtime drift
 
 ### TRK-032 Generic Plan Import Adapter
 

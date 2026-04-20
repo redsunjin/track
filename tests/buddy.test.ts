@@ -15,7 +15,8 @@ test("renderBuddy prints a compact companion block", async () => {
   const output = renderBuddy(summary, roadmap, state);
 
   assert.match(output, /TRACK COMPANION/);
-  assert.match(output, /FLAG/);
-  assert.match(output, /CP/);
+  assert.match(output, /SIGNAL/);
+  assert.match(output, /CHECK/);
+  assert.match(output, /CREW/);
   assert.match(output, /BAR/);
 });

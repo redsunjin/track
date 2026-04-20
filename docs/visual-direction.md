@@ -21,6 +21,8 @@ Translate the old racing-game feel into these interface qualities:
 Do not copy old game screens literally.
 Reuse the logic of the presentation, not the exact layout.
 
+For the current surface audit, rollout order, and dashboard-specific design checkpoints, see [retro-telemetry-dashboard-plan.md](./retro-telemetry-dashboard-plan.md).
+
 ## Style principles
 
 ### 1. Pixel discipline

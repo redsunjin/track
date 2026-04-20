@@ -1,30 +1,73 @@
 # External Adapters
 
-`Track` now has a generic import core for external planning files.
+`Track` now routes external roadmap import through an adapter-backed normalization layer.
 
-The rule is:
+The operating rule stays the same:
 
-- external tools can author plans
+- external tools may author plans
 - `Track` projects those plans into local `.track` files
-- `.track` remains the runtime source of truth
+- local `.track` state remains the runtime source of truth
 
-## Current shape
+## Current baseline
 
 CLI surface:
 
 ```bash
 npm run import -- --source examples/external-plan.example.yaml --dry-run --json
+npm run import -- --adapter notion --source examples/notion-roadmap.example.json --dry-run --json
 npm run import -- --source plan.yaml
 ```
 
-Default behavior:
+Current implementation path:
 
-- reads an external YAML or JSON plan file
-- projects phases into `.track/roadmap.yaml`
-- projects tasks and checkpoint state into `.track/state.yaml`
-- preserves matching task progress when an existing local state is available
+1. `track import` resolves the source file
+2. `createRoadmapAdapter()` selects the adapter kind
+3. the selected adapter loads the source payload
+4. the adapter normalizes the input into `IntermediateRoadmapSchema`
+5. `intermediateToExternalPlan()` bridges that schema into the existing external-plan projection
+6. Track projects the result into `.track/roadmap.yaml` and `.track/state.yaml`
 
-## Generic plan schema
+Default adapter:
+
+- `file`
+
+First provider-specific entry point:
+
+- `notion`
+  - fixture-backed import path for Notion-style page/property exports
+
+That keeps the CLI stable while moving future provider logic behind a shared adapter contract.
+
+## Shared adapter contract
+
+Core pieces:
+
+- `src/adapters/base.ts`
+  - defines the `RoadmapAdapter` contract
+- `src/adapter-schema.ts`
+  - defines `IntermediateRoadmapSchema`
+- `src/adapters/bridge.ts`
+  - converts the intermediate schema into the existing `ExternalPlanFile`
+- `src/adapters/file-adapter.ts`
+  - provides the file-backed baseline adapter
+- `src/adapters/notion-adapter.ts`
+  - maps Notion-style page/property fixtures into the shared schema
+- `src/adapters/registry.ts`
+  - resolves adapter kinds and source paths for `track import`
+
+The current file baseline accepts two input shapes:
+
+- the legacy generic external-plan shape
+- the direct intermediate roadmap schema
+
+That means future adapters can either:
+
+- map their source into `IntermediateRoadmapSchema` directly
+- or emit the legacy external-plan shape while migrating toward the shared schema
+
+## Supported file shapes
+
+### 1. Generic external-plan shape
 
 Top-level fields:
 
@@ -60,18 +103,135 @@ tasks:
     status: doing
 ```
 
-Reference file:
+Reference:
 
 - [external-plan.example.yaml](../examples/external-plan.example.yaml)
 
-## Why this exists before Notion/Jira adapters
+### 2. Intermediate roadmap schema
 
-Vendor integrations should be thin.
+Top-level fields:
+
+- `version`
+- `project`
+- `phases`
+- optional `tasks`
+- optional `metadata`
+
+Minimal example:
+
+```yaml
+version: 1
+project:
+  id: adapter-demo
+  name: Adapter Demo
+  mode: sprint
+phases:
+  - id: phase-1
+    title: Source contract
+    checkpoints:
+      - id: cp-1
+        title: Normalize source payload
+tasks:
+  - id: task-1
+    title: Map provider records into checkpoints
+    phase_id: phase-1
+    checkpoint_id: cp-1
+metadata:
+  kind: fixture
+  name: adapter-demo
+  plan_id: adapter-demo-plan
+  plan_title: Adapter Demo Plan
+  topology: sprint
+```
+
+### 3. Notion adapter fixture shape
+
+The first provider-specific entry point uses `--adapter notion` and a Notion-style fixture document.
+
+Minimal example:
+
+```json
+{
+  "version": 1,
+  "project": {
+    "id": "track",
+    "name": "Track",
+    "mode": "sprint"
+  },
+  "database": {
+    "id": "db-track-roadmap",
+    "title": "Track Roadmap"
+  },
+  "plan": {
+    "id": "track-v2",
+    "title": "Track plugin v2",
+    "topology": "sprint"
+  },
+  "pages": [
+    {
+      "id": "page-phase-8",
+      "type": "phase",
+      "properties": {
+        "Phase ID": "phase-8",
+        "Title": "External roadmap adapters"
+      }
+    },
+    {
+      "id": "page-cp-14",
+      "type": "checkpoint",
+      "properties": {
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-14",
+        "Title": "Intermediate adapter schema",
+        "Status": "done"
+      }
+    },
+    {
+      "id": "page-task-16",
+      "type": "task",
+      "properties": {
+        "Task ID": "task-016",
+        "Title": "Define intermediate roadmap adapter schema",
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-14",
+        "Owner": "codex",
+        "Status": "done"
+      }
+    }
+  ]
+}
+```
+
+Reference:
+
+- [notion-roadmap.example.json](../examples/notion-roadmap.example.json)
+
+## Why the adapter layer exists
+
+Vendor integrations should stay thin.
 
 That means:
 
-- Notion should map into the generic plan shape
-- Jira should map into the generic plan shape
-- GitHub or Linear should do the same
+- Notion should normalize into the shared intermediate schema
+- Jira should do the same
+- GitHub or Linear should follow the same contract
 
-If the generic projection is stable first, Track avoids turning every integration into a bespoke state model.
+If the adapter boundary is stable first, Track avoids turning every integration into a bespoke state model.
+
+## Verification
+
+Current regression coverage:
+
+- `tests/external-plan.test.ts`
+- `tests/adapter-base.test.ts`
+- `tests/file-roadmap-adapter.test.ts`
+- `tests/notion-roadmap-adapter.test.ts`
+
+Recommended checks:
+
+```bash
+npm test
+npm run import -- --source examples/external-plan.example.yaml --dry-run --json
+npm run import -- --adapter notion --source examples/notion-roadmap.example.json --dry-run --json
+npm run check:harness
+```

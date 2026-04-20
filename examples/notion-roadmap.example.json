@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "project": {
+    "id": "track",
+    "name": "Track",
+    "mode": "sprint"
+  },
+  "database": {
+    "id": "db-track-roadmap",
+    "title": "Track Roadmap"
+  },
+  "plan": {
+    "id": "track-v2",
+    "title": "Track plugin v2",
+    "topology": "sprint"
+  },
+  "pages": [
+    {
+      "id": "page-phase-8",
+      "type": "phase",
+      "properties": {
+        "Phase ID": "phase-8",
+        "Title": "External roadmap adapters",
+        "Goal": "Normalize external planning sources through adapter contracts and provider-ready baselines without replacing Track's local runtime model.",
+        "Kind": "integration"
+      }
+    },
+    {
+      "id": "page-cp-14",
+      "type": "checkpoint",
+      "properties": {
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-14",
+        "Title": "Intermediate adapter schema",
+        "Kind": "build",
+        "Status": "done",
+        "Weight": 3
+      }
+    },
+    {
+      "id": "page-cp-15",
+      "type": "checkpoint",
+      "properties": {
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-15",
+        "Title": "Adapter-backed file import bridge",
+        "Kind": "integration",
+        "Status": "done",
+        "Weight": 3
+      }
+    },
+    {
+      "id": "page-cp-16",
+      "type": "checkpoint",
+      "properties": {
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-16",
+        "Title": "Adapter contract docs and fixtures",
+        "Kind": "build",
+        "Status": "done",
+        "Weight": 2
+      }
+    },
+    {
+      "id": "page-task-16",
+      "type": "task",
+      "properties": {
+        "Task ID": "task-016",
+        "Title": "Define intermediate roadmap adapter schema",
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-14",
+        "Owner": "codex",
+        "Status": "done"
+      }
+    },
+    {
+      "id": "page-task-17",
+      "type": "task",
+      "properties": {
+        "Task ID": "task-017",
+        "Title": "Route file import through roadmap adapters",
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-15",
+        "Owner": "codex",
+        "Status": "doing"
+      }
+    },
+    {
+      "id": "page-task-18",
+      "type": "task",
+      "properties": {
+        "Task ID": "task-018",
+        "Title": "Document adapter bridge and fixture contracts",
+        "Phase ID": "phase-8",
+        "Checkpoint ID": "cp-16",
+        "Owner": "codex",
+        "Status": "todo"
+      }
+    }
+  ]
+}

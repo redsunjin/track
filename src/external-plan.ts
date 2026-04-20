@@ -1,7 +1,7 @@
-import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { parse } from "yaml";
 
+import { intermediateToExternalPlan } from "./adapters/bridge.js";
+import { createRoadmapAdapter, resolveRoadmapAdapterSourcePath } from "./adapters/registry.js";
 import { resolveTrackFilePath, sanitizeInlineText } from "./security.js";
 import { saveTrackRoadmap } from "./roadmap.js";
 import { saveTrackState } from "./state.js";
@@ -23,14 +23,9 @@ import type {
   TrackStatus,
 } from "./types.js";
 
-const DEFAULT_EXTERNAL_PLAN_CANDIDATES = [
-  path.join("track-plan.yaml"),
-  path.join("track-plan.yml"),
-  path.join("track-plan.json"),
-];
-
 export interface ImportExternalPlanOptions {
   cwd: string;
+  adapterKind?: string;
   dryRun?: boolean;
   existingState?: TrackStateFile;
   preserveProgress?: boolean;
@@ -39,33 +34,28 @@ export interface ImportExternalPlanOptions {
   roadmapOutFile?: string;
 }
 
-export async function resolveExternalPlanPath(cwd: string, explicitFile?: string): Promise<string> {
-  if (explicitFile) {
-    return path.resolve(cwd, explicitFile);
-  }
-
-  for (const candidate of DEFAULT_EXTERNAL_PLAN_CANDIDATES) {
-    const fullPath = path.resolve(cwd, candidate);
-    try {
-      await readFile(fullPath, "utf8");
-      return fullPath;
-    } catch {
-      continue;
-    }
-  }
-
-  throw new Error(
-    `No external Track plan file found. Expected one of: ${DEFAULT_EXTERNAL_PLAN_CANDIDATES.join(", ")}`
-  );
+export async function resolveExternalPlanPath(
+  cwd: string,
+  explicitFile?: string,
+  adapterKind?: string
+): Promise<string> {
+  return resolveRoadmapAdapterSourcePath(cwd, adapterKind, explicitFile);
 }
 
-export async function loadExternalPlan(cwd: string, explicitFile?: string): Promise<ExternalPlanFile> {
-  const filePath = await resolveExternalPlanPath(cwd, explicitFile);
-  const raw = await readFile(filePath, "utf8");
-  const parsed = filePath.endsWith(".json") ? JSON.parse(raw) : parse(raw);
-
-  validateExternalPlan(parsed);
-  return parsed;
+export async function loadExternalPlan(
+  cwd: string,
+  explicitFile?: string,
+  adapterKind?: string
+): Promise<ExternalPlanFile> {
+  const adapter = await createRoadmapAdapter({
+    cwd,
+    adapterKind,
+    sourceFile: explicitFile,
+  });
+  await adapter.fetch();
+  const converted = intermediateToExternalPlan(await adapter.toInternalSchema());
+  validateExternalPlan(converted);
+  return converted;
 }
 
 export function projectExternalPlan(
@@ -128,7 +118,7 @@ export function projectExternalPlan(
 }
 
 export async function importExternalPlan(options: ImportExternalPlanOptions): Promise<ProjectExternalPlanResult> {
-  const plan = await loadExternalPlan(options.cwd, options.sourceFile);
+  const plan = await loadExternalPlan(options.cwd, options.sourceFile, options.adapterKind);
   const result = projectExternalPlan(plan, {
     existingState: options.existingState,
     preserveProgress: options.preserveProgress,

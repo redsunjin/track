@@ -65,10 +65,12 @@ Verification:
 ## External plan import
 
 Track now includes a vendor-neutral import core for external planning documents.
+The current baseline runs through an adapter-backed normalization layer, so future provider-specific sources can plug in without changing Track's local runtime schema.
 
 Current usage:
 
 - `npm run import -- --source examples/external-plan.example.yaml --dry-run --json`
+- `npm run import -- --adapter notion --source examples/notion-roadmap.example.json --dry-run --json`
 - `npm run import -- --source plan.yaml`
 
 Reference:
@@ -93,6 +95,7 @@ Reference:
 - External adapters: [docs/external-adapters.md](docs/external-adapters.md)
 - VS Code companion scaffold: [vscode-extension/README.md](vscode-extension/README.md)
 - Pitwall concept: [docs/pitwall-concept.md](docs/pitwall-concept.md)
+- Retro telemetry dashboard plan: [docs/retro-telemetry-dashboard-plan.md](docs/retro-telemetry-dashboard-plan.md)
 - Track generator: [docs/track-generator-method.md](docs/track-generator-method.md)
 - Runtime requirements: [docs/runtime-feature-matrix.md](docs/runtime-feature-matrix.md)
 - Visual direction: [docs/visual-direction.md](docs/visual-direction.md)

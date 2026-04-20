@@ -5,6 +5,7 @@ import process from "node:process";
 import { applyTrackMutation } from "./actions.js";
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
+import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
@@ -38,6 +39,7 @@ async function main(): Promise<void> {
   const dryRun = args.includes("--dry-run");
   const json = args.includes("--json");
   const preserveProgress = !args.includes("--reset-progress");
+  const adapterKind = readFlag(args, "--adapter");
   const sourceFile = readFlag(args, "--source");
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
@@ -173,6 +175,7 @@ async function main(): Promise<void> {
   if (command === "import") {
     const existingState = preserveProgress ? await loadTrackState(process.cwd(), file).catch(() => undefined) : undefined;
     const result = await importExternalPlan({
+      adapterKind,
       cwd: process.cwd(),
       dryRun,
       existingState,
@@ -189,6 +192,19 @@ async function main(): Promise<void> {
 
     process.stdout.write(`${summarizeExternalPlanImport(result)}\n`);
     process.stdout.write(`${renderStatus(summarizeTrack(result.state), { color })}\n`);
+    return;
+  }
+
+  if (command === "check:harness") {
+    const result = await checkHarnessConsistency(process.cwd());
+    if (json) {
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    } else {
+      process.stdout.write(`${renderHarnessCheck(result)}\n`);
+    }
+    if (!result.ok) {
+      process.exitCode = 1;
+    }
     return;
   }
 
