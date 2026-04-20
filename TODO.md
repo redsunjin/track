@@ -2,13 +2,21 @@
 
 ## Active
 
-- `TRK-036` Installable Agent Packs
+- `TRK-037` MCP Control Snapshot Expansion
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-036 Installable Agent Packs
+
+- completed:
+  - pack export registry
+  - `track pack list`
+  - `track pack export --tool <kind> --out <dir>`
+  - reusable pack bundle manifest and smoke coverage
 
 ### TRK-035 Agent Operating Packs
 

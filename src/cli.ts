@@ -76,9 +76,27 @@ async function main(): Promise<void> {
       method: "tools/call",
       params: { name: "get_track_status", arguments: {} },
     });
-    const pitwallResult = await server.handle({
+    const tasksResult = await server.handle({
       jsonrpc: "2.0",
       id: 4,
+      method: "tools/call",
+      params: { name: "list_track_tasks", arguments: {} },
+    });
+    const nextActionsResult = await server.handle({
+      jsonrpc: "2.0",
+      id: 5,
+      method: "tools/call",
+      params: { name: "get_track_next_actions", arguments: {} },
+    });
+    const controlSnapshotResult = await server.handle({
+      jsonrpc: "2.0",
+      id: 6,
+      method: "tools/call",
+      params: { name: "get_track_control_snapshot", arguments: {} },
+    });
+    const pitwallResult = await server.handle({
+      jsonrpc: "2.0",
+      id: 7,
       method: "tools/call",
       params: { name: "get_pitwall_overview", arguments: { root: root ?? process.cwd() } },
     });
@@ -89,6 +107,9 @@ async function main(): Promise<void> {
           initialized: initialize,
           tools,
           status: statusResult,
+          tasks: tasksResult,
+          nextActions: nextActionsResult,
+          controlSnapshot: controlSnapshotResult,
           pitwall: pitwallResult,
         },
         null,

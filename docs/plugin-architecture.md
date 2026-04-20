@@ -87,6 +87,8 @@ Recommended core tools:
 
 - `get_track_status`
 - `list_track_tasks`
+- `get_track_next_actions`
+- `get_track_control_snapshot`
 - `start_track_task`
 - `complete_track_task`
 - `block_track_task`

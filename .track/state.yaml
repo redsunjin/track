@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 10
-  active_lap: 10
+  total_laps: 11
+  active_lap: 11
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -145,6 +145,22 @@ laps:
         weight: 3
       - id: cp-23
         title: Export smoke and docs integration
+        status: done
+        weight: 2
+  - id: lap-11
+    title: MCP control snapshot expansion
+    status: done
+    checkpoints:
+      - id: cp-24
+        title: Control snapshot helper
+        status: done
+        weight: 2
+      - id: cp-25
+        title: MCP structured control tools
+        status: done
+        weight: 3
+      - id: cp-26
+        title: MCP contract and regression coverage
         status: done
         weight: 2
 tasks:
@@ -286,6 +302,21 @@ tasks:
   - id: task-028
     title: Verify exported agent bundles and docs
     checkpoint_id: cp-23
+    status: done
+    owner: codex
+  - id: task-029
+    title: Build shared control snapshot helper
+    checkpoint_id: cp-24
+    status: done
+    owner: codex
+  - id: task-030
+    title: Add structured MCP control tools
+    checkpoint_id: cp-25
+    status: done
+    owner: codex
+  - id: task-031
+    title: Update MCP contract and regression coverage
+    checkpoint_id: cp-26
     status: done
     owner: codex
 flags: []
@@ -505,3 +536,28 @@ events:
     actor: codex
     timestamp: 2026-04-21T13:30:00+09:00
     summary: Completed TRK-036 Installable Agent Packs
+  - id: evt-2026-04-21T14:00:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-21T14:00:00+09:00
+    summary: Selected TRK-037 MCP Control Snapshot Expansion as the next active slice
+  - id: evt-2026-04-21T14:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T14:10:00+09:00
+    summary: Completed Build shared control snapshot helper
+  - id: evt-2026-04-21T14:25:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T14:25:00+09:00
+    summary: Completed Add structured MCP control tools
+  - id: evt-2026-04-21T14:35:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T14:35:00+09:00
+    summary: Completed Update MCP contract and regression coverage
+  - id: evt-2026-04-21T14:40:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-21T14:40:00+09:00
+    summary: Completed TRK-037 MCP Control Snapshot Expansion

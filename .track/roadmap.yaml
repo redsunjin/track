@@ -265,3 +265,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-11
+      title: MCP control snapshot expansion
+      goal: Expand the Track MCP read surface with structured task-list, next-action, and control-snapshot tools for agent clients.
+      kind: integration
+      checkpoints:
+        - id: cp-24
+          title: Control snapshot helper
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-25
+          title: MCP structured control tools
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 3
+            coordination: 2
+            risk: 2
+        - id: cp-26
+          title: MCP contract and regression coverage
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1

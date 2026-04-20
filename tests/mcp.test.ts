@@ -22,6 +22,9 @@ test("TrackMCPServer initializes, lists tools, and returns track status", async 
   assert.deepEqual(toolNames, [
     "get_track_status",
     "get_track_map",
+    "list_track_tasks",
+    "get_track_next_actions",
+    "get_track_control_snapshot",
     "get_pitwall_overview",
     "get_pitwall_detail",
     "get_pitwall_owner_load",
@@ -51,7 +54,7 @@ test("TrackMCPServer exposes write tools only when allowWrite is enabled", async
   assert.ok(toolNames.includes("advance_track_checkpoint"));
 });
 
-test("TrackMCPServer returns track map and pitwall detail", async () => {
+test("TrackMCPServer returns track map, control snapshot, and pitwall detail", async () => {
   const workspaceRoot = path.resolve("..");
   const server = new TrackMCPServer({
     repoRoot: path.resolve("."),
@@ -66,6 +69,40 @@ test("TrackMCPServer returns track map and pitwall detail", async () => {
   });
   const mapPayload = (mapResult?.result as { structuredContent: { segments: Array<{ label: string }> } }).structuredContent;
   assert.ok(mapPayload.segments.some((segment) => segment.label === "MCP contract"));
+
+  const tasksResult = await server.handle({
+    jsonrpc: "2.0",
+    id: 40,
+    method: "tools/call",
+    params: { name: "list_track_tasks", arguments: {} },
+  });
+  const tasksPayload =
+    (tasksResult?.result as { structuredContent: { tasks: Array<{ id: string; checkpointTitle: string }> } }).structuredContent;
+  assert.ok(tasksPayload.tasks.length > 0);
+  assert.ok(tasksPayload.tasks.some((task) => typeof task.checkpointTitle === "string"));
+
+  const nextActionsResult = await server.handle({
+    jsonrpc: "2.0",
+    id: 41,
+    method: "tools/call",
+    params: { name: "get_track_next_actions", arguments: {} },
+  });
+  const nextActionsPayload =
+    (nextActionsResult?.result as { structuredContent: { next_actions: Array<{ kind: string }> } }).structuredContent;
+  assert.ok(Array.isArray(nextActionsPayload.next_actions));
+
+  const controlSnapshotResult = await server.handle({
+    jsonrpc: "2.0",
+    id: 42,
+    method: "tools/call",
+    params: { name: "get_track_control_snapshot", arguments: {} },
+  });
+  const controlSnapshotPayload =
+    (controlSnapshotResult?.result as {
+      structuredContent: { snapshot: { summary: { projectName: string }; tasks: Array<{ id: string }> } };
+    }).structuredContent;
+  assert.equal(controlSnapshotPayload.snapshot.summary.projectName, "Track");
+  assert.ok(controlSnapshotPayload.snapshot.tasks.length > 0);
 
   const detailResult = await server.handle({
     jsonrpc: "2.0",

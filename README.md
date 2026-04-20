@@ -28,7 +28,7 @@ Claude Code, Codex, and Gemini CLI can execute work, but they do not natively pr
 V1 is a plugin-first architecture:
 
 - file-backed state and event log
-- read/write MCP surface for agent clients
+- read/write MCP surface for agent clients, including structured control snapshots
 - Claude/Codex/Gemini command patterns
 - CLI progress view with ANSI signal mode and `--no-color` fallback
 - generic external plan import path

@@ -2,6 +2,7 @@ import { createInterface } from "node:readline";
 import process from "node:process";
 
 import { applyTrackMutation } from "./actions.js";
+import { buildTrackControlSnapshot, listTrackNextActions, listTrackTasks } from "./control.js";
 import { generateTrackMap } from "./generator.js";
 import { loadPitwallDetail, loadPitwallOwnerLoad, scanPitwall } from "./pitwall.js";
 import { loadTrackRoadmap } from "./roadmap.js";
@@ -44,6 +45,33 @@ export const READ_TOOLS: JSONDict[] = [
     inputSchema: schema({
       repo_path: { type: "string" },
       roadmap_file: { type: "string" },
+      state_file: { type: "string" },
+    }),
+  },
+  {
+    name: "list_track_tasks",
+    title: "List Track tasks",
+    description: "Read-only task list with lap/checkpoint context for the current repo.",
+    inputSchema: schema({
+      repo_path: { type: "string" },
+      state_file: { type: "string" },
+    }),
+  },
+  {
+    name: "get_track_next_actions",
+    title: "Get Track next actions",
+    description: "Read-only prioritized next-action list for the current repo.",
+    inputSchema: schema({
+      repo_path: { type: "string" },
+      state_file: { type: "string" },
+    }),
+  },
+  {
+    name: "get_track_control_snapshot",
+    title: "Get Track control snapshot",
+    description: "Read-only structured control snapshot with summary, active lap/checkpoint, task list, and next actions.",
+    inputSchema: schema({
+      repo_path: { type: "string" },
       state_file: { type: "string" },
     }),
   },
@@ -241,6 +269,36 @@ export class TrackMCPServer {
         repo_path: repoRoot,
         project: roadmap.project,
         segments,
+      } as unknown as JSONDict;
+    }
+
+    if (name === "list_track_tasks") {
+      const repoRoot = await readRepoRoot(argumentsObject, this.repoRoot, this.workspaceRoot);
+      const state = await loadTrackState(repoRoot, readOptionalString(argumentsObject, "state_file"));
+      const tasks = listTrackTasks(state);
+      return {
+        repo_path: repoRoot,
+        tasks,
+      } as unknown as JSONDict;
+    }
+
+    if (name === "get_track_next_actions") {
+      const repoRoot = await readRepoRoot(argumentsObject, this.repoRoot, this.workspaceRoot);
+      const state = await loadTrackState(repoRoot, readOptionalString(argumentsObject, "state_file"));
+      const next_actions = listTrackNextActions(state);
+      return {
+        repo_path: repoRoot,
+        next_actions,
+      } as unknown as JSONDict;
+    }
+
+    if (name === "get_track_control_snapshot") {
+      const repoRoot = await readRepoRoot(argumentsObject, this.repoRoot, this.workspaceRoot);
+      const state = await loadTrackState(repoRoot, readOptionalString(argumentsObject, "state_file"));
+      const snapshot = buildTrackControlSnapshot(state);
+      return {
+        repo_path: repoRoot,
+        snapshot,
       } as unknown as JSONDict;
     }
 

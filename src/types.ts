@@ -85,6 +85,59 @@ export interface TrackSummary {
   recentEvents: TrackEvent[];
 }
 
+export interface TrackTaskView {
+  id: string;
+  title: string;
+  status: TrackStatus;
+  owner: string | null;
+  lapId: string | null;
+  lapTitle: string | null;
+  checkpointId: string | null;
+  checkpointTitle: string | null;
+  blockedReason: string | null;
+  isCurrent: boolean;
+}
+
+export type TrackNextActionKind =
+  | "resolve_blocker"
+  | "continue_task"
+  | "start_task"
+  | "advance_checkpoint"
+  | "plan_next_slice";
+
+export interface TrackNextActionItem {
+  id: string;
+  kind: TrackNextActionKind;
+  title: string;
+  detail: string | null;
+  taskId: string | null;
+  checkpointId: string | null;
+  owner: string | null;
+  priority: TrackHealth;
+}
+
+export interface TrackControlSnapshot {
+  summary: TrackSummary;
+  activeLap: {
+    id: string;
+    title: string;
+    status: TrackStatus;
+    index: number;
+    total: number;
+  } | null;
+  activeCheckpoint: {
+    id: string;
+    title: string;
+    status: TrackStatus;
+    lapId: string | null;
+    lapTitle: string | null;
+  } | null;
+  tasks: TrackTaskView[];
+  nextActions: TrackNextActionItem[];
+  flags: Flag[];
+  recentEvents: TrackEvent[];
+}
+
 export type PitwallStaleState = "fresh" | "aging" | "stale" | "unknown";
 
 export interface PitwallMetrics {

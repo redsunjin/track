@@ -42,6 +42,18 @@ Supported protocol methods:
 
 - roadmap-derived track segments
 
+### `list_track_tasks`
+
+- structured task list with lap and checkpoint context
+
+### `get_track_next_actions`
+
+- prioritized next-action list derived from the current local Track state
+
+### `get_track_control_snapshot`
+
+- one structured control payload with summary, active lap/checkpoint, tasks, next actions, flags, and recent events
+
 ### `get_pitwall_overview`
 
 - workspace-wide Track summaries

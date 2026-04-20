@@ -19,6 +19,9 @@ Common MCP tools:
 
 - `get_track_status`
 - `get_track_map`
+- `list_track_tasks`
+- `get_track_next_actions`
+- `get_track_control_snapshot`
 - `get_pitwall_overview`
 - `get_pitwall_detail`
 - `get_pitwall_owner_load`

@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-010-installable-agent-packs.md](./worksheets/HW-010-installable-agent-packs.md)
+- [HW-011-mcp-control-snapshot-expansion.md](./worksheets/HW-011-mcp-control-snapshot-expansion.md)
 
 Last completed worksheet:
 
-- [HW-009-agent-operating-packs.md](./worksheets/HW-009-agent-operating-packs.md)
+- [HW-010-installable-agent-packs.md](./worksheets/HW-010-installable-agent-packs.md)
 
 ## Adoption Rules
 

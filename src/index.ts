@@ -1,4 +1,5 @@
 export { applyTrackMutation } from "./actions.js";
+export { buildTrackControlSnapshot, listTrackNextActions, listTrackTasks } from "./control.js";
 export {
   exportAgentPack,
   listAgentPackFiles,
@@ -47,6 +48,8 @@ export { summarizeTrack } from "./summary.js";
 export type {
   MutationResult,
   ExternalPlanFile,
+  TrackControlSnapshot,
+  TrackNextActionItem,
   PitwallEntry,
   PitwallMetrics,
   ProjectExternalPlanResult,
@@ -55,5 +58,6 @@ export type {
   TrackSegment,
   TrackStateFile,
   TrackSummary,
+  TrackTaskView,
 } from "./types.js";
 export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "./adapter-schema.js";
