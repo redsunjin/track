@@ -233,3 +233,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-10
+      title: Installable agent packs
+      goal: Turn the repo-local agent operating packs into exportable bundles without creating client-specific Track runtimes.
+      kind: integration
+      checkpoints:
+        - id: cp-21
+          title: Pack export contract
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-22
+          title: CLI pack export path
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-23
+          title: Export smoke and docs integration
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1

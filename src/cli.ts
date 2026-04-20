@@ -3,6 +3,12 @@
 import process from "node:process";
 
 import { applyTrackMutation } from "./actions.js";
+import {
+  exportAgentPack,
+  listAgentPackKinds,
+  normalizeAgentPackKind,
+  summarizeAgentPackExport,
+} from "./agent-packs.js";
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
 import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
@@ -40,6 +46,8 @@ async function main(): Promise<void> {
   const json = args.includes("--json");
   const preserveProgress = !args.includes("--reset-progress");
   const adapterKind = readFlag(args, "--adapter");
+  const packKind = readFlag(args, "--tool");
+  const outDir = readFlag(args, "--out");
   const sourceFile = readFlag(args, "--source");
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
@@ -193,6 +201,42 @@ async function main(): Promise<void> {
     process.stdout.write(`${summarizeExternalPlanImport(result)}\n`);
     process.stdout.write(`${renderStatus(summarizeTrack(result.state), { color })}\n`);
     return;
+  }
+
+  if (command === "pack") {
+    const subcommand = args[1] ?? "list";
+    if (subcommand === "list") {
+      const packs = listAgentPackKinds();
+      if (json) {
+        process.stdout.write(`${JSON.stringify({ packs }, null, 2)}\n`);
+        return;
+      }
+      process.stdout.write(`${packs.join("\n")}\n`);
+      return;
+    }
+
+    if (subcommand === "export") {
+      const normalizedKind = normalizeAgentPackKind(packKind);
+      if (!normalizedKind) {
+        throw new Error("`track pack export` requires `--tool <claude-code|codex|gemini-cli>`.");
+      }
+
+      const result = await exportAgentPack({
+        repoRoot: process.cwd(),
+        kind: normalizedKind,
+        outDir,
+      });
+
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+        return;
+      }
+
+      process.stdout.write(`${summarizeAgentPackExport(result)}\n`);
+      return;
+    }
+
+    throw new Error(`Unknown Track pack command: ${subcommand}`);
   }
 
   if (command === "check:harness") {

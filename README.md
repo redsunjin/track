@@ -34,6 +34,7 @@ V1 is a plugin-first architecture:
 - generic external plan import path
 - `lab` shorthand that maps to Track and Pitwall terminal surfaces
 - minimal VS Code companion scaffold plus room for a later compact corner widget
+- exportable Claude/Codex/Gemini operating-pack bundles
 
 ## Security defaults
 
@@ -80,6 +81,17 @@ Reference:
 
 - [docs/external-adapters.md](docs/external-adapters.md)
 - [examples/external-plan.example.yaml](examples/external-plan.example.yaml)
+
+## Agent pack export
+
+Track can export reusable agent-pack bundles for the supported client surfaces.
+
+Current usage:
+
+- `track pack list`
+- `track pack export --tool claude-code --out ./tmp/track-claude-pack`
+- `track pack export --tool codex --out ./tmp/track-codex-pack`
+- `track pack export --tool gemini-cli --out ./tmp/track-gemini-pack`
 
 ## Non-goals for V1
 

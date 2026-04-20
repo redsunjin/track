@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-009-agent-operating-packs.md](./worksheets/HW-009-agent-operating-packs.md)
+- [HW-010-installable-agent-packs.md](./worksheets/HW-010-installable-agent-packs.md)
 
 Last completed worksheet:
 
-- [HW-008-external-roadmap-adapters.md](./worksheets/HW-008-external-roadmap-adapters.md)
+- [HW-009-agent-operating-packs.md](./worksheets/HW-009-agent-operating-packs.md)
 
 ## Adoption Rules
 

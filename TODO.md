@@ -2,13 +2,21 @@
 
 ## Active
 
-- `TRK-035` Agent Operating Packs
+- `TRK-036` Installable Agent Packs
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-035 Agent Operating Packs
+
+- completed:
+  - shared Track command and MCP contract baseline
+  - Claude Code, Codex, and Gemini CLI pack docs
+  - shared helper scripts for context and mutation flows
+  - cross-tool pack smoke coverage
 
 ### TRK-030 External Roadmap Adapters
 

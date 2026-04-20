@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 9
-  active_lap: 9
+  total_laps: 10
+  active_lap: 10
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -129,6 +129,22 @@ laps:
         weight: 4
       - id: cp-20
         title: Cross-tool smoke and docs integration
+        status: done
+        weight: 2
+  - id: lap-10
+    title: Installable agent packs
+    status: done
+    checkpoints:
+      - id: cp-21
+        title: Pack export contract
+        status: done
+        weight: 2
+      - id: cp-22
+        title: CLI pack export path
+        status: done
+        weight: 3
+      - id: cp-23
+        title: Export smoke and docs integration
         status: done
         weight: 2
 tasks:
@@ -255,6 +271,21 @@ tasks:
   - id: task-025
     title: Integrate cross-tool smoke and docs verification
     checkpoint_id: cp-20
+    status: done
+    owner: codex
+  - id: task-026
+    title: Define installable pack export contract
+    checkpoint_id: cp-21
+    status: done
+    owner: codex
+  - id: task-027
+    title: Wire CLI pack export and bundle layout
+    checkpoint_id: cp-22
+    status: done
+    owner: codex
+  - id: task-028
+    title: Verify exported agent bundles and docs
+    checkpoint_id: cp-23
     status: done
     owner: codex
 flags: []
@@ -449,3 +480,28 @@ events:
     actor: codex
     timestamp: 2026-04-21T10:25:00+09:00
     summary: Completed TRK-035 Agent Operating Packs
+  - id: evt-2026-04-21T12:40:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-21T12:40:00+09:00
+    summary: Selected TRK-036 Installable Agent Packs as the next active slice
+  - id: evt-2026-04-21T12:50:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T12:50:00+09:00
+    summary: Completed Define installable pack export contract
+  - id: evt-2026-04-21T13:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T13:10:00+09:00
+    summary: Completed Wire CLI pack export and bundle layout
+  - id: evt-2026-04-21T13:25:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T13:25:00+09:00
+    summary: Completed Verify exported agent bundles and docs
+  - id: evt-2026-04-21T13:30:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-21T13:30:00+09:00
+    summary: Completed TRK-036 Installable Agent Packs

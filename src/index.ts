@@ -1,4 +1,14 @@
 export { applyTrackMutation } from "./actions.js";
+export {
+  exportAgentPack,
+  listAgentPackFiles,
+  listAgentPackKinds,
+  loadAgentPackManifest,
+  normalizeAgentPackKind,
+  resolveDefaultAgentPackOutDir,
+  summarizeAgentPackExport,
+} from "./agent-packs.js";
+export type { AgentPackExportResult, AgentPackKind } from "./agent-packs.js";
 export { intermediateToExternalPlan } from "./adapters/bridge.js";
 export { MockRoadmapAdapter } from "./adapters/base.js";
 export { FileRoadmapAdapter } from "./adapters/file-adapter.js";

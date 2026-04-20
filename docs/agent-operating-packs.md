@@ -45,6 +45,22 @@ Shared helper scripts live under [agents/shared/bin](../agents/shared/bin).
 
 These are the stable baseline for every client pack.
 
+## Export Path
+
+`Track` can export one reusable pack bundle at a time:
+
+- `track pack list`
+- `track pack export --tool claude-code --out ./tmp/track-claude-pack`
+- `track pack export --tool codex --out ./tmp/track-codex-pack`
+- `track pack export --tool gemini-cli --out ./tmp/track-gemini-pack`
+
+Each export includes:
+
+- `shared/`
+- one tool-specific pack directory
+- `manifest.json`
+- a top-level export `README.md`
+
 ## Client Packs
 
 - [Claude Code](../agents/claude-code/README.md)
