@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 8
-  active_lap: 8
+  total_laps: 9
+  active_lap: 9
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -115,6 +115,22 @@ laps:
         title: Source-specific adapter entry points
         status: done
         weight: 3
+  - id: lap-9
+    title: Agent operating packs
+    status: done
+    checkpoints:
+      - id: cp-18
+        title: Shared operating contract baseline
+        status: done
+        weight: 2
+      - id: cp-19
+        title: Tool-specific operating packs
+        status: done
+        weight: 4
+      - id: cp-20
+        title: Cross-tool smoke and docs integration
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -214,6 +230,31 @@ tasks:
   - id: task-020
     title: Add GitHub/Jira/Linear adapter registry hooks
     checkpoint_id: cp-17
+    status: done
+    owner: codex
+  - id: task-021
+    title: Define shared operating contract baseline
+    checkpoint_id: cp-18
+    status: done
+    owner: codex
+  - id: task-022
+    title: Build Claude Code operating pack
+    checkpoint_id: cp-19
+    status: done
+    owner: codex
+  - id: task-023
+    title: Build Codex operating pack
+    checkpoint_id: cp-19
+    status: done
+    owner: codex
+  - id: task-024
+    title: Build Gemini CLI operating pack
+    checkpoint_id: cp-19
+    status: done
+    owner: codex
+  - id: task-025
+    title: Integrate cross-tool smoke and docs verification
+    checkpoint_id: cp-20
     status: done
     owner: codex
 flags: []
@@ -373,3 +414,38 @@ events:
     actor: codex
     timestamp: 2026-04-20T12:10:00+09:00
     summary: Completed TRK-030 External Roadmap Adapters
+  - id: evt-2026-04-21T09:00:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-21T09:00:00+09:00
+    summary: Selected TRK-035 Agent Operating Packs as the next active slice
+  - id: evt-2026-04-21T09:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T09:10:00+09:00
+    summary: Completed Define shared operating contract baseline
+  - id: evt-2026-04-21T10:00:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T10:00:00+09:00
+    summary: Completed Build Claude Code operating pack
+  - id: evt-2026-04-21T10:00:30+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T10:00:30+09:00
+    summary: Completed Build Codex operating pack
+  - id: evt-2026-04-21T10:01:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T10:01:00+09:00
+    summary: Completed Build Gemini CLI operating pack
+  - id: evt-2026-04-21T10:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T10:20:00+09:00
+    summary: Completed Integrate cross-tool smoke and docs verification
+  - id: evt-2026-04-21T10:25:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-21T10:25:00+09:00
+    summary: Completed TRK-035 Agent Operating Packs

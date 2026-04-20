@@ -2,40 +2,39 @@
 
 ## Active Slice
 
-- id: `TRK-030`
-- title: `External Roadmap Adapters`
+- id: `TRK-035`
+- title: `Agent Operating Packs`
 
 ## Goal
 
-Turn the existing generic import path into an adapter-backed external roadmap baseline that can support future provider-specific sources without changing Track's local runtime model.
+Package the shared Track command and MCP contract into usable Claude Code, Codex, and Gemini CLI operating packs without forking core runtime behavior.
 
 ## First Steps
 
-1. land the intermediate roadmap schema and file adapter baseline as the official `track import` path
-2. keep `notion` as the first fixture-backed provider entry point on top of that shared contract
-3. expand from registry-backed provider hooks instead of jumping straight into network-bound integrations
+1. lock one shared operating contract for command and MCP usage
+2. build thin Claude Code, Codex, and Gemini CLI packs on top of that contract
+3. verify the three packs still point at the same local `.track` runtime
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- keep vendor-specific adapters thin and normalize them into one shared intermediate schema
-- do not add remote auth or write-back flows before the adapter contract is stable
-- keep the existing `track import` CLI shape stable while the implementation moves under adapters
-- treat fixture-backed provider adapters as the proving ground before any live API integration
-- do not reopen the completed retro telemetry slice unless a regression appears
+- keep client packs thin and avoid per-client runtime forks
+- do not add live remote auth or tool-specific state stores
+- keep CLI and MCP semantics aligned across all packs
+- do not reopen completed adapter or telemetry slices unless a regression appears
 
 ## Verification
 
 ```bash
 npm test
 npm run check:harness
-npm run import -- --source examples/external-plan.example.yaml --dry-run --json
 npm run status -- --no-color
+npm run companion -- --no-color
 npm run pitwall -- --root /Users/Agent/ps-workspace --owners --no-color
 ```
 
 ## Exit Condition
 
-- the file-backed adapter path is the documented baseline for `track import`
-- Track has one shared intermediate roadmap schema for future adapters
-- at least one provider-specific adapter entry point works without changing local runtime ownership
+- Claude Code, Codex, and Gemini CLI each have a usable operating pack
+- every pack points at the same shared command and MCP contract
+- Track still reads as one local-first runtime rather than three client-specific systems

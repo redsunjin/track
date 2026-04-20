@@ -2,13 +2,21 @@
 
 ## Active
 
-- `TRK-030` External Roadmap Adapters
+- `TRK-035` Agent Operating Packs
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-030 External Roadmap Adapters
+
+- completed:
+  - adapter-backed import baseline
+  - shared intermediate roadmap schema
+  - fixture-backed notion/github/jira/linear adapter entry points
+  - provider registry hook coverage
 
 ### TRK-034 Retro Telemetry Dashboard Pass
 

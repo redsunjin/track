@@ -96,6 +96,7 @@ Reference:
 - MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
 - Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
 - External adapters: [docs/external-adapters.md](docs/external-adapters.md)
+- Agent operating packs: [docs/agent-operating-packs.md](docs/agent-operating-packs.md)
 - VS Code companion scaffold: [vscode-extension/README.md](vscode-extension/README.md)
 - Pitwall concept: [docs/pitwall-concept.md](docs/pitwall-concept.md)
 - Retro telemetry dashboard plan: [docs/retro-telemetry-dashboard-plan.md](docs/retro-telemetry-dashboard-plan.md)

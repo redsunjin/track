@@ -201,3 +201,35 @@ roadmap:
             dependencies: 3
             coordination: 3
             risk: 3
+    - id: phase-9
+      title: Agent operating packs
+      goal: Package the shared Track command and MCP contract into usable Claude Code, Codex, and Gemini CLI operating packs.
+      kind: integration
+      checkpoints:
+        - id: cp-18
+          title: Shared operating contract baseline
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-19
+          title: Tool-specific operating packs
+          kind: integration
+          difficulty:
+            effort: 4
+            uncertainty: 3
+            dependencies: 3
+            coordination: 3
+            risk: 2
+        - id: cp-20
+          title: Cross-tool smoke and docs integration
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1

@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-008-external-roadmap-adapters.md](./worksheets/HW-008-external-roadmap-adapters.md)
+- [HW-009-agent-operating-packs.md](./worksheets/HW-009-agent-operating-packs.md)
 
 Last completed worksheet:
 
-- [HW-007-retro-telemetry-dashboard.md](./worksheets/HW-007-retro-telemetry-dashboard.md)
+- [HW-008-external-roadmap-adapters.md](./worksheets/HW-008-external-roadmap-adapters.md)
 
 ## Adoption Rules
 
