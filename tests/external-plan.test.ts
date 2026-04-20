@@ -11,6 +11,9 @@ import { loadTrackState } from "../src/state.js";
 const EXTERNAL_PLAN_PATH = path.resolve("examples", "external-plan.example.yaml");
 const EXAMPLE_STATE_PATH = path.resolve("examples", "track-state.example.yaml");
 const NOTION_PLAN_PATH = path.resolve("examples", "notion-roadmap.example.json");
+const GITHUB_PLAN_PATH = path.resolve("examples", "github-roadmap.example.json");
+const JIRA_PLAN_PATH = path.resolve("examples", "jira-roadmap.example.json");
+const LINEAR_PLAN_PATH = path.resolve("examples", "linear-roadmap.example.json");
 
 test("projectExternalPlan creates roadmap and state from an external plan", async () => {
   const externalPlan = await loadExternalPlan(path.resolve("."), EXTERNAL_PLAN_PATH);
@@ -99,6 +102,33 @@ test("loadExternalPlan can use the notion adapter entry point", async () => {
   assert.equal(externalPlan.source?.name, "Track Roadmap");
 });
 
+test("loadExternalPlan can use the github adapter entry point", async () => {
+  const externalPlan = await loadExternalPlan(path.resolve("."), GITHUB_PLAN_PATH, "github");
+
+  assert.equal(externalPlan.plan.phases[0]?.checkpoints?.[0]?.id, "cp-17a");
+  assert.equal(externalPlan.tasks?.[0]?.lap_id, "phase-8");
+  assert.equal(externalPlan.source?.kind, "github");
+  assert.equal(externalPlan.source?.name, "openai/track");
+});
+
+test("loadExternalPlan can use the jira adapter entry point", async () => {
+  const externalPlan = await loadExternalPlan(path.resolve("."), JIRA_PLAN_PATH, "jira");
+
+  assert.equal(externalPlan.plan.phases[0]?.checkpoints?.[0]?.id, "cp-17b");
+  assert.equal(externalPlan.tasks?.[0]?.id, "TRK-201");
+  assert.equal(externalPlan.source?.kind, "jira");
+  assert.equal(externalPlan.source?.name, "TRK");
+});
+
+test("loadExternalPlan can use the linear adapter entry point", async () => {
+  const externalPlan = await loadExternalPlan(path.resolve("."), LINEAR_PLAN_PATH, "linear");
+
+  assert.equal(externalPlan.plan.phases[0]?.checkpoints?.[0]?.id, "cp-17c");
+  assert.equal(externalPlan.tasks?.[0]?.status, "blocked");
+  assert.equal(externalPlan.source?.kind, "linear");
+  assert.equal(externalPlan.source?.name, "TRACK");
+});
+
 test("projectExternalPlan preserves matching task progress from the existing Track state", async () => {
   const externalPlan = await loadExternalPlan(path.resolve("."), EXTERNAL_PLAN_PATH);
   const existingState = await loadTrackState(path.resolve("."), ".track/state.yaml");
@@ -173,4 +203,43 @@ test("importExternalPlan accepts provider-specific adapter kinds", async () => {
   assert.equal(result.roadmap.roadmap.phases[0]?.id, "phase-8");
   assert.equal(result.state.track.next_action, "Route file import through roadmap adapters");
   assert.equal(result.state.tasks?.find((task) => task.id === "task-017")?.status, "doing");
+});
+
+test("importExternalPlan accepts github, jira, and linear adapter kinds", async () => {
+  const fixtures = [
+    {
+      kind: "github" as const,
+      filename: "github-roadmap.json",
+      sourcePath: GITHUB_PLAN_PATH,
+      expectedNextAction: "Map GitHub issues into Track tasks",
+    },
+    {
+      kind: "jira" as const,
+      filename: "jira-roadmap.json",
+      sourcePath: JIRA_PLAN_PATH,
+      expectedNextAction: "Normalize Jira epics into Track phases",
+    },
+    {
+      kind: "linear" as const,
+      filename: "linear-roadmap.json",
+      sourcePath: LINEAR_PLAN_PATH,
+      expectedNextAction: "Resolve blocker on Map Linear cycles into Track phases",
+    },
+  ];
+
+  for (const fixture of fixtures) {
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), `track-import-${fixture.kind}-`));
+    await writeFile(path.join(tempDir, fixture.filename), await readFile(fixture.sourcePath, "utf8"), "utf8");
+
+    const result = await importExternalPlan({
+      cwd: tempDir,
+      adapterKind: fixture.kind,
+      preserveProgress: false,
+      sourceFile: fixture.filename,
+      dryRun: true,
+    });
+
+    assert.equal(result.roadmap.roadmap.phases[0]?.id, "phase-8");
+    assert.equal(result.state.track.next_action, fixture.expectedNextAction);
+  }
 });

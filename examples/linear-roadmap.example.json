@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "project": {
+    "id": "track",
+    "name": "Track",
+    "mode": "sprint"
+  },
+  "linear": {
+    "workspace": "Track Workspace",
+    "team": "TRACK"
+  },
+  "plan": {
+    "id": "track-v2",
+    "title": "Track plugin v2",
+    "topology": "sprint"
+  },
+  "cycles": [
+    {
+      "id": "phase-8",
+      "title": "External roadmap adapters",
+      "goal": "Normalize external planning sources through adapter contracts and provider-ready baselines without replacing Track's local runtime model.",
+      "kind": "integration",
+      "checkpoints": [
+        {
+          "id": "cp-17c",
+          "title": "Linear adapter registry hook",
+          "kind": "integration",
+          "status": "blocked",
+          "weight": 2
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "LIN-301",
+      "title": "Map Linear cycles into Track phases",
+      "cycle_id": "phase-8",
+      "checkpoint_id": "cp-17c",
+      "assignee": "codex",
+      "status": "blocked"
+    }
+  ]
+}

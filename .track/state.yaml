@@ -11,9 +11,9 @@ track:
   total_laps: 8
   active_lap: 8
   health: green
-  next_action: Add GitHub/Jira/Linear adapter registry hooks
+  next_action: Select next active slice
   blocked_reason: null
-  percent_complete: 96
+  percent_complete: 100
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -97,7 +97,7 @@ laps:
         weight: 2
   - id: lap-8
     title: External roadmap adapters
-    status: doing
+    status: done
     checkpoints:
       - id: cp-14
         title: Intermediate adapter schema
@@ -113,7 +113,7 @@ laps:
         weight: 2
       - id: cp-17
         title: Source-specific adapter entry points
-        status: doing
+        status: done
         weight: 3
 tasks:
   - id: task-001
@@ -214,7 +214,7 @@ tasks:
   - id: task-020
     title: Add GitHub/Jira/Linear adapter registry hooks
     checkpoint_id: cp-17
-    status: todo
+    status: done
     owner: codex
 flags: []
 events:
@@ -363,3 +363,13 @@ events:
     actor: codex
     timestamp: 2026-04-20T11:20:00+09:00
     summary: Completed Define first provider-specific adapter entry point
+  - id: evt-2026-04-20T12:05:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-20T12:05:00+09:00
+    summary: Completed Add GitHub/Jira/Linear adapter registry hooks
+  - id: evt-2026-04-20T12:10:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-20T12:10:00+09:00
+    summary: Completed TRK-030 External Roadmap Adapters

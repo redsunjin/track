@@ -71,6 +71,9 @@ Current usage:
 
 - `npm run import -- --source examples/external-plan.example.yaml --dry-run --json`
 - `npm run import -- --adapter notion --source examples/notion-roadmap.example.json --dry-run --json`
+- `npm run import -- --adapter github --source examples/github-roadmap.example.json --dry-run --json`
+- `npm run import -- --adapter jira --source examples/jira-roadmap.example.json --dry-run --json`
+- `npm run import -- --adapter linear --source examples/linear-roadmap.example.json --dry-run --json`
 - `npm run import -- --source plan.yaml`
 
 Reference:

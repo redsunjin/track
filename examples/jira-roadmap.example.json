@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "project": {
+    "id": "track",
+    "name": "Track",
+    "mode": "sprint"
+  },
+  "jira": {
+    "site": "https://track.atlassian.net",
+    "project_key": "TRK"
+  },
+  "plan": {
+    "id": "track-v2",
+    "title": "Track plugin v2",
+    "topology": "sprint"
+  },
+  "epics": [
+    {
+      "id": "phase-8",
+      "title": "External roadmap adapters",
+      "goal": "Normalize external planning sources through adapter contracts and provider-ready baselines without replacing Track's local runtime model.",
+      "kind": "integration",
+      "checkpoints": [
+        {
+          "id": "cp-17b",
+          "title": "Jira adapter registry hook",
+          "kind": "integration",
+          "status": "todo",
+          "weight": 2
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "key": "TRK-201",
+      "title": "Normalize Jira epics into Track phases",
+      "epic_id": "phase-8",
+      "checkpoint_id": "cp-17b",
+      "assignee": "codex",
+      "status": "todo"
+    }
+  ]
+}

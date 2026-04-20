@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "project": {
+    "id": "track",
+    "name": "Track",
+    "mode": "sprint"
+  },
+  "github": {
+    "repository": "openai/track",
+    "project_number": 7
+  },
+  "plan": {
+    "id": "track-v2",
+    "title": "Track plugin v2",
+    "topology": "sprint"
+  },
+  "milestones": [
+    {
+      "id": "phase-8",
+      "title": "External roadmap adapters",
+      "goal": "Normalize external planning sources through adapter contracts and provider-ready baselines without replacing Track's local runtime model.",
+      "kind": "integration",
+      "checkpoints": [
+        {
+          "id": "cp-17a",
+          "title": "GitHub adapter registry hook",
+          "kind": "integration",
+          "status": "doing",
+          "weight": 2
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "task-gh-1",
+      "title": "Map GitHub issues into Track tasks",
+      "milestone_id": "phase-8",
+      "checkpoint_id": "cp-17a",
+      "assignee": "codex",
+      "status": "doing"
+    }
+  ]
+}

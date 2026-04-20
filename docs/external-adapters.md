@@ -15,6 +15,9 @@ CLI surface:
 ```bash
 npm run import -- --source examples/external-plan.example.yaml --dry-run --json
 npm run import -- --adapter notion --source examples/notion-roadmap.example.json --dry-run --json
+npm run import -- --adapter github --source examples/github-roadmap.example.json --dry-run --json
+npm run import -- --adapter jira --source examples/jira-roadmap.example.json --dry-run --json
+npm run import -- --adapter linear --source examples/linear-roadmap.example.json --dry-run --json
 npm run import -- --source plan.yaml
 ```
 
@@ -36,6 +39,12 @@ First provider-specific entry point:
 - `notion`
   - fixture-backed import path for Notion-style page/property exports
 
+Additional registry-backed fixture hooks:
+
+- `github`
+- `jira`
+- `linear`
+
 That keeps the CLI stable while moving future provider logic behind a shared adapter contract.
 
 ## Shared adapter contract
@@ -52,6 +61,12 @@ Core pieces:
   - provides the file-backed baseline adapter
 - `src/adapters/notion-adapter.ts`
   - maps Notion-style page/property fixtures into the shared schema
+- `src/adapters/github-adapter.ts`
+  - maps GitHub-style milestone and issue fixtures into the shared schema
+- `src/adapters/jira-adapter.ts`
+  - maps Jira-style epic and issue fixtures into the shared schema
+- `src/adapters/linear-adapter.ts`
+  - maps Linear-style cycle and issue fixtures into the shared schema
 - `src/adapters/registry.ts`
   - resolves adapter kinds and source paths for `track import`
 
@@ -206,6 +221,16 @@ Reference:
 
 - [notion-roadmap.example.json](../examples/notion-roadmap.example.json)
 
+### 4. Registry-backed provider fixtures
+
+The current registry-backed provider hooks are fixture-first, not live API integrations.
+
+Reference fixtures:
+
+- [github-roadmap.example.json](../examples/github-roadmap.example.json)
+- [jira-roadmap.example.json](../examples/jira-roadmap.example.json)
+- [linear-roadmap.example.json](../examples/linear-roadmap.example.json)
+
 ## Why the adapter layer exists
 
 Vendor integrations should stay thin.
@@ -226,6 +251,7 @@ Current regression coverage:
 - `tests/adapter-base.test.ts`
 - `tests/file-roadmap-adapter.test.ts`
 - `tests/notion-roadmap-adapter.test.ts`
+- `tests/provider-roadmap-adapters.test.ts`
 
 Recommended checks:
 
@@ -233,5 +259,8 @@ Recommended checks:
 npm test
 npm run import -- --source examples/external-plan.example.yaml --dry-run --json
 npm run import -- --adapter notion --source examples/notion-roadmap.example.json --dry-run --json
+npm run import -- --adapter github --source examples/github-roadmap.example.json --dry-run --json
+npm run import -- --adapter jira --source examples/jira-roadmap.example.json --dry-run --json
+npm run import -- --adapter linear --source examples/linear-roadmap.example.json --dry-run --json
 npm run check:harness
 ```

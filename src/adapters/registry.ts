@@ -3,14 +3,20 @@ import path from "node:path";
 
 import type { RoadmapAdapter } from "./base.js";
 import { FileRoadmapAdapter } from "./file-adapter.js";
+import { GitHubRoadmapAdapter } from "./github-adapter.js";
+import { JiraRoadmapAdapter } from "./jira-adapter.js";
+import { LinearRoadmapAdapter } from "./linear-adapter.js";
 import { NotionRoadmapAdapter } from "./notion-adapter.js";
 
-export type RoadmapAdapterKind = "file" | "notion";
+export type RoadmapAdapterKind = "file" | "notion" | "github" | "jira" | "linear";
 
 const DEFAULT_ADAPTER_KIND: RoadmapAdapterKind = "file";
 
 const ADAPTER_SOURCE_CANDIDATES: Record<RoadmapAdapterKind, string[]> = {
   file: ["track-plan.yaml", "track-plan.yml", "track-plan.json"],
+  github: ["github-roadmap.json", "github-roadmap.yaml", "github-roadmap.yml"],
+  jira: ["jira-roadmap.json", "jira-roadmap.yaml", "jira-roadmap.yml"],
+  linear: ["linear-roadmap.json", "linear-roadmap.yaml", "linear-roadmap.yml"],
   notion: ["notion-roadmap.json", "notion-roadmap.yaml", "notion-roadmap.yml"],
 };
 
@@ -21,7 +27,7 @@ export interface RoadmapAdapterFactoryOptions {
 }
 
 export function listRoadmapAdapterKinds(): RoadmapAdapterKind[] {
-  return ["file", "notion"];
+  return ["file", "notion", "github", "jira", "linear"];
 }
 
 export function normalizeRoadmapAdapterKind(raw: string | undefined): RoadmapAdapterKind {
@@ -29,7 +35,7 @@ export function normalizeRoadmapAdapterKind(raw: string | undefined): RoadmapAda
     return DEFAULT_ADAPTER_KIND;
   }
 
-  if (raw === "file" || raw === "notion") {
+  if (raw === "file" || raw === "notion" || raw === "github" || raw === "jira" || raw === "linear") {
     return raw;
   }
 
@@ -70,6 +76,12 @@ export async function createRoadmapAdapter(options: RoadmapAdapterFactoryOptions
   switch (kind) {
     case "file":
       return new FileRoadmapAdapter(sourcePath);
+    case "github":
+      return new GitHubRoadmapAdapter(sourcePath);
+    case "jira":
+      return new JiraRoadmapAdapter(sourcePath);
+    case "linear":
+      return new LinearRoadmapAdapter(sourcePath);
     case "notion":
       return new NotionRoadmapAdapter(sourcePath);
   }
