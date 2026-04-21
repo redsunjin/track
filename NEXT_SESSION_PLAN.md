@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-039`
-- title: `Agent Pack Install Hooks`
+- id: `TRK-040`
+- title: `Package Split / Publishable Layout`
 
 ## Goal
 
-Add safe local install hooks for exported Claude Code, Codex, and Gemini CLI operating packs so a bundle can be placed into an explicit target with dry-run preview.
+Add explicit source-level package boundaries and package-layout checks so Track can move toward publishable package extraction without destabilizing the current runtime.
 
 ## First Steps
 
-1. add install planning and manifest support to the agent pack runtime
-2. expose `track pack install --tool <kind> --out <dir>` through the CLI
-3. verify dry-run and real install paths remain aligned with export output
+1. add package boundary entrypoints for core/runtime/mcp/cli/agents
+2. expose `track package list` and `track package check`
+3. document the package layout and verify the boundary map
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- keep install hooks safe and explicit
-- do not write directly into global Claude/Codex/Gemini config directories in this slice
-- do not introduce client-specific state models
-- keep export and install bundle layouts aligned
+- keep this as a source-level baseline, not a physical workspace split
+- do not publish npm packages in this slice
+- do not move runtime files unless required for boundary entrypoints
+- package docs must not overclaim independent package publishing
 
 ## Verification
 
@@ -29,12 +29,12 @@ Add safe local install hooks for exported Claude Code, Codex, and Gemini CLI ope
 npm test
 npm run check:harness
 npm run status -- --no-color
-node --import tsx ./src/cli.ts pack install --tool codex --out /tmp/track-codex-install --dry-run --json
-node --import tsx ./src/cli.ts pack install --tool codex --out /tmp/track-codex-install
+npm run package:check
+node --import tsx ./src/cli.ts package list
 ```
 
 ## Exit Condition
 
-- `track pack install` works for supported tool kinds
-- dry-run reports the planned files without writing
-- real install writes shared files, tool-specific files, export manifest, and install manifest
+- package boundaries exist for `track-core`, `track-runtime`, `track-mcp`, `track-cli`, `track-agents`, and `track-vscode`
+- root package exports mirror the boundary map
+- package layout checks pass with the normal harness

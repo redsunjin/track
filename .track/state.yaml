@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 13
-  active_lap: 13
+  total_laps: 14
+  active_lap: 14
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -193,6 +193,22 @@ laps:
         weight: 3
       - id: cp-32
         title: Install smoke and docs integration
+        status: done
+        weight: 2
+  - id: lap-14
+    title: Package split / publishable layout
+    status: done
+    checkpoints:
+      - id: cp-33
+        title: Package boundary entrypoints
+        status: done
+        weight: 3
+      - id: cp-34
+        title: Package layout CLI checks
+        status: done
+        weight: 2
+      - id: cp-35
+        title: Package docs and harness integration
         status: done
         weight: 2
 tasks:
@@ -379,6 +395,21 @@ tasks:
   - id: task-037
     title: Verify install smoke and docs integration
     checkpoint_id: cp-32
+    status: done
+    owner: codex
+  - id: task-038
+    title: Add package boundary entrypoints
+    checkpoint_id: cp-33
+    status: done
+    owner: codex
+  - id: task-039
+    title: Wire package layout CLI checks
+    checkpoint_id: cp-34
+    status: done
+    owner: codex
+  - id: task-040
+    title: Update package docs and harness integration
+    checkpoint_id: cp-35
     status: done
     owner: codex
 flags: []
@@ -673,3 +704,28 @@ events:
     actor: codex
     timestamp: 2026-04-21T16:35:00+09:00
     summary: Completed TRK-039 Agent Pack Install Hooks
+  - id: evt-2026-04-21T17:00:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-21T17:00:00+09:00
+    summary: Selected TRK-040 Package Split / Publishable Layout as the next active slice
+  - id: evt-2026-04-21T17:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T17:10:00+09:00
+    summary: Completed Add package boundary entrypoints
+  - id: evt-2026-04-21T17:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T17:20:00+09:00
+    summary: Completed Wire package layout CLI checks
+  - id: evt-2026-04-21T17:30:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T17:30:00+09:00
+    summary: Completed Update package docs and harness integration
+  - id: evt-2026-04-21T17:35:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-21T17:35:00+09:00
+    summary: Completed TRK-040 Package Split / Publishable Layout

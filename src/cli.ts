@@ -18,6 +18,7 @@ import { buildTrackControlSnapshot } from "./control.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
+import { checkTrackPackageLayout, listTrackPackageBoundaries, renderPackageLayoutCheck } from "./package-layout.js";
 import {
   loadPitwallDetail,
   loadPitwallOwnerLoad,
@@ -283,6 +284,34 @@ async function main(): Promise<void> {
     }
 
     throw new Error(`Unknown Track pack command: ${subcommand}`);
+  }
+
+  if (command === "package") {
+    const subcommand = args[1] ?? "list";
+    if (subcommand === "list") {
+      const boundaries = listTrackPackageBoundaries();
+      if (json) {
+        process.stdout.write(`${JSON.stringify({ boundaries }, null, 2)}\n`);
+        return;
+      }
+      process.stdout.write(`${boundaries.map((boundary) => `${boundary.packageName}\t${boundary.entrypoint}`).join("\n")}\n`);
+      return;
+    }
+
+    if (subcommand === "check") {
+      const result = await checkTrackPackageLayout(process.cwd());
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackageLayoutCheck(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
+    throw new Error(`Unknown Track package command: ${subcommand}`);
   }
 
   if (command === "check:harness") {

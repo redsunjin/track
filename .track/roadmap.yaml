@@ -361,3 +361,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-14
+      title: Package split / publishable layout
+      goal: Add explicit source-level package boundaries and checks for future publishable extraction.
+      kind: build
+      checkpoints:
+        - id: cp-33
+          title: Package boundary entrypoints
+          kind: build
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-34
+          title: Package layout CLI checks
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-35
+          title: Package docs and harness integration
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1

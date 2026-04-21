@@ -2,13 +2,22 @@
 
 ## Active
 
-- `TRK-039` Agent Pack Install Hooks
+- `TRK-040` Package Split / Publishable Layout
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-039 Agent Pack Install Hooks
+
+- completed:
+  - `track pack install`
+  - explicit `--out` target support
+  - repo-local default install target
+  - dry-run install planning
+  - install manifest and regression coverage
 
 ### TRK-038 VS Code Companion Expansion
 

@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-013-agent-pack-install-hooks.md](./worksheets/HW-013-agent-pack-install-hooks.md)
+- [HW-014-package-split-publishable-layout.md](./worksheets/HW-014-package-split-publishable-layout.md)
 
 Last completed worksheet:
 
-- [HW-012-vscode-companion-expansion.md](./worksheets/HW-012-vscode-companion-expansion.md)
+- [HW-013-agent-pack-install-hooks.md](./worksheets/HW-013-agent-pack-install-hooks.md)
 
 ## Adoption Rules
 

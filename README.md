@@ -35,6 +35,7 @@ V1 is a plugin-first architecture:
 - `lab` shorthand that maps to Track and Pitwall terminal surfaces
 - VS Code companion with webview, course tree, and compact corner telemetry
 - exportable Claude/Codex/Gemini operating-pack bundles
+- source-level package boundaries for `track-core`, `track-runtime`, `track-mcp`, `track-cli`, `track-agents`, and `track-vscode`
 
 ## Security defaults
 
@@ -96,6 +97,20 @@ Current usage:
 - `track pack install --tool codex --out ./tmp/track-codex-install --dry-run --json`
 - `track pack install --tool codex --out ./tmp/track-codex-install`
 
+## Package layout
+
+Track now exposes source-level package boundaries and subpath exports for future package extraction.
+
+Current checks:
+
+- `npm run package:check`
+- `track package list`
+- `track package check`
+
+Reference:
+
+- [docs/package-layout.md](docs/package-layout.md)
+
 ## Non-goals for V1
 
 - generic project management replacement
@@ -109,6 +124,7 @@ Current usage:
 - Deep dive: [docs/deep-dive-report.md](docs/deep-dive-report.md)
 - Harness guide: [docs/HARNESS_MASTER_GUIDE.md](docs/HARNESS_MASTER_GUIDE.md)
 - MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
+- Package layout: [docs/package-layout.md](docs/package-layout.md)
 - Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
 - External adapters: [docs/external-adapters.md](docs/external-adapters.md)
 - Agent operating packs: [docs/agent-operating-packs.md](docs/agent-operating-packs.md)

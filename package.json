@@ -3,6 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./agents": "./src/packages/agents.ts",
+    "./cli": "./src/packages/cli.ts",
+    "./core": "./src/packages/core.ts",
+    "./mcp": "./src/packages/mcp.ts",
+    "./package-layout": "./src/package-layout.ts",
+    "./runtime": "./src/packages/runtime.ts",
+    "./vscode": "./vscode-extension/src/extension.ts"
+  },
   "bin": {
     "track": "./src/cli.ts"
   },
@@ -13,6 +23,7 @@
     "import": "node --import tsx ./src/cli.ts import",
     "lab": "node --import tsx ./src/cli.ts lab",
     "mcp:smoke": "node --import tsx ./src/cli.ts mcp-smoke-test",
+    "package:check": "node --import tsx ./src/cli.ts package check",
     "status": "node --import tsx ./src/cli.ts status",
     "next": "node --import tsx ./src/cli.ts next",
     "map": "node --import tsx ./src/cli.ts map",
