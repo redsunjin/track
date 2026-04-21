@@ -1,4 +1,4 @@
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 
 export interface TrackPackageBoundary {
@@ -17,6 +17,47 @@ export interface PackageLayoutCheckResult {
     role: "entrypoint" | "owned_path";
   }>;
   ok: boolean;
+}
+
+export interface PackageDryRunEntry {
+  covered: boolean;
+  coveredBy: string | null;
+  name?: string;
+  subpath?: string;
+  target: string;
+}
+
+export interface PackageDryRunIssue {
+  boundary?: string;
+  code:
+    | "invalid_manifest"
+    | "missing_bin"
+    | "missing_export"
+    | "missing_files_allowlist"
+    | "missing_package_field"
+    | "missing_package_file"
+    | "uncovered_bin"
+    | "uncovered_doc"
+    | "export_target_mismatch"
+    | "uncovered_export"
+    | "uncovered_package_path";
+  message: string;
+  path?: string;
+  severity: "error" | "warning";
+}
+
+export interface PackageDryRunCheckResult {
+  binEntries: PackageDryRunEntry[];
+  exportEntries: PackageDryRunEntry[];
+  filesAllowlist: string[];
+  includedFiles: string[];
+  issues: PackageDryRunIssue[];
+  layout: PackageLayoutCheckResult;
+  ok: boolean;
+  packageName: string | null;
+  privatePackage: boolean;
+  publishable: boolean;
+  version: string | null;
 }
 
 export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
@@ -64,6 +105,8 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
   },
 ];
 
+const REQUIRED_PACKAGE_DOCS = ["README.md", "docs/package-layout.md"];
+
 export function listTrackPackageBoundaries(): TrackPackageBoundary[] {
   return TRACK_PACKAGE_BOUNDARIES.map((boundary) => ({
     ...boundary,
@@ -93,6 +136,108 @@ export async function checkTrackPackageLayout(repoRoot: string): Promise<Package
   };
 }
 
+export async function checkTrackPackageDryRun(repoRoot: string): Promise<PackageDryRunCheckResult> {
+  const layout = await checkTrackPackageLayout(repoRoot);
+  const issues: PackageDryRunIssue[] = [];
+  const manifest = await readPackageManifest(repoRoot, issues);
+  const packageName = readString(manifest, "name");
+  const version = readString(manifest, "version");
+  const privatePackage = readBoolean(manifest, "private") === true;
+  const filesAllowlist = readStringArray(manifest, "files");
+
+  if (!packageName) {
+    issues.push({
+      code: "missing_package_field",
+      message: "package.json must define a package name.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (!version) {
+    issues.push({
+      code: "missing_package_field",
+      message: "package.json must define a version.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (filesAllowlist.length === 0) {
+    issues.push({
+      code: "missing_files_allowlist",
+      message: "package.json must define a files allowlist before distribution dry-runs are meaningful.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  const exportEntries = readExportEntries(manifest.exports).map((entry) => withCoverage(entry, filesAllowlist));
+  const binEntries = readBinEntries(manifest.bin).map((entry) => withCoverage(entry, filesAllowlist));
+
+  validatePackageBoundaryExports(exportEntries, issues);
+  validateCoveredEntries(exportEntries, "export", issues);
+  validateCoveredEntries(binEntries, "bin", issues);
+  validateRequiredBin(binEntries, issues);
+  await validateRequiredDocs(repoRoot, filesAllowlist, issues);
+  validateCoveredPackageBoundaries(layout.boundaries, filesAllowlist, issues);
+
+  const includedFiles = [
+    "package.json",
+    ...REQUIRED_PACKAGE_DOCS.filter((docPath) => isPackagePathCovered(filesAllowlist, docPath)),
+    ...exportEntries.map((entry) => entry.target),
+    ...binEntries.map((entry) => entry.target),
+  ];
+
+  return {
+    binEntries,
+    exportEntries,
+    filesAllowlist,
+    includedFiles: [...new Set(includedFiles)].sort(),
+    issues,
+    layout,
+    ok: layout.ok && !issues.some((issue) => issue.severity === "error"),
+    packageName,
+    privatePackage,
+    publishable: !privatePackage,
+    version,
+  };
+}
+
+export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const coveredExports = result.exportEntries.filter((entry) => entry.covered).length;
+  const coveredBins = result.binEntries.filter((entry) => entry.covered).length;
+  const lines = [
+    result.ok ? "PACKAGE DRY-RUN OK" : "PACKAGE DRY-RUN FAIL",
+    `PACKAGE  ${packageLabel}`,
+    `PUBLISH  ${result.publishable ? "publishable" : "private-root"}`,
+    `FILES    ${result.filesAllowlist.length ? result.filesAllowlist.join(", ") : "missing"}`,
+    `EXPORTS  ${coveredExports}/${result.exportEntries.length} covered`,
+    `BIN      ${coveredBins}/${result.binEntries.length} covered`,
+    `LAYOUT   ${result.layout.ok ? "ok" : "failed"}`,
+  ];
+
+  if (result.exportEntries.length) {
+    lines.push("");
+    lines.push("Exports:");
+    for (const entry of result.exportEntries) {
+      lines.push(`- ${(entry.subpath ?? "?").padEnd(16)} ${entry.target} ${entry.covered ? "covered" : "uncovered"}`);
+    }
+  }
+
+  if (result.issues.length) {
+    lines.push("");
+    lines.push("Issues:");
+    for (const issue of result.issues) {
+      lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
 export function renderPackageLayoutCheck(result: PackageLayoutCheckResult): string {
   const lines = [
     result.ok ? "PACKAGE LAYOUT OK" : "PACKAGE LAYOUT FAIL",
@@ -114,6 +259,17 @@ export function renderPackageLayoutCheck(result: PackageLayoutCheckResult): stri
   return lines.join("\n");
 }
 
+export function isPackagePathCovered(filesAllowlist: string[], targetPath: string): string | null {
+  const normalizedTarget = normalizePackagePath(targetPath);
+  for (const allowedPath of filesAllowlist) {
+    const normalizedAllowed = normalizePackagePath(allowedPath);
+    if (normalizedTarget === normalizedAllowed || normalizedTarget.startsWith(`${normalizedAllowed}/`)) {
+      return allowedPath;
+    }
+  }
+  return null;
+}
+
 async function exists(targetPath: string): Promise<boolean> {
   try {
     await access(targetPath);
@@ -121,4 +277,200 @@ async function exists(targetPath: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function readPackageManifest(repoRoot: string, issues: PackageDryRunIssue[]): Promise<Record<string, unknown>> {
+  try {
+    return JSON.parse(await readFile(path.join(repoRoot, "package.json"), "utf8")) as Record<string, unknown>;
+  } catch (error: unknown) {
+    issues.push({
+      code: "invalid_manifest",
+      message: error instanceof Error ? error.message : String(error),
+      path: "package.json",
+      severity: "error",
+    });
+    return {};
+  }
+}
+
+function readString(source: Record<string, unknown>, key: string): string | null {
+  const value = source[key];
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function readBoolean(source: Record<string, unknown>, key: string): boolean | null {
+  const value = source[key];
+  return typeof value === "boolean" ? value : null;
+}
+
+function readStringArray(source: Record<string, unknown>, key: string): string[] {
+  const value = source[key];
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.filter((item): item is string => typeof item === "string" && item.length > 0);
+}
+
+function readExportEntries(exportsValue: unknown): PackageDryRunEntry[] {
+  if (!exportsValue || typeof exportsValue !== "object" || Array.isArray(exportsValue)) {
+    return [];
+  }
+
+  return Object.entries(exportsValue)
+    .flatMap(([subpath, target]) => {
+      const resolvedTarget = findFirstStringLeaf(target);
+      return resolvedTarget ? [{ subpath, target: normalizePackageTarget(resolvedTarget), covered: false, coveredBy: null }] : [];
+    })
+    .sort((left, right) => (left.subpath ?? "").localeCompare(right.subpath ?? ""));
+}
+
+function readBinEntries(binValue: unknown): PackageDryRunEntry[] {
+  if (typeof binValue === "string") {
+    return [{ name: "track", target: normalizePackageTarget(binValue), covered: false, coveredBy: null }];
+  }
+  if (!binValue || typeof binValue !== "object" || Array.isArray(binValue)) {
+    return [];
+  }
+
+  return Object.entries(binValue)
+    .filter((entry): entry is [string, string] => typeof entry[1] === "string")
+    .map(([name, target]) => ({ name, target: normalizePackageTarget(target), covered: false, coveredBy: null }))
+    .sort((left, right) => (left.name ?? "").localeCompare(right.name ?? ""));
+}
+
+function findFirstStringLeaf(value: unknown): string | null {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+  for (const child of Object.values(value)) {
+    const result = findFirstStringLeaf(child);
+    if (result) {
+      return result;
+    }
+  }
+  return null;
+}
+
+function withCoverage(entry: PackageDryRunEntry, filesAllowlist: string[]): PackageDryRunEntry {
+  const coveredBy = isPackagePathCovered(filesAllowlist, entry.target);
+  return {
+    ...entry,
+    covered: Boolean(coveredBy),
+    coveredBy,
+  };
+}
+
+function validatePackageBoundaryExports(exportEntries: PackageDryRunEntry[], issues: PackageDryRunIssue[]): void {
+  for (const boundary of TRACK_PACKAGE_BOUNDARIES) {
+    const expectedSubpath = `./${boundary.name}`;
+    const entry = exportEntries.find((candidate) => candidate.subpath === expectedSubpath);
+    if (!entry) {
+      issues.push({
+        boundary: boundary.name,
+        code: "missing_export",
+        message: `package.json exports must expose ${expectedSubpath}.`,
+        path: "package.json",
+        severity: "error",
+      });
+      continue;
+    }
+    if (entry.target !== boundary.entrypoint) {
+      issues.push({
+        boundary: boundary.name,
+        code: "export_target_mismatch",
+        message: `${expectedSubpath} should point at ${boundary.entrypoint}, got ${entry.target}.`,
+        path: "package.json",
+        severity: "error",
+      });
+    }
+  }
+}
+
+function validateCoveredEntries(
+  entries: PackageDryRunEntry[],
+  kind: "bin" | "export",
+  issues: PackageDryRunIssue[]
+): void {
+  for (const entry of entries) {
+    if (entry.covered) {
+      continue;
+    }
+    issues.push({
+      code: kind === "bin" ? "uncovered_bin" : "uncovered_export",
+      message:
+        kind === "bin"
+          ? `bin ${entry.name ?? "unknown"} target ${entry.target} is not covered by package.json files.`
+          : `export ${entry.subpath ?? "unknown"} target ${entry.target} is not covered by package.json files.`,
+      path: entry.target,
+      severity: "error",
+    });
+  }
+}
+
+function validateRequiredBin(binEntries: PackageDryRunEntry[], issues: PackageDryRunIssue[]): void {
+  if (!binEntries.some((entry) => entry.name === "track")) {
+    issues.push({
+      code: "missing_bin",
+      message: "package.json must expose the track CLI through bin.track.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+}
+
+async function validateRequiredDocs(
+  repoRoot: string,
+  filesAllowlist: string[],
+  issues: PackageDryRunIssue[]
+): Promise<void> {
+  for (const docPath of REQUIRED_PACKAGE_DOCS) {
+    if (!(await exists(path.join(repoRoot, docPath)))) {
+      issues.push({
+        code: "missing_package_file",
+        message: `${docPath} is required for package dry-run documentation.`,
+        path: docPath,
+        severity: "error",
+      });
+      continue;
+    }
+    if (!isPackagePathCovered(filesAllowlist, docPath)) {
+      issues.push({
+        code: "uncovered_doc",
+        message: `${docPath} is not covered by package.json files.`,
+        path: docPath,
+        severity: "error",
+      });
+    }
+  }
+}
+
+function validateCoveredPackageBoundaries(
+  boundaries: TrackPackageBoundary[],
+  filesAllowlist: string[],
+  issues: PackageDryRunIssue[]
+): void {
+  for (const boundary of boundaries) {
+    for (const packagePath of [boundary.entrypoint, ...boundary.owns]) {
+      if (!isPackagePathCovered(filesAllowlist, packagePath)) {
+        issues.push({
+          boundary: boundary.name,
+          code: "uncovered_package_path",
+          message: `${packagePath} owned by ${boundary.packageName} is not covered by package.json files.`,
+          path: packagePath,
+          severity: "error",
+        });
+      }
+    }
+  }
+}
+
+function normalizePackageTarget(target: string): string {
+  return normalizePackagePath(target.replace(/^\.\//, ""));
+}
+
+function normalizePackagePath(targetPath: string): string {
+  return path.posix.normalize(targetPath.replace(/\\/g, "/").replace(/^\.\//, ""));
 }

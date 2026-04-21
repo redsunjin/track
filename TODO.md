@@ -2,13 +2,23 @@
 
 ## Active
 
-- `TRK-040` Package Split / Publishable Layout
+- `TRK-041` Package Artifact Dry Run
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-040 Package Split / Publishable Layout
+
+- completed:
+  - source-level package boundary map
+  - package entrypoints for core/runtime/mcp/cli/agents
+  - root package subpath exports
+  - `track package list`
+  - `track package check`
+  - package layout docs and regression coverage
 
 ### TRK-039 Agent Pack Install Hooks
 

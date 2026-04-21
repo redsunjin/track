@@ -17,7 +17,16 @@ test("terminal renderers support ansi color and no-color fallback", async () => 
   const roadmap = await loadTrackRoadmap(root, ".track/roadmap.yaml");
   const summary = summarizeTrack(state);
   const segments = generateTrackMap(roadmap, state);
+  const metrics = {
+    activeTaskCount: 0,
+    blockedTaskCount: 0,
+    lastEventAt: null,
+    paceDeltaPercent: null,
+    staleState: "unknown" as const,
+    updateAgeMinutes: null,
+  };
   const detail = {
+    metrics,
     repoPath: root,
     state,
     summary,
@@ -29,7 +38,7 @@ test("terminal renderers support ansi color and no-color fallback", async () => 
   const nextColor = renderNext(summary, { color: true });
   const companionColor = renderBuddy(summary, roadmap, state, { color: true });
   const mapColor = renderTrackMap(roadmap.project.name, segments, { color: true });
-  const pitwallColor = renderPitwall(root, [{ repoPath: root, summary }], { color: true });
+  const pitwallColor = renderPitwall(root, [{ metrics, repoPath: root, summary }], { color: true });
   const detailColor = renderPitwallDetail(detail, { color: true });
 
   assert.match(statusColor, /\u001b\[/);

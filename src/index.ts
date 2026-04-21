@@ -25,8 +25,21 @@ export { renderBuddy } from "./buddy.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 export { generateTrackMap, renderTrackMap } from "./generator.js";
 export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServer } from "./mcp.js";
-export { checkTrackPackageLayout, listTrackPackageBoundaries, renderPackageLayoutCheck } from "./package-layout.js";
-export type { PackageLayoutCheckResult, TrackPackageBoundary } from "./package-layout.js";
+export {
+  checkTrackPackageDryRun,
+  checkTrackPackageLayout,
+  isPackagePathCovered,
+  listTrackPackageBoundaries,
+  renderPackageDryRunCheck,
+  renderPackageLayoutCheck,
+} from "./package-layout.js";
+export type {
+  PackageDryRunCheckResult,
+  PackageDryRunEntry,
+  PackageDryRunIssue,
+  PackageLayoutCheckResult,
+  TrackPackageBoundary,
+} from "./package-layout.js";
 export {
   advanceCheckpoint,
   applyEventToState,

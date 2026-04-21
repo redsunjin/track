@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "files": [
+    "src",
+    "agents",
+    "docs",
+    "vscode-extension",
+    "README.md",
+    "AGENTS.md"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./agents": "./src/packages/agents.ts",
@@ -24,11 +32,13 @@
     "lab": "node --import tsx ./src/cli.ts lab",
     "mcp:smoke": "node --import tsx ./src/cli.ts mcp-smoke-test",
     "package:check": "node --import tsx ./src/cli.ts package check",
+    "package:dry-run": "node --import tsx ./src/cli.ts package dry-run",
     "status": "node --import tsx ./src/cli.ts status",
     "next": "node --import tsx ./src/cli.ts next",
     "map": "node --import tsx ./src/cli.ts map",
     "pitwall": "node --import tsx ./src/cli.ts pitwall",
     "test": "node --import tsx --test tests/**/*.test.ts",
+    "typecheck": "tsc --noEmit",
     "vscode:build": "tsc -p vscode-extension/tsconfig.json",
     "vscode:check": "tsc -p vscode-extension/tsconfig.json --noEmit"
   },

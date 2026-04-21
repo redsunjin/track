@@ -35,9 +35,15 @@ Run:
 
 ```bash
 npm run package:check
+npm run package:dry-run
+npm pack --dry-run --json
 ```
 
 This verifies that every declared boundary has an entrypoint and that the owned source paths still exist.
+The dry-run check also verifies that `package.json.files` covers the boundary entrypoints, exported subpaths, CLI bin target, and package layout docs before any physical npm packing step.
+
+Track's root package remains `private: true`.
+`package dry-run` is therefore a distribution-readiness check, not a publishing command.
 
 ## Extraction Rule
 

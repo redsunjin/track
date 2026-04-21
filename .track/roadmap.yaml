@@ -393,3 +393,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-15
+      title: Package artifact dry run
+      goal: Add deterministic package artifact readiness checks before any physical npm publish or workspace split.
+      kind: build
+      checkpoints:
+        - id: cp-36
+          title: Package artifact allowlist
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-37
+          title: Package dry-run CLI
+          kind: build
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-38
+          title: Dry-run docs and regression coverage
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1

@@ -2,39 +2,42 @@
 
 ## Active Slice
 
-- id: `TRK-040`
-- title: `Package Split / Publishable Layout`
+- id: `TRK-041`
+- title: `Package Artifact Dry Run`
 
 ## Goal
 
-Add explicit source-level package boundaries and package-layout checks so Track can move toward publishable package extraction without destabilizing the current runtime.
+Add a deterministic package artifact dry-run so Track can verify exports, bin targets, docs, and package allowlist coverage before any physical npm publish or workspace split.
 
 ## First Steps
 
-1. add package boundary entrypoints for core/runtime/mcp/cli/agents
-2. expose `track package list` and `track package check`
-3. document the package layout and verify the boundary map
+1. add a `package.json.files` allowlist for the current source-level distribution boundary
+2. expose `track package dry-run` and `npm run package:dry-run`
+3. document the dry-run contract and keep the root package private
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- keep this as a source-level baseline, not a physical workspace split
 - do not publish npm packages in this slice
-- do not move runtime files unless required for boundary entrypoints
-- package docs must not overclaim independent package publishing
+- keep this as a dry-run/readiness check, not a physical workspace split
+- do not move runtime files
+- package docs must clearly state that the root package remains private
 
 ## Verification
 
 ```bash
 npm test
+npm run typecheck
 npm run check:harness
 npm run status -- --no-color
 npm run package:check
-node --import tsx ./src/cli.ts package list
+npm run package:dry-run
+node --import tsx ./src/cli.ts package dry-run --json
+npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- package boundaries exist for `track-core`, `track-runtime`, `track-mcp`, `track-cli`, `track-agents`, and `track-vscode`
-- root package exports mirror the boundary map
-- package layout checks pass with the normal harness
+- `package.json.files` covers source package boundaries, docs, VS Code extension sources, and agent packs
+- `track package dry-run` reports export/bin/allowlist coverage
+- dry-run checks pass with normal test and harness checks

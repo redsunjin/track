@@ -209,7 +209,11 @@ async function validateRuntimeFiles(cwd: string, issues: string[]): Promise<"ok"
   try {
     const [roadmap, state] = await Promise.all([loadTrackRoadmap(cwd), loadTrackState(cwd)]);
     const runtimeIssues: string[] = [];
-    validateRuntimeParity(roadmap as Record<string, unknown>, state as Record<string, unknown>, runtimeIssues);
+    validateRuntimeParity(
+      roadmap as unknown as Record<string, unknown>,
+      state as unknown as Record<string, unknown>,
+      runtimeIssues
+    );
     issues.push(...runtimeIssues);
     return runtimeIssues.length === 0 ? "ok" : "error";
   } catch (error: unknown) {

@@ -11,6 +11,7 @@ import {
   summarizeAgentPackExport,
   summarizeAgentPackInstall,
 } from "./agent-packs.js";
+import type { TrackMutationCommand } from "./actions.js";
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
 import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
@@ -18,7 +19,13 @@ import { buildTrackControlSnapshot } from "./control.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
-import { checkTrackPackageLayout, listTrackPackageBoundaries, renderPackageLayoutCheck } from "./package-layout.js";
+import {
+  checkTrackPackageDryRun,
+  checkTrackPackageLayout,
+  listTrackPackageBoundaries,
+  renderPackageDryRunCheck,
+  renderPackageLayoutCheck,
+} from "./package-layout.js";
 import {
   loadPitwallDetail,
   loadPitwallOwnerLoad,
@@ -311,6 +318,19 @@ async function main(): Promise<void> {
       return;
     }
 
+    if (subcommand === "dry-run") {
+      const result = await checkTrackPackageDryRun(process.cwd());
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackageDryRunCheck(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
     throw new Error(`Unknown Track package command: ${subcommand}`);
   }
 
@@ -343,10 +363,12 @@ async function main(): Promise<void> {
   }
 
   if (["start", "done", "block", "unblock"].includes(command) || (command === "checkpoint" && targetId === "advance")) {
+    const mutationCommand: TrackMutationCommand =
+      command === "checkpoint" ? "checkpoint-advance" : requireMutationCommand(command);
     const result = await applyTrackMutation({
       actor,
       checkpointId: command === "checkpoint" ? args[2] : undefined,
-      command: command === "checkpoint" ? "checkpoint-advance" : command,
+      command: mutationCommand,
       reason,
       repoRoot: process.cwd(),
       stateFile: file,
@@ -427,6 +449,13 @@ function requireTarget(command: string, target: string | undefined): string {
     throw new Error(`Command \`${command}\` requires a task id.`);
   }
   return target;
+}
+
+function requireMutationCommand(command: string): TrackMutationCommand {
+  if (command === "start" || command === "done" || command === "block" || command === "unblock") {
+    return command;
+  }
+  throw new Error(`Unknown Track command: ${command}`);
 }
 
 function ensureWatchable(json: boolean): void {

@@ -3,10 +3,18 @@ import { createRequire } from "node:module";
 import test from "node:test";
 
 const require = createRequire(import.meta.url);
+
+type CompanionSnapshot = {
+  currentOwner: string;
+  percentComplete: number;
+  projectName: string;
+  recentEvents: Array<{ summary: string; timestamp?: string }>;
+};
+
 const { coerceCompanionSnapshot, renderCompanionDocument } = require("../vscode-extension/src/companion-view.ts") as {
-  coerceCompanionSnapshot: (value: unknown) => unknown;
+  coerceCompanionSnapshot: (value: unknown) => CompanionSnapshot;
   renderCompanionDocument: (
-    snapshot: unknown,
+    snapshot: CompanionSnapshot,
     options?: {
       generatedAt?: string;
       repoRoot?: string;

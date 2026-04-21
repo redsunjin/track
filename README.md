@@ -104,8 +104,10 @@ Track now exposes source-level package boundaries and subpath exports for future
 Current checks:
 
 - `npm run package:check`
+- `npm run package:dry-run`
 - `track package list`
 - `track package check`
+- `track package dry-run`
 
 Reference:
 
