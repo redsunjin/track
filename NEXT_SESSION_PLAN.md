@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-038`
-- title: `VS Code Companion Expansion`
+- id: `TRK-039`
+- title: `Agent Pack Install Hooks`
 
 ## Goal
 
-Expand the VS Code companion beyond a webview-only surface by adding a compact course tree and strengthening the always-visible corner telemetry signal.
+Add safe local install hooks for exported Claude Code, Codex, and Gemini CLI operating packs so a bundle can be placed into an explicit target with dry-run preview.
 
 ## First Steps
 
-1. add a `Track Course` tree view contribution and provider
-2. wire the tree and status bar to the shared Track control snapshot
-3. verify the extension host smoke path, docs, and runtime state stay aligned
+1. add install planning and manifest support to the agent pack runtime
+2. expose `track pack install --tool <kind> --out <dir>` through the CLI
+3. verify dry-run and real install paths remain aligned with export output
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- keep VS Code as a companion surface, not the source of truth
-- do not introduce a separate VS Code state model
-- keep terminal and MCP surfaces unchanged unless a regression appears
-- do not add publishing or marketplace work in this slice
+- keep install hooks safe and explicit
+- do not write directly into global Claude/Codex/Gemini config directories in this slice
+- do not introduce client-specific state models
+- keep export and install bundle layouts aligned
 
 ## Verification
 
@@ -29,12 +29,12 @@ Expand the VS Code companion beyond a webview-only surface by adding a compact c
 npm test
 npm run check:harness
 npm run status -- --no-color
-npm run vscode:build
-npm run vscode:check
+node --import tsx ./src/cli.ts pack install --tool codex --out /tmp/track-codex-install --dry-run --json
+node --import tsx ./src/cli.ts pack install --tool codex --out /tmp/track-codex-install
 ```
 
 ## Exit Condition
 
-- VS Code contributes a `Track Course` tree view
-- the status bar reads as a compact corner telemetry widget
-- tree, webview, and status bar all read from the same local Track runtime
+- `track pack install` works for supported tool kinds
+- dry-run reports the planned files without writing
+- real install writes shared files, tool-specific files, export manifest, and install manifest

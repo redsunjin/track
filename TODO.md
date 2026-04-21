@@ -2,13 +2,21 @@
 
 ## Active
 
-- `TRK-038` VS Code Companion Expansion
+- `TRK-039` Agent Pack Install Hooks
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-038 VS Code Companion Expansion
+
+- completed:
+  - VS Code `Track Course` tree view
+  - compact corner telemetry status-bar treatment
+  - control-snapshot-backed extension data loading
+  - extension host smoke coverage and docs
 
 ### TRK-037 MCP Control Snapshot Expansion
 

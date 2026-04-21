@@ -64,6 +64,21 @@ Each export includes:
 - `manifest.json`
 - a top-level export `README.md`
 
+## Install Hook
+
+`Track` can also install one pack bundle into an explicit local target:
+
+- `track pack install --tool claude-code --out ./tmp/track-claude-install`
+- `track pack install --tool codex --out ./tmp/track-codex-install`
+- `track pack install --tool gemini-cli --out ./tmp/track-gemini-install`
+
+Use `--dry-run` to inspect the planned files without writing:
+
+- `track pack install --tool codex --out ./tmp/track-codex-install --dry-run --json`
+
+If `--out` is omitted, Track installs into the repo-local `.track/agent-installs/<tool>` directory.
+This keeps the first install hook safe and avoids writing directly into global Claude/Codex/Gemini configuration directories.
+
 ## Client Packs
 
 - [Claude Code](../agents/claude-code/README.md)

@@ -83,7 +83,7 @@ Reference:
 - [docs/external-adapters.md](docs/external-adapters.md)
 - [examples/external-plan.example.yaml](examples/external-plan.example.yaml)
 
-## Agent pack export
+## Agent pack export and install
 
 Track can export reusable agent-pack bundles for the supported client surfaces.
 
@@ -93,6 +93,8 @@ Current usage:
 - `track pack export --tool claude-code --out ./tmp/track-claude-pack`
 - `track pack export --tool codex --out ./tmp/track-codex-pack`
 - `track pack export --tool gemini-cli --out ./tmp/track-gemini-pack`
+- `track pack install --tool codex --out ./tmp/track-codex-install --dry-run --json`
+- `track pack install --tool codex --out ./tmp/track-codex-install`
 
 ## Non-goals for V1
 

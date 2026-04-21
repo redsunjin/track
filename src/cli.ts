@@ -5,9 +5,11 @@ import process from "node:process";
 import { applyTrackMutation } from "./actions.js";
 import {
   exportAgentPack,
+  installAgentPack,
   listAgentPackKinds,
   normalizeAgentPackKind,
   summarizeAgentPackExport,
+  summarizeAgentPackInstall,
 } from "./agent-packs.js";
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
@@ -255,6 +257,28 @@ async function main(): Promise<void> {
       }
 
       process.stdout.write(`${summarizeAgentPackExport(result)}\n`);
+      return;
+    }
+
+    if (subcommand === "install") {
+      const normalizedKind = normalizeAgentPackKind(packKind);
+      if (!normalizedKind) {
+        throw new Error("`track pack install` requires `--tool <claude-code|codex|gemini-cli>`.");
+      }
+
+      const result = await installAgentPack({
+        dryRun,
+        repoRoot: process.cwd(),
+        kind: normalizedKind,
+        targetDir: outDir,
+      });
+
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+        return;
+      }
+
+      process.stdout.write(`${summarizeAgentPackInstall(result)}\n`);
       return;
     }
 

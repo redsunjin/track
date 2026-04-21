@@ -19,6 +19,15 @@ export interface AgentPackExportResult {
   readmePath: string;
 }
 
+export interface AgentPackInstallResult {
+  dryRun: boolean;
+  installManifestPath: string;
+  installedFiles: string[];
+  kind: AgentPackKind;
+  label: string;
+  targetDir: string;
+}
+
 const TRACK_VERSION = "0.1.0";
 
 const PACKS: Record<AgentPackKind, AgentPackMetadata> = {
@@ -65,6 +74,10 @@ export function normalizeAgentPackKind(raw: string | undefined): AgentPackKind |
 
 export function resolveDefaultAgentPackOutDir(repoRoot: string, kind: AgentPackKind): string {
   return path.join(repoRoot, ".track", "agent-packs", kind);
+}
+
+export function resolveDefaultAgentPackInstallDir(repoRoot: string, kind: AgentPackKind): string {
+  return path.join(repoRoot, ".track", "agent-installs", kind);
 }
 
 export async function exportAgentPack(options: {
@@ -164,6 +177,73 @@ export function summarizeAgentPackExport(result: AgentPackExportResult): string 
   ].join("\n");
 }
 
+export async function installAgentPack(options: {
+  dryRun?: boolean;
+  kind: AgentPackKind;
+  repoRoot: string;
+  targetDir?: string;
+}): Promise<AgentPackInstallResult> {
+  const pack = PACKS[options.kind];
+  const targetDir = path.resolve(options.targetDir ?? resolveDefaultAgentPackInstallDir(options.repoRoot, pack.kind));
+  const plannedFiles = plannedAgentPackFiles(pack.kind);
+  const installManifestPath = path.join(targetDir, "install-manifest.json");
+  const installedFiles = [...plannedFiles, "install-manifest.json"];
+
+  if (options.dryRun) {
+    return {
+      dryRun: true,
+      installManifestPath,
+      installedFiles,
+      kind: pack.kind,
+      label: pack.label,
+      targetDir,
+    };
+  }
+
+  await exportAgentPack({
+    repoRoot: options.repoRoot,
+    kind: pack.kind,
+    outDir: targetDir,
+  });
+
+  await writeFile(
+    installManifestPath,
+    JSON.stringify(
+      {
+        version: 1,
+        track_version: TRACK_VERSION,
+        tool: pack.kind,
+        label: pack.label,
+        installed_at: new Date().toISOString(),
+        target_dir: targetDir,
+        files: installedFiles,
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  return {
+    dryRun: false,
+    installManifestPath,
+    installedFiles,
+    kind: pack.kind,
+    label: pack.label,
+    targetDir,
+  };
+}
+
+export function summarizeAgentPackInstall(result: AgentPackInstallResult): string {
+  const verb = result.dryRun ? "Would install" : "Installed";
+  return [
+    `${verb} ${result.label} pack`,
+    `TARGET   ${result.targetDir}`,
+    `FILES    ${result.installedFiles.length}`,
+    `MANIFEST ${result.installManifestPath}`,
+  ].join("\n");
+}
+
 async function copyTrackedFile(sourcePath: string, targetPath: string): Promise<void> {
   await mkdir(path.dirname(targetPath), { recursive: true });
   await copyFile(sourcePath, targetPath);
@@ -191,4 +271,14 @@ export async function listAgentPackFiles(root: string): Promise<string[]> {
     files.push(entry.name);
   }
   return files.sort();
+}
+
+function plannedAgentPackFiles(kind: AgentPackKind): string[] {
+  const pack = PACKS[kind];
+  return [
+    ...SHARED_FILES.map((relativePath) => path.join("shared", relativePath)),
+    ...pack.files.map((relativePath) => path.join(pack.kind, relativePath)),
+    "README.md",
+    "manifest.json",
+  ];
 }

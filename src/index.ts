@@ -2,14 +2,17 @@ export { applyTrackMutation } from "./actions.js";
 export { buildTrackControlSnapshot, listTrackNextActions, listTrackTasks } from "./control.js";
 export {
   exportAgentPack,
+  installAgentPack,
   listAgentPackFiles,
   listAgentPackKinds,
   loadAgentPackManifest,
   normalizeAgentPackKind,
+  resolveDefaultAgentPackInstallDir,
   resolveDefaultAgentPackOutDir,
   summarizeAgentPackExport,
+  summarizeAgentPackInstall,
 } from "./agent-packs.js";
-export type { AgentPackExportResult, AgentPackKind } from "./agent-packs.js";
+export type { AgentPackExportResult, AgentPackInstallResult, AgentPackKind } from "./agent-packs.js";
 export { intermediateToExternalPlan } from "./adapters/bridge.js";
 export { MockRoadmapAdapter } from "./adapters/base.js";
 export { FileRoadmapAdapter } from "./adapters/file-adapter.js";

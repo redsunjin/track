@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 12
-  active_lap: 12
+  total_laps: 13
+  active_lap: 13
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -177,6 +177,22 @@ laps:
         weight: 2
       - id: cp-29
         title: Extension host docs and smoke coverage
+        status: done
+        weight: 2
+  - id: lap-13
+    title: Agent pack install hooks
+    status: done
+    checkpoints:
+      - id: cp-30
+        title: Install plan and manifest support
+        status: done
+        weight: 2
+      - id: cp-31
+        title: CLI pack install path
+        status: done
+        weight: 3
+      - id: cp-32
+        title: Install smoke and docs integration
         status: done
         weight: 2
 tasks:
@@ -348,6 +364,21 @@ tasks:
   - id: task-034
     title: Update extension host smoke coverage and docs
     checkpoint_id: cp-29
+    status: done
+    owner: codex
+  - id: task-035
+    title: Add install planning and manifest support
+    checkpoint_id: cp-30
+    status: done
+    owner: codex
+  - id: task-036
+    title: Wire CLI pack install path
+    checkpoint_id: cp-31
+    status: done
+    owner: codex
+  - id: task-037
+    title: Verify install smoke and docs integration
+    checkpoint_id: cp-32
     status: done
     owner: codex
 flags: []
@@ -617,3 +648,28 @@ events:
     actor: codex
     timestamp: 2026-04-21T15:40:00+09:00
     summary: Completed TRK-038 VS Code Companion Expansion
+  - id: evt-2026-04-21T16:00:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-21T16:00:00+09:00
+    summary: Selected TRK-039 Agent Pack Install Hooks as the next active slice
+  - id: evt-2026-04-21T16:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T16:10:00+09:00
+    summary: Completed Add install planning and manifest support
+  - id: evt-2026-04-21T16:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T16:20:00+09:00
+    summary: Completed Wire CLI pack install path
+  - id: evt-2026-04-21T16:30:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T16:30:00+09:00
+    summary: Completed Verify install smoke and docs integration
+  - id: evt-2026-04-21T16:35:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-21T16:35:00+09:00
+    summary: Completed TRK-039 Agent Pack Install Hooks

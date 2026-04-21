@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   exportAgentPack,
+  installAgentPack,
   listAgentPackFiles,
   listAgentPackKinds,
   loadAgentPackManifest,
@@ -51,3 +52,47 @@ for (const kind of listAgentPackKinds()) {
     assert.ok((helperStat.mode & 0o111) !== 0);
   });
 }
+
+test("installAgentPack supports dry-run planning without writing files", async () => {
+  const targetDir = await mkdtemp(path.join(os.tmpdir(), "track-pack-install-dry-run-"));
+  const installDir = path.join(targetDir, "codex");
+  const result = await installAgentPack({
+    dryRun: true,
+    repoRoot: REPO_ROOT,
+    kind: "codex",
+    targetDir: installDir,
+  });
+
+  assert.equal(result.dryRun, true);
+  assert.equal(result.kind, "codex");
+  assert.equal(result.targetDir, installDir);
+  assert.ok(result.installedFiles.includes("install-manifest.json"));
+  assert.ok(result.installedFiles.includes(path.join("shared", "bin", "track-context.sh")));
+  assert.ok(result.installedFiles.includes(path.join("codex", "README.md")));
+
+  await assert.rejects(readFile(path.join(installDir, "install-manifest.json"), "utf8"));
+});
+
+test("installAgentPack writes bundle files and an install manifest", async () => {
+  const targetDir = await mkdtemp(path.join(os.tmpdir(), "track-pack-install-"));
+  const installDir = path.join(targetDir, "gemini-cli");
+  const result = await installAgentPack({
+    repoRoot: REPO_ROOT,
+    kind: "gemini-cli",
+    targetDir: installDir,
+  });
+
+  const exportedFiles = await listAgentPackFiles(installDir);
+  const installManifest = JSON.parse(await readFile(path.join(installDir, "install-manifest.json"), "utf8")) as {
+    tool: string;
+    files: string[];
+  };
+
+  assert.equal(result.dryRun, false);
+  assert.equal(installManifest.tool, "gemini-cli");
+  assert.ok(exportedFiles.includes("install-manifest.json"));
+  assert.ok(exportedFiles.includes("manifest.json"));
+  assert.ok(exportedFiles.includes(path.join("shared", "bin", "track-update.sh")));
+  assert.ok(exportedFiles.includes(path.join("gemini-cli", "README.md")));
+  assert.ok(installManifest.files.includes("install-manifest.json"));
+});
