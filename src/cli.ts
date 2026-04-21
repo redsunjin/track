@@ -12,6 +12,7 @@ import {
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
 import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
+import { buildTrackControlSnapshot } from "./control.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
@@ -269,6 +270,21 @@ async function main(): Promise<void> {
     }
     if (!result.ok) {
       process.exitCode = 1;
+    }
+    return;
+  }
+
+  if (command === "control") {
+    const state = await loadTrackState(process.cwd(), file);
+    const snapshot = buildTrackControlSnapshot(state);
+    if (json) {
+      process.stdout.write(`${JSON.stringify(snapshot, null, 2)}\n`);
+      return;
+    }
+
+    process.stdout.write(`${renderStatus(snapshot.summary, { color })}\n`);
+    for (const action of snapshot.nextActions.slice(0, 3)) {
+      process.stdout.write(`ACTION   ${action.title}\n`);
     }
     return;
   }

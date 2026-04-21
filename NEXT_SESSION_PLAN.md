@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-037`
-- title: `MCP Control Snapshot Expansion`
+- id: `TRK-038`
+- title: `VS Code Companion Expansion`
 
 ## Goal
 
-Expand the Track MCP read surface with structured task-list, next-action, and control-snapshot tools so agent clients can read one richer control model directly.
+Expand the VS Code companion beyond a webview-only surface by adding a compact course tree and strengthening the always-visible corner telemetry signal.
 
 ## First Steps
 
-1. define one shared control-snapshot helper over the existing Track state model
-2. expose task-list, next-action, and control-snapshot tools through MCP
-3. verify the richer MCP payloads stay aligned with the terminal summary vocabulary
+1. add a `Track Course` tree view contribution and provider
+2. wire the tree and status bar to the shared Track control snapshot
+3. verify the extension host smoke path, docs, and runtime state stay aligned
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- keep MCP reads thin and avoid reimplementing state semantics per tool
-- do not add new MCP write mutations in this slice
-- keep CLI and MCP semantics aligned across all surfaces
-- do not reopen completed adapter, telemetry, or pack-export slices unless a regression appears
+- keep VS Code as a companion surface, not the source of truth
+- do not introduce a separate VS Code state model
+- keep terminal and MCP surfaces unchanged unless a regression appears
+- do not add publishing or marketplace work in this slice
 
 ## Verification
 
@@ -29,11 +29,12 @@ Expand the Track MCP read surface with structured task-list, next-action, and co
 npm test
 npm run check:harness
 npm run status -- --no-color
-node --import tsx ./src/cli.ts mcp-smoke-test
+npm run vscode:build
+npm run vscode:check
 ```
 
 ## Exit Condition
 
-- MCP exposes structured task-list, next-action, and control-snapshot tools
-- richer MCP reads still point at the same shared local `.track` runtime
-- agent clients can read one control payload without scraping terminal text
+- VS Code contributes a `Track Course` tree view
+- the status bar reads as a compact corner telemetry widget
+- tree, webview, and status bar all read from the same local Track runtime

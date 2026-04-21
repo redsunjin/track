@@ -15,6 +15,7 @@
     "onStartupFinished",
     "onCommand:track.openCompanion",
     "onCommand:track.refreshCompanion",
+    "onView:track.course",
     "workspaceContains:.track/state.yaml",
     "workspaceContains:.track/state.yml",
     "workspaceContains:.track/state.json"
@@ -30,6 +31,14 @@
         "command": "track.refreshCompanion",
         "title": "Track: Refresh Companion"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "track.course",
+          "name": "Track Course"
+        }
+      ]
+    }
   }
 }

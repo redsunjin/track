@@ -24,6 +24,13 @@ test("VS Code companion host smoke path loads summary and refreshes on state cha
 
   const subscriptions: Array<{ dispose: () => void }> = [];
   const commandHandlers = new Map<string, () => unknown | Promise<unknown>>();
+  const treeProviders = new Map<
+    string,
+    {
+      getChildren: (element?: unknown) => unknown[] | Promise<unknown[]>;
+      getTreeItem: (element: unknown) => unknown;
+    }
+  >();
   const panels: Array<{
     title: string;
     webview: { html: string };
@@ -46,6 +53,12 @@ test("VS Code companion host smoke path loads summary and refreshes on state cha
   };
 
   const mockVscode = {
+    EventEmitter: class EventEmitter {
+      event = () => undefined;
+      fire() {
+        return undefined;
+      }
+    },
     RelativePattern: class RelativePattern {
       constructor(
         public readonly base: { uri: { fsPath: string } },
@@ -54,6 +67,18 @@ test("VS Code companion host smoke path loads summary and refreshes on state cha
     },
     StatusBarAlignment: {
       Right: 2,
+    },
+    TreeItem: class TreeItem {
+      description = "";
+      tooltip = "";
+      constructor(
+        public readonly label: string,
+        public readonly collapsibleState: number
+      ) {}
+    },
+    TreeItemCollapsibleState: {
+      None: 0,
+      Expanded: 2,
     },
     ViewColumn: {
       Beside: 2,
@@ -81,6 +106,10 @@ test("VS Code companion host smoke path loads summary and refreshes on state cha
         };
         panels.push(panel);
         return panel;
+      },
+      registerTreeDataProvider: (viewId: string, provider: { getChildren: () => unknown[]; getTreeItem: (element: unknown) => unknown }) => {
+        treeProviders.set(viewId, provider);
+        return { dispose: () => treeProviders.delete(viewId) };
       },
     },
     workspace: {
@@ -134,9 +163,17 @@ test("VS Code companion host smoke path loads summary and refreshes on state cha
     await waitFor(() => statusBar.text.includes("Track"));
     assert.equal(commandHandlers.has("track.openCompanion"), true);
     assert.equal(commandHandlers.has("track.refreshCompanion"), true);
+    assert.equal(treeProviders.has("track.course"), true);
     assert.equal(watchers.length, 3);
     assert.equal(watchers[0]?.changeCallbacks.length ?? 0, 1);
+    assert.match(statusBar.tooltip, /Track Corner Widget/);
     assert.match(statusBar.tooltip, /Text dashboard|Lock checkpoint weights and event schema/);
+
+    const treeProvider = treeProviders.get("track.course");
+    const roots = (await treeProvider?.getChildren()) as Array<{ label: string; description?: string; children?: unknown[] }>;
+    assert.ok(roots.some((node) => node.label === "SIGNAL"));
+    assert.ok(roots.some((node) => node.label === "NEXT ACTIONS"));
+    assert.ok(roots.some((node) => node.label === "TASK BOARD"));
 
     await commandHandlers.get("track.openCompanion")?.();
     assert.equal(panels.length, 1);

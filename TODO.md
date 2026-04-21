@@ -2,13 +2,22 @@
 
 ## Active
 
-- `TRK-037` MCP Control Snapshot Expansion
+- `TRK-038` VS Code Companion Expansion
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-037 MCP Control Snapshot Expansion
+
+- completed:
+  - shared control snapshot helper
+  - `list_track_tasks`
+  - `get_track_next_actions`
+  - `get_track_control_snapshot`
+  - MCP contract and smoke coverage updates
 
 ### TRK-036 Installable Agent Packs
 

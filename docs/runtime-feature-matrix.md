@@ -172,6 +172,7 @@ Good additions:
 - tiny lap counter
 - shortened owner label
 - IDE companion panel sharing the same summary vocabulary
+- VS Code tree view sharing the same control snapshot
 
 ### 3. `track map`
 
@@ -310,7 +311,7 @@ Must show:
 
 ### Can wait
 
-- VS Code companion
+- VS Code marketplace packaging
 - richer ASCII track art
 - multi-user approval flows
 - persistent SQLite aggregation for Pitwall

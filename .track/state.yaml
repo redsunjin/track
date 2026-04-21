@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 11
-  active_lap: 11
+  total_laps: 12
+  active_lap: 12
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -161,6 +161,22 @@ laps:
         weight: 3
       - id: cp-26
         title: MCP contract and regression coverage
+        status: done
+        weight: 2
+  - id: lap-12
+    title: VS Code companion expansion
+    status: done
+    checkpoints:
+      - id: cp-27
+        title: VS Code course tree contribution
+        status: done
+        weight: 3
+      - id: cp-28
+        title: Corner telemetry signal pass
+        status: done
+        weight: 2
+      - id: cp-29
+        title: Extension host docs and smoke coverage
         status: done
         weight: 2
 tasks:
@@ -317,6 +333,21 @@ tasks:
   - id: task-031
     title: Update MCP contract and regression coverage
     checkpoint_id: cp-26
+    status: done
+    owner: codex
+  - id: task-032
+    title: Add VS Code Track Course tree view
+    checkpoint_id: cp-27
+    status: done
+    owner: codex
+  - id: task-033
+    title: Tighten compact corner telemetry status
+    checkpoint_id: cp-28
+    status: done
+    owner: codex
+  - id: task-034
+    title: Update extension host smoke coverage and docs
+    checkpoint_id: cp-29
     status: done
     owner: codex
 flags: []
@@ -561,3 +592,28 @@ events:
     actor: codex
     timestamp: 2026-04-21T14:40:00+09:00
     summary: Completed TRK-037 MCP Control Snapshot Expansion
+  - id: evt-2026-04-21T15:00:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-21T15:00:00+09:00
+    summary: Selected TRK-038 VS Code Companion Expansion as the next active slice
+  - id: evt-2026-04-21T15:15:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T15:15:00+09:00
+    summary: Completed Add VS Code Track Course tree view
+  - id: evt-2026-04-21T15:25:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T15:25:00+09:00
+    summary: Completed Tighten compact corner telemetry status
+  - id: evt-2026-04-21T15:35:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-21T15:35:00+09:00
+    summary: Completed Update extension host smoke coverage and docs
+  - id: evt-2026-04-21T15:40:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-21T15:40:00+09:00
+    summary: Completed TRK-038 VS Code Companion Expansion

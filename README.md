@@ -33,7 +33,7 @@ V1 is a plugin-first architecture:
 - CLI progress view with ANSI signal mode and `--no-color` fallback
 - generic external plan import path
 - `lab` shorthand that maps to Track and Pitwall terminal surfaces
-- minimal VS Code companion scaffold plus room for a later compact corner widget
+- VS Code companion with webview, course tree, and compact corner telemetry
 - exportable Claude/Codex/Gemini operating-pack bundles
 
 ## Security defaults
@@ -55,6 +55,7 @@ Current behavior:
 
 - adds `Track: Open Companion`
 - shows a status bar indicator
+- contributes a `Track Course` tree view under Explorer
 - opens a webview panel with the same summary vocabulary as `track status`
 - refreshes when local `.track/state.yaml` changes
 

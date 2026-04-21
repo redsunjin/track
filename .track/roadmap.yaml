@@ -297,3 +297,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-12
+      title: VS Code companion expansion
+      goal: Add a compact Track Course tree view and corner telemetry treatment to the VS Code companion.
+      kind: ui
+      checkpoints:
+        - id: cp-27
+          title: VS Code course tree contribution
+          kind: ui
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-28
+          title: Corner telemetry signal pass
+          kind: ui
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-29
+          title: Extension host docs and smoke coverage
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
