@@ -425,3 +425,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-16
+      title: Retro track color pass
+      goal: Make terminal map output feel more like a retro course board with sector markers, type-aware color, and plain-text fallback.
+      kind: ui
+      checkpoints:
+        - id: cp-39
+          title: Wrapped course board
+          kind: ui
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 1
+            coordination: 1
+            risk: 1
+        - id: cp-40
+          title: Segment markers and color legend
+          kind: ui
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 1
+            coordination: 1
+            risk: 1
+        - id: cp-41
+          title: Color and plain fallback verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 1
+            coordination: 1
+            risk: 1

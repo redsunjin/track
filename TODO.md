@@ -2,13 +2,23 @@
 
 ## Active
 
-- `TRK-041` Package Artifact Dry Run
+- `TRK-042` Retro Track Color Pass
 
 ## Queued
 
 ## Parked
 
 ## Done
+
+### TRK-041 Package Artifact Dry Run
+
+- completed:
+  - `package.json.files` artifact allowlist
+  - `track package dry-run`
+  - `npm run package:dry-run`
+  - export/bin/docs/package boundary coverage checks
+  - `npm run typecheck`
+  - npm pack dry-run verification
 
 ### TRK-040 Package Split / Publishable Layout
 

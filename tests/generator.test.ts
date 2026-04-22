@@ -48,7 +48,10 @@ test("renderTrackMap prints a roadmap-derived course overview", async () => {
   const output = renderTrackMap(roadmap.project.name, generateTrackMap(roadmap, state));
 
   assert.match(output, /TRACK \/\/ MAP GENERATOR/);
+  assert.match(output, /MODE     RETRO COURSE BOARD/);
   assert.match(output, /COURSE/);
+  assert.match(output, /LEGEND/);
+  assert.match(output, /\[#01>>>>\]/);
   assert.match(output, /MCP contract/);
   assert.match(output, /Claude\/Codex\/Gemini command adapters/);
   assert.match(output, /Generic plan import adapter/);

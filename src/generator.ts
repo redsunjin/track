@@ -1,4 +1,4 @@
-import { createPalette, type RenderOptions } from "./ansi.js";
+import { createPalette, padLeftVisible, padVisible, visibleLength, type RenderOptions } from "./ansi.js";
 import { sanitizeInlineText } from "./security.js";
 import type {
   Checkpoint,
@@ -41,12 +41,18 @@ export function generateTrackMap(roadmap: TrackRoadmapFile, state?: TrackStateFi
 export function renderTrackMap(projectName: string, segments: TrackSegment[], options?: RenderOptions): string {
   const palette = createPalette(options);
   const active = segments.find((segment) => segment.progressState === "active");
+  const stats = summarizeCourse(segments);
   const lines = [
     palette.header("TRACK // MAP GENERATOR"),
     palette.divider("------------------------------------------------------------"),
     `PROJECT  ${sanitizeInlineText(projectName, "unknown")}`,
+    "MODE     RETRO COURSE BOARD",
     `ACTIVE   ${active ? palette.active(sanitizeInlineText(active.label, active.id)) : palette.muted("none")}`,
-    `COURSE   ${segments.map((segment) => renderSegmentGlyph(segment, palette)).join(palette.divider("-"))}`,
+    `BOARD    ${palette.success(`${stats.done} done`)}  ${palette.active(`${stats.active} active`)}  ${palette.muted(`${stats.upcoming} upcoming`)}  ${palette.label(`${segments.length} sectors`)}`,
+    palette.divider("------------------------------------------------------------"),
+    palette.header("COURSE"),
+    ...renderCourseRows(segments, palette),
+    `LEGEND   ${palette.success("# done")}  ${palette.active("@ active")}  ${palette.muted(". upcoming")}  ${renderTypeLegend(palette)}`,
     palette.divider("------------------------------------------------------------"),
     palette.header("IDX  TYPE      DFF  SLP  PAC  ST   LABEL"),
     palette.divider("------------------------------------------------------------"),
@@ -54,7 +60,7 @@ export function renderTrackMap(projectName: string, segments: TrackSegment[], op
 
   for (const [index, segment] of segments.entries()) {
     const typeCell = palette.segment(segment.type, segment.progressState, pad(segment.type.toUpperCase(), 8));
-    const stateCell = palette.segment(segment.type, segment.progressState, pad(segment.progressState.toUpperCase(), 7));
+    const stateCell = renderProgressState(segment.progressState, palette);
     const label =
       segment.progressState === "active"
         ? palette.active(sanitizeInlineText(segment.label, segment.id))
@@ -62,10 +68,10 @@ export function renderTrackMap(projectName: string, segments: TrackSegment[], op
           ? palette.success(sanitizeInlineText(segment.label, segment.id))
           : sanitizeInlineText(segment.label, segment.id);
     lines.push(
-      `${padLeft(String(index + 1), 2)}   ${typeCell} ${padLeft(segment.difficultyScore.toFixed(1), 3)}  ${padLeft(
+      `${padLeftVisible(String(index + 1), 2)}   ${typeCell} ${padLeftVisible(segment.difficultyScore.toFixed(1), 3)}  ${padLeftVisible(
         segment.slopeScore.toFixed(1),
         3
-      )}  ${padLeft(segment.paceScore.toFixed(1), 3)}  ${stateCell} ${label}`
+      )}  ${padLeftVisible(segment.paceScore.toFixed(1), 3)}  ${stateCell} ${label}`
     );
     if (segment.notes.length) {
       lines.push(`     NOTES  ${palette.muted(sanitizeInlineText(segment.notes.join(" | "), "No notes"))}`);
@@ -73,6 +79,70 @@ export function renderTrackMap(projectName: string, segments: TrackSegment[], op
   }
 
   return lines.join("\n");
+}
+
+function summarizeCourse(segments: TrackSegment[]): { active: number; done: number; upcoming: number } {
+  return {
+    active: segments.filter((segment) => segment.progressState === "active").length,
+    done: segments.filter((segment) => segment.progressState === "done").length,
+    upcoming: segments.filter((segment) => segment.progressState === "upcoming").length,
+  };
+}
+
+function renderCourseRows(segments: TrackSegment[], palette: ReturnType<typeof createPalette>): string[] {
+  const maxWidth = 104;
+  const rows: string[] = [];
+  let row = `${palette.muted("START")} `;
+
+  for (const [index, segment] of segments.entries()) {
+    const token = renderSegmentToken(segment, index + 1, palette);
+    const separator = row.trim().length ? " " : "";
+    if (visibleLength(row) + visibleLength(separator) + visibleLength(token) > maxWidth) {
+      rows.push(row.trimEnd());
+      row = "      ";
+    }
+    row += `${separator}${token}`;
+  }
+
+  if (row.trim().length) {
+    rows.push(`${row.trimEnd()} ${palette.muted("FINISH")}`);
+  }
+
+  return rows.map((line, index) => `${index === 0 ? "TRACK   " : "        "}${line}`);
+}
+
+function renderSegmentToken(
+  segment: TrackSegment,
+  index: number,
+  palette: ReturnType<typeof createPalette>
+): string {
+  const marker = segment.progressState === "active" ? "@" : segment.progressState === "done" ? "#" : ".";
+  const sector = String(index).padStart(2, "0");
+  return palette.segment(segment.type, segment.progressState, `[${marker}${sector}${glyphForType(segment.type)}]`);
+}
+
+function renderTypeLegend(palette: ReturnType<typeof createPalette>): string {
+  return [
+    palette.segment("sprint", "upcoming", ">>>> sprint"),
+    palette.segment("straight", "upcoming", "==== straight"),
+    palette.segment("sweep", "upcoming", "~~~~ sweep"),
+    palette.segment("chicane", "upcoming", "S//S chicane"),
+    palette.segment("climb", "upcoming", "/^^\\ climb"),
+    palette.segment("fork", "upcoming", "Y--Y fork"),
+  ].join("  ");
+}
+
+function renderProgressState(
+  progressState: "active" | "done" | "upcoming",
+  palette: ReturnType<typeof createPalette>
+): string {
+  if (progressState === "active") {
+    return palette.active(padVisible("ACTIVE", 7));
+  }
+  if (progressState === "done") {
+    return palette.success(padVisible("DONE", 7));
+  }
+  return palette.muted(padVisible("UPCOMING", 7));
 }
 
 function buildSegment(
@@ -263,12 +333,6 @@ function buildNotes(
   return notes;
 }
 
-function renderSegmentGlyph(segment: TrackSegment, palette: ReturnType<typeof createPalette>): string {
-  const base = glyphForType(segment.type);
-  const glyph = segment.progressState === "done" ? base.toLowerCase() : segment.progressState === "active" ? `@${base}` : base;
-  return palette.segment(segment.type, segment.progressState, glyph);
-}
-
 function glyphForType(type: SegmentType): string {
   switch (type) {
     case "straight":
@@ -278,15 +342,15 @@ function glyphForType(type: SegmentType): string {
     case "sweep":
       return "~~~~";
     case "chicane":
-      return "SSSS";
+      return "S//S";
     case "hairpin":
-      return "UUUU";
+      return "U--U";
     case "climb":
-      return "^^^^";
+      return "/^^\\";
     case "pit":
       return "|PP|";
     case "fork":
-      return "Y==Y";
+      return "Y--Y";
   }
 }
 

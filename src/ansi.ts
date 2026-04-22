@@ -78,9 +78,6 @@ export function createPalette(options?: RenderOptions): SignalPalette {
       if (progressState === "active") {
         return wrap(text, BOLD, CYAN);
       }
-      if (progressState === "done") {
-        return wrap(text, GREEN);
-      }
       switch (type) {
         case "pit":
           return wrap(text, BLUE);

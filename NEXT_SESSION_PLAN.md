@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-041`
-- title: `Package Artifact Dry Run`
+- id: `TRK-042`
+- title: `Retro Track Color Pass`
 
 ## Goal
 
-Add a deterministic package artifact dry-run so Track can verify exports, bin targets, docs, and package allowlist coverage before any physical npm publish or workspace split.
+Make the terminal map feel more like a retro course board by adding wrapped track tokens, sector markers, type-aware color, and a clear legend.
 
 ## First Steps
 
-1. add a `package.json.files` allowlist for the current source-level distribution boundary
-2. expose `track package dry-run` and `npm run package:dry-run`
-3. document the dry-run contract and keep the root package private
+1. replace the single-line course string with a wrapped course board
+2. add sector markers and a state/type legend
+3. preserve plain-text fallback while improving ANSI color output
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- do not publish npm packages in this slice
-- keep this as a dry-run/readiness check, not a physical workspace split
-- do not move runtime files
-- package docs must clearly state that the root package remains private
+- keep terminal UX as the primary validation surface
+- keep ASCII fallback readable without ANSI color
+- do not introduce a browser game surface in this slice
+- avoid state mutations during visual checks
 
 ## Verification
 
@@ -29,15 +29,14 @@ Add a deterministic package artifact dry-run so Track can verify exports, bin ta
 npm test
 npm run typecheck
 npm run check:harness
+npm run map -- --no-color
+npm run map -- --color
 npm run status -- --no-color
-npm run package:check
-npm run package:dry-run
-node --import tsx ./src/cli.ts package dry-run --json
-npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- `package.json.files` covers source package boundaries, docs, VS Code extension sources, and agent packs
-- `track package dry-run` reports export/bin/allowlist coverage
-- dry-run checks pass with normal test and harness checks
+- `track map` renders a wrapped retro course board instead of one long course line
+- segment tokens show sector number and progress marker
+- ANSI color differentiates segment types while the table keeps done/active/upcoming state clear
+- plain text remains readable with `--no-color`

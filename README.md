@@ -113,6 +113,15 @@ Reference:
 
 - [docs/package-layout.md](docs/package-layout.md)
 
+## Retro terminal surfaces
+
+The terminal map now renders a wrapped retro course board with sector markers and type-aware ANSI color:
+
+- `npm run map -- --color`
+- `npm run map -- --no-color`
+- `npm run companion -- --color`
+- `npm run pitwall -- --root /path/to/workspace --color`
+
 ## Non-goals for V1
 
 - generic project management replacement
