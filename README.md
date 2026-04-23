@@ -36,7 +36,7 @@ V1 is a plugin-first architecture:
 - VS Code companion with webview, course tree, and compact corner telemetry
 - exportable Claude/Codex/Gemini operating-pack bundles
 - source-level package boundaries for `track-core`, `track-runtime`, `track-mcp`, `track-cli`, `track-agents`, and `track-vscode`
-- compiled `dist` build artifacts for package readiness checks
+- compiled `dist` package exports and CLI bin for release-manifest readiness checks
 
 ## Security defaults
 
@@ -126,7 +126,7 @@ Current checks:
 - `track package dry-run`
 
 `package:build-check` runs the compiled CLI from `dist/cli.js` after build.
-The package exports remain source-level until the release manifest is switched in a later slice.
+The public package exports and `bin.track` now point at compiled release artifacts under `dist`.
 
 Reference:
 

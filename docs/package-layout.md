@@ -26,7 +26,7 @@ The root package exposes subpaths that mirror the boundary map:
 - `track/vscode`
 - `track/package-layout`
 
-These are source-level exports for the current local-first runtime.
+These package exports now resolve to compiled release artifacts under `dist/`.
 They are not yet independent npm packages.
 
 ## Build Artifacts
@@ -36,12 +36,13 @@ The build emits JavaScript, source maps, declarations, and declaration maps.
 
 This is the current release baseline:
 
-- `src/` remains the local development and test entrypoint surface
+- `src/` remains the local development and source-boundary surface
 - `dist/` is generated and included in `package.json.files`
-- `npm run package:build-check` builds `dist/` and then runs the package dry-run through `node dist/cli.js`
+- `package.json.exports` points public subpaths at `dist/**/*.js` with matching declaration targets
+- `bin.track` points at `dist/cli.js`
+- `npm run package:build-check` builds root runtime artifacts, builds the VS Code extension, and then runs the package dry-run through `node dist/cli.js`
 
-The package exports and CLI bin still point at source-level entrypoints in this slice.
-Switching exports/bin to compiled `dist` targets should happen as a separate release-manifest slice after the built CLI path is stable.
+The root package still remains `private: true`, so this is a release-manifest readiness baseline rather than an npm publishing step.
 
 ## Extension subpaths
 
@@ -62,6 +63,7 @@ Run:
 
 ```bash
 npm run build
+npm run vscode:build
 npm run package:check
 npm run package:dry-run
 npm run package:build-check
@@ -70,6 +72,7 @@ npm pack --dry-run --json
 
 This verifies that every declared boundary has an entrypoint and that the owned source paths still exist.
 The dry-run check also verifies that `package.json.files` covers `dist`, boundary entrypoints, exported subpaths, CLI bin target, and package layout docs before any physical npm packing step.
+Export and bin targets must exist, so run the build scripts before invoking `node dist/cli.js package dry-run` directly.
 
 Track's root package remains `private: true`.
 `package dry-run` is therefore a distribution-readiness check, not a publishing command.

@@ -2,16 +2,25 @@
 
 ## Active
 
-- `TRK-043` Build Artifact Baseline
+- `TRK-044` Release Manifest Switch
 
 ## Queued
 
-- `TRK-044` Release Manifest Switch
 - `TRK-045` OpenClaw Pitwall CLI Surface
+- `TRK-046` Publish/Install Smoke
 
 ## Parked
 
 ## Done
+
+### TRK-043 Build Artifact Baseline
+
+- completed:
+  - root `tsconfig.build.json`
+  - `npm run build`
+  - `dist` allowlist coverage
+  - built CLI package dry-run path
+  - build artifact docs and regression coverage
 
 ### TRK-042 Retro Track Color Pass
 

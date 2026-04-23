@@ -13,21 +13,54 @@
     "AGENTS.md"
   ],
   "exports": {
-    ".": "./src/index.ts",
-    "./agents": "./src/packages/agents.ts",
-    "./bot-bridge": "./src/packages/bot-bridge.ts",
-    "./cli": "./src/packages/cli.ts",
-    "./core": "./src/packages/core.ts",
-    "./mcp": "./src/packages/mcp.ts",
-    "./openclaw-adapter": "./src/packages/openclaw-adapter.ts",
-    "./openclaw-monitor": "./src/packages/openclaw-monitor.ts",
-    "./package-layout": "./src/package-layout.ts",
-    "./pitwall-monitor": "./src/packages/pitwall-monitor.ts",
-    "./runtime": "./src/packages/runtime.ts",
-    "./vscode": "./vscode-extension/src/extension.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./agents": {
+      "types": "./dist/packages/agents.d.ts",
+      "import": "./dist/packages/agents.js"
+    },
+    "./bot-bridge": {
+      "types": "./dist/packages/bot-bridge.d.ts",
+      "import": "./dist/packages/bot-bridge.js"
+    },
+    "./cli": {
+      "types": "./dist/packages/cli.d.ts",
+      "import": "./dist/packages/cli.js"
+    },
+    "./core": {
+      "types": "./dist/packages/core.d.ts",
+      "import": "./dist/packages/core.js"
+    },
+    "./mcp": {
+      "types": "./dist/packages/mcp.d.ts",
+      "import": "./dist/packages/mcp.js"
+    },
+    "./openclaw-adapter": {
+      "types": "./dist/packages/openclaw-adapter.d.ts",
+      "import": "./dist/packages/openclaw-adapter.js"
+    },
+    "./openclaw-monitor": {
+      "types": "./dist/packages/openclaw-monitor.d.ts",
+      "import": "./dist/packages/openclaw-monitor.js"
+    },
+    "./package-layout": {
+      "types": "./dist/package-layout.d.ts",
+      "import": "./dist/package-layout.js"
+    },
+    "./pitwall-monitor": {
+      "types": "./dist/packages/pitwall-monitor.d.ts",
+      "import": "./dist/packages/pitwall-monitor.js"
+    },
+    "./runtime": {
+      "types": "./dist/packages/runtime.d.ts",
+      "import": "./dist/packages/runtime.js"
+    },
+    "./vscode": "./vscode-extension/dist/extension.js"
   },
   "bin": {
-    "track": "./src/cli.ts"
+    "track": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -37,14 +70,14 @@
     "import": "node --import tsx ./src/cli.ts import",
     "lab": "node --import tsx ./src/cli.ts lab",
     "mcp:smoke": "node --import tsx ./src/cli.ts mcp-smoke-test",
-    "package:build-check": "npm run build && node dist/cli.js package dry-run",
+    "package:build-check": "npm run build && npm run vscode:build && node dist/cli.js package dry-run",
     "package:check": "node --import tsx ./src/cli.ts package check",
-    "package:dry-run": "node --import tsx ./src/cli.ts package dry-run",
+    "package:dry-run": "npm run package:build-check",
     "status": "node --import tsx ./src/cli.ts status",
     "next": "node --import tsx ./src/cli.ts next",
     "map": "node --import tsx ./src/cli.ts map",
     "pitwall": "node --import tsx ./src/cli.ts pitwall",
-    "test": "node --import tsx --test tests/**/*.test.ts",
+    "test": "npm run build && node --import tsx --test tests/**/*.test.ts",
     "typecheck": "tsc --noEmit",
     "vscode:build": "tsc -p vscode-extension/tsconfig.json",
     "vscode:check": "tsc -p vscode-extension/tsconfig.json --noEmit"

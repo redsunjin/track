@@ -489,3 +489,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-18
+      title: Release manifest switch
+      goal: Switch public package exports and CLI bin to compiled release artifacts while keeping source boundary checks intact.
+      kind: build
+      checkpoints:
+        - id: cp-45
+          title: Dist package exports
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-46
+          title: Release target guardrails
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-47
+          title: Manifest switch verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1

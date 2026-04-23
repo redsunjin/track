@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 17
-  active_lap: 17
+  total_laps: 18
+  active_lap: 18
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -259,6 +259,22 @@ laps:
         title: Built CLI dry-run verification
         status: done
         weight: 2
+  - id: lap-18
+    title: Release manifest switch
+    status: done
+    checkpoints:
+      - id: cp-45
+        title: Dist package exports
+        status: done
+        weight: 2
+      - id: cp-46
+        title: Release target guardrails
+        status: done
+        weight: 2
+      - id: cp-47
+        title: Manifest switch verification
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -503,6 +519,21 @@ tasks:
   - id: task-049
     title: Verify built CLI dry-run path
     checkpoint_id: cp-44
+    status: done
+    owner: codex
+  - id: task-050
+    title: Switch package exports and CLI bin to dist
+    checkpoint_id: cp-45
+    status: done
+    owner: codex
+  - id: task-051
+    title: Validate release export and bin targets
+    checkpoint_id: cp-46
+    status: done
+    owner: codex
+  - id: task-052
+    title: Verify release manifest dry-run output
+    checkpoint_id: cp-47
     status: done
     owner: codex
 flags: []
@@ -897,3 +928,28 @@ events:
     actor: codex
     timestamp: 2026-04-23T20:27:00+09:00
     summary: Completed TRK-043 Build Artifact Baseline
+  - id: evt-2026-04-23T20:29:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-23T20:29:00+09:00
+    summary: Selected TRK-044 Release Manifest Switch as the next active slice
+  - id: evt-2026-04-23T20:33:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:33:00+09:00
+    summary: Completed Switch package exports and CLI bin to dist
+  - id: evt-2026-04-23T20:35:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:35:00+09:00
+    summary: Completed Validate release export and bin targets
+  - id: evt-2026-04-23T20:37:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:37:00+09:00
+    summary: Completed Verify release manifest dry-run output
+  - id: evt-2026-04-23T20:38:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-23T20:38:00+09:00
+    summary: Completed TRK-044 Release Manifest Switch

@@ -24,6 +24,7 @@ test("package boundaries define the publishable Track package split", () => {
     "track-vscode",
   ]);
   assert.ok(boundaries.every((boundary) => boundary.entrypoint.length > 0));
+  assert.ok(boundaries.every((boundary) => boundary.releaseEntrypoint.length > 0));
   assert.ok(boundaries.every((boundary) => boundary.owns.length > 0));
 });
 
@@ -36,19 +37,27 @@ test("package layout check passes when boundary entrypoints and owned paths exis
   assert.match(renderPackageLayoutCheck(result), /track-core/);
 });
 
-test("package subpath exports resolve the source-level package entrypoints", async () => {
+test("package subpath exports resolve the release package entrypoints", async () => {
+  const root = await import("track");
   const core = await import("track/core");
   const runtime = await import("track/runtime");
   const mcp = await import("track/mcp");
   const agents = await import("track/agents");
+  const botBridge = await import("track/bot-bridge");
   const openclawAdapter = await import("track/openclaw-adapter");
+  const openclawMonitor = await import("track/openclaw-monitor");
+  const pitwallMonitor = await import("track/pitwall-monitor");
   const layout = await import("track/package-layout");
 
+  assert.equal(typeof root.summarizeTrack, "function");
   assert.equal(typeof core.summarizeTrack, "function");
   assert.equal(typeof runtime.loadTrackState, "function");
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
+  assert.equal(typeof botBridge.renderMonitorBotSummary, "function");
   assert.equal(typeof openclawAdapter.buildOpenClawSnapshotFromToolData, "function");
+  assert.equal(typeof openclawMonitor.buildOpenClawMonitorSnapshot, "function");
+  assert.equal(typeof pitwallMonitor.buildPitwallMonitorView, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -61,8 +70,9 @@ test("package dry-run verifies manifest allowlist coverage", async () => {
   assert.ok(result.filesAllowlist.includes("dist"));
   assert.ok(result.filesAllowlist.includes("src"));
   assert.ok(result.filesAllowlist.includes("docs"));
-  assert.ok(result.exportEntries.find((entry) => entry.subpath === "./core")?.covered);
-  assert.ok(result.binEntries.find((entry) => entry.name === "track")?.covered);
+  assert.ok(result.exportEntries.find((entry) => entry.subpath === "./core" && entry.target === "dist/packages/core.js")?.covered);
+  assert.ok(result.exportEntries.find((entry) => entry.subpath === "./core" && entry.target === "dist/packages/core.d.ts")?.covered);
+  assert.ok(result.binEntries.find((entry) => entry.name === "track" && entry.target === "dist/cli.js")?.covered);
   assert.deepEqual(result.issues, []);
   assert.match(renderPackageDryRunCheck(result), /PACKAGE DRY-RUN OK/);
   assert.match(renderPackageDryRunCheck(result), /private-root/);

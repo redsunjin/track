@@ -7,6 +7,7 @@ export interface TrackPackageBoundary {
   name: string;
   packageName: string;
   owns: string[];
+  releaseEntrypoint: string;
 }
 
 export interface PackageLayoutCheckResult {
@@ -20,6 +21,7 @@ export interface PackageLayoutCheckResult {
 }
 
 export interface PackageDryRunEntry {
+  condition?: string;
   covered: boolean;
   coveredBy: string | null;
   name?: string;
@@ -34,7 +36,9 @@ export interface PackageDryRunIssue {
     | "missing_build_artifact_allowlist"
     | "missing_build_script"
     | "missing_bin"
+    | "missing_bin_target"
     | "missing_export"
+    | "missing_export_target"
     | "missing_files_allowlist"
     | "missing_package_field"
     | "missing_package_file"
@@ -69,6 +73,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     description: "Canonical types, summary projection, control snapshot, and track-map generation.",
     entrypoint: "src/packages/core.ts",
     owns: ["src/types.ts", "src/summary.ts", "src/control.ts", "src/generator.ts", "src/security.ts"],
+    releaseEntrypoint: "dist/packages/core.js",
   },
   {
     name: "runtime",
@@ -76,6 +81,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     description: "File-backed state loading, mutation, import adapters, and Pitwall runtime helpers.",
     entrypoint: "src/packages/runtime.ts",
     owns: ["src/state.ts", "src/roadmap.ts", "src/mutation.ts", "src/actions.ts", "src/external-plan.ts", "src/adapters", "src/pitwall.ts"],
+    releaseEntrypoint: "dist/packages/runtime.js",
   },
   {
     name: "mcp",
@@ -83,6 +89,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     description: "MCP server, read/write tool declarations, stdio transport, and MCP contract docs.",
     entrypoint: "src/packages/mcp.ts",
     owns: ["src/mcp.ts", "docs/MCP_CONTRACT.md"],
+    releaseEntrypoint: "dist/packages/mcp.js",
   },
   {
     name: "cli",
@@ -90,6 +97,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     description: "Terminal commands, renderers, aliases, watch loop, and race telemetry text surfaces.",
     entrypoint: "src/packages/cli.ts",
     owns: ["src/cli.ts", "src/render.ts", "src/buddy.ts", "src/aliases.ts", "src/watch.ts", "src/ansi.ts"],
+    releaseEntrypoint: "dist/packages/cli.js",
   },
   {
     name: "agents",
@@ -97,6 +105,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     description: "Claude Code, Codex, Gemini CLI operating packs plus export/install helpers.",
     entrypoint: "src/packages/agents.ts",
     owns: ["src/agent-packs.ts", "agents", "docs/agent-operating-packs.md"],
+    releaseEntrypoint: "dist/packages/agents.js",
   },
   {
     name: "vscode",
@@ -104,6 +113,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     description: "VS Code companion extension, webview shell, course tree, and status-bar telemetry.",
     entrypoint: "vscode-extension/src/extension.ts",
     owns: ["vscode-extension/package.json", "vscode-extension/src", "vscode-extension/README.md"],
+    releaseEntrypoint: "vscode-extension/dist/extension.js",
   },
 ];
 
@@ -182,6 +192,7 @@ export async function checkTrackPackageDryRun(repoRoot: string): Promise<Package
   validateCoveredEntries(exportEntries, "export", issues);
   validateCoveredEntries(binEntries, "bin", issues);
   validateRequiredBin(binEntries, issues);
+  await validatePackageEntryTargets(repoRoot, exportEntries, binEntries, issues);
   await validateRequiredDocs(repoRoot, filesAllowlist, issues);
   validateCoveredPackageBoundaries(layout.boundaries, filesAllowlist, issues);
 
@@ -226,7 +237,8 @@ export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): stri
     lines.push("");
     lines.push("Exports:");
     for (const entry of result.exportEntries) {
-      lines.push(`- ${(entry.subpath ?? "?").padEnd(16)} ${entry.target} ${entry.covered ? "covered" : "uncovered"}`);
+      const label = entry.condition ? `${entry.subpath ?? "?"}:${entry.condition}` : entry.subpath ?? "?";
+      lines.push(`- ${label.padEnd(24)} ${entry.target} ${entry.covered ? "covered" : "uncovered"}`);
     }
   }
 
@@ -320,11 +332,11 @@ function readExportEntries(exportsValue: unknown): PackageDryRunEntry[] {
   }
 
   return Object.entries(exportsValue)
-    .flatMap(([subpath, target]) => {
-      const resolvedTarget = findFirstStringLeaf(target);
-      return resolvedTarget ? [{ subpath, target: normalizePackageTarget(resolvedTarget), covered: false, coveredBy: null }] : [];
-    })
-    .sort((left, right) => (left.subpath ?? "").localeCompare(right.subpath ?? ""));
+    .flatMap(([subpath, target]) => readExportTargetEntries(subpath, target))
+    .sort((left, right) => {
+      const subpathOrder = (left.subpath ?? "").localeCompare(right.subpath ?? "");
+      return subpathOrder === 0 ? (left.condition ?? "").localeCompare(right.condition ?? "") : subpathOrder;
+    });
 }
 
 function readBinEntries(binValue: unknown): PackageDryRunEntry[] {
@@ -341,20 +353,28 @@ function readBinEntries(binValue: unknown): PackageDryRunEntry[] {
     .sort((left, right) => (left.name ?? "").localeCompare(right.name ?? ""));
 }
 
-function findFirstStringLeaf(value: unknown): string | null {
+function readExportTargetEntries(
+  subpath: string,
+  value: unknown,
+  conditionPath: string[] = []
+): PackageDryRunEntry[] {
   if (typeof value === "string") {
-    return value;
+    return [
+      {
+        condition: conditionPath.length ? conditionPath.join(".") : undefined,
+        covered: false,
+        coveredBy: null,
+        subpath,
+        target: normalizePackageTarget(value),
+      },
+    ];
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return null;
+    return [];
   }
-  for (const child of Object.values(value)) {
-    const result = findFirstStringLeaf(child);
-    if (result) {
-      return result;
-    }
-  }
-  return null;
+  return Object.entries(value).flatMap(([condition, child]) =>
+    readExportTargetEntries(subpath, child, [...conditionPath, condition])
+  );
 }
 
 function withCoverage(entry: PackageDryRunEntry, filesAllowlist: string[]): PackageDryRunEntry {
@@ -369,8 +389,8 @@ function withCoverage(entry: PackageDryRunEntry, filesAllowlist: string[]): Pack
 function validatePackageBoundaryExports(exportEntries: PackageDryRunEntry[], issues: PackageDryRunIssue[]): void {
   for (const boundary of TRACK_PACKAGE_BOUNDARIES) {
     const expectedSubpath = `./${boundary.name}`;
-    const entry = exportEntries.find((candidate) => candidate.subpath === expectedSubpath);
-    if (!entry) {
+    const entries = exportEntries.filter((candidate) => candidate.subpath === expectedSubpath);
+    if (entries.length === 0) {
       issues.push({
         boundary: boundary.name,
         code: "missing_export",
@@ -380,11 +400,13 @@ function validatePackageBoundaryExports(exportEntries: PackageDryRunEntry[], iss
       });
       continue;
     }
-    if (entry.target !== boundary.entrypoint) {
+    if (!entries.some((entry) => entry.target === boundary.releaseEntrypoint)) {
       issues.push({
         boundary: boundary.name,
         code: "export_target_mismatch",
-        message: `${expectedSubpath} should point at ${boundary.entrypoint}, got ${entry.target}.`,
+        message: `${expectedSubpath} should point at ${boundary.releaseEntrypoint}, got ${entries
+          .map((entry) => entry.target)
+          .join(", ")}.`,
         path: "package.json",
         severity: "error",
       });
@@ -451,6 +473,35 @@ function validateRequiredBin(binEntries: PackageDryRunEntry[], issues: PackageDr
       path: "package.json",
       severity: "error",
     });
+  }
+}
+
+async function validatePackageEntryTargets(
+  repoRoot: string,
+  exportEntries: PackageDryRunEntry[],
+  binEntries: PackageDryRunEntry[],
+  issues: PackageDryRunIssue[]
+): Promise<void> {
+  for (const entry of exportEntries) {
+    if (!(await exists(path.join(repoRoot, entry.target)))) {
+      issues.push({
+        code: "missing_export_target",
+        message: `export ${entry.subpath ?? "unknown"} target ${entry.target} does not exist.`,
+        path: entry.target,
+        severity: "error",
+      });
+    }
+  }
+
+  for (const entry of binEntries) {
+    if (!(await exists(path.join(repoRoot, entry.target)))) {
+      issues.push({
+        code: "missing_bin_target",
+        message: `bin ${entry.name ?? "unknown"} target ${entry.target} does not exist.`,
+        path: entry.target,
+        severity: "error",
+      });
+    }
   }
 }
 
