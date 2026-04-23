@@ -129,12 +129,14 @@ Current checks:
 - `npm run package:check`
 - `npm run package:dry-run`
 - `npm run package:build-check`
+- `npm run package:install-smoke`
 - `track package list`
 - `track package check`
 - `track package dry-run`
 
 `package:build-check` runs the compiled CLI from `dist/cli.js` after build.
 The public package exports and `bin.track` now point at compiled release artifacts under `dist`.
+`package:install-smoke` packs Track into a temporary tarball, installs it into a throwaway consumer project, then verifies package subpath imports and the installed `track` CLI.
 
 Reference:
 

@@ -553,3 +553,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-20
+      title: Publish/install smoke
+      goal: Verify Track can be packed and installed into a temporary consumer project without publishing.
+      kind: build
+      checkpoints:
+        - id: cp-51
+          title: Temporary package install smoke
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 3
+            coordination: 1
+            risk: 1
+        - id: cp-52
+          title: Installed import and CLI verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 3
+            coordination: 1
+            risk: 1
+        - id: cp-53
+          title: Install smoke docs and harness
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

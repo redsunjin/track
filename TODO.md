@@ -2,16 +2,25 @@
 
 ## Active
 
-- `TRK-045` OpenClaw Pitwall CLI Surface
+- `TRK-046` Publish/Install Smoke
 
 ## Queued
 
-- `TRK-046` Publish/Install Smoke
 - `TRK-047` OpenClaw Live Adapter Hook
+- `TRK-048` Publish Readiness Gate
 
 ## Parked
 
 ## Done
+
+### TRK-045 OpenClaw Pitwall CLI Surface
+
+- completed:
+  - `track pitwall --openclaw`
+  - `--source`, `--blocked`, `--errors`, `--running`, and `--json`
+  - graceful missing-source board
+  - OpenClaw Pitwall loader/renderer tests
+  - CLI docs and built-output verification
 
 ### TRK-044 Release Manifest Switch
 

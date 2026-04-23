@@ -67,12 +67,14 @@ npm run vscode:build
 npm run package:check
 npm run package:dry-run
 npm run package:build-check
+npm run package:install-smoke
 npm pack --dry-run --json
 ```
 
 This verifies that every declared boundary has an entrypoint and that the owned source paths still exist.
 The dry-run check also verifies that `package.json.files` covers `dist`, boundary entrypoints, exported subpaths, CLI bin target, and package layout docs before any physical npm packing step.
 Export and bin targets must exist, so run the build scripts before invoking `node dist/cli.js package dry-run` directly.
+The install smoke creates a temporary tarball and consumer project, installs Track from that tarball, imports public subpaths, and runs the installed `track` bin.
 
 Track's root package remains `private: true`.
 `package dry-run` is therefore a distribution-readiness check, not a publishing command.

@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 19
-  active_lap: 19
+  total_laps: 20
+  active_lap: 20
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -291,6 +291,22 @@ laps:
         title: OpenClaw CLI docs and verification
         status: done
         weight: 2
+  - id: lap-20
+    title: Publish/install smoke
+    status: done
+    checkpoints:
+      - id: cp-51
+        title: Temporary package install smoke
+        status: done
+        weight: 2
+      - id: cp-52
+        title: Installed import and CLI verification
+        status: done
+        weight: 2
+      - id: cp-53
+        title: Install smoke docs and harness
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -565,6 +581,21 @@ tasks:
   - id: task-055
     title: Verify OpenClaw CLI docs and output
     checkpoint_id: cp-50
+    status: done
+    owner: codex
+  - id: task-056
+    title: Add temporary package install smoke
+    checkpoint_id: cp-51
+    status: done
+    owner: codex
+  - id: task-057
+    title: Verify installed imports and CLI bin
+    checkpoint_id: cp-52
+    status: done
+    owner: codex
+  - id: task-058
+    title: Document install smoke and harness state
+    checkpoint_id: cp-53
     status: done
     owner: codex
 flags: []
@@ -1009,3 +1040,28 @@ events:
     actor: codex
     timestamp: 2026-04-23T20:48:00+09:00
     summary: Completed TRK-045 OpenClaw Pitwall CLI Surface
+  - id: evt-2026-04-23T21:20:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-23T21:20:00+09:00
+    summary: Selected TRK-046 Publish/Install Smoke as the next active slice
+  - id: evt-2026-04-23T21:22:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T21:22:00+09:00
+    summary: Completed Add temporary package install smoke
+  - id: evt-2026-04-23T21:24:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T21:24:00+09:00
+    summary: Completed Verify installed imports and CLI bin
+  - id: evt-2026-04-23T21:26:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T21:26:00+09:00
+    summary: Completed Document install smoke and harness state
+  - id: evt-2026-04-23T21:27:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-23T21:27:00+09:00
+    summary: Completed TRK-046 Publish/Install Smoke

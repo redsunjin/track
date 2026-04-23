@@ -73,6 +73,7 @@
     "package:build-check": "npm run build && npm run vscode:build && node dist/cli.js package dry-run",
     "package:check": "node --import tsx ./src/cli.ts package check",
     "package:dry-run": "npm run package:build-check",
+    "package:install-smoke": "node scripts/package-install-smoke.mjs",
     "status": "node --import tsx ./src/cli.ts status",
     "next": "node --import tsx ./src/cli.ts next",
     "map": "node --import tsx ./src/cli.ts map",
