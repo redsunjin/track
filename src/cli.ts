@@ -27,11 +27,13 @@ import {
 } from "./openclaw-pitwall.js";
 import { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./openclaw-live.js";
 import {
+  buildTrackPackageHandoff,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   checkTrackPublishReadiness,
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
+  renderPackageHandoffNote,
   renderPackageLayoutCheck,
   renderPackageReadinessCheck,
 } from "./package-layout.js";
@@ -463,6 +465,19 @@ async function main(): Promise<void> {
         process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       } else {
         process.stdout.write(`${renderPackageReadinessCheck(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
+    if (subcommand === "handoff" || subcommand === "notes") {
+      const result = await buildTrackPackageHandoff(process.cwd());
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackageHandoffNote(result)}\n`);
       }
       if (!result.ok) {
         process.exitCode = 1;

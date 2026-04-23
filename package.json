@@ -77,6 +77,7 @@
     "package:build-check": "npm run build && npm run vscode:build && node dist/cli.js package dry-run",
     "package:check": "node --import tsx ./src/cli.ts package check",
     "package:dry-run": "npm run package:build-check",
+    "package:handoff": "node --import tsx ./src/cli.ts package handoff",
     "package:install-smoke": "node scripts/package-install-smoke.mjs",
     "package:readiness": "node --import tsx ./src/cli.ts package readiness",
     "status": "node --import tsx ./src/cli.ts status",

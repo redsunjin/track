@@ -69,6 +69,7 @@ npm run package:check
 npm run package:dry-run
 npm run package:build-check
 npm run package:install-smoke
+npm run package:handoff
 npm run package:readiness
 npm pack --dry-run --json
 ```
@@ -100,6 +101,26 @@ The gate verifies:
 
 Current release mode is `private-root`.
 That means distribution artifacts can be checked and handed off, but npm publish is intentionally blocked until `private` is changed deliberately.
+
+## Handoff Notes
+
+Use the handoff command when someone needs the current release picture in one pasteable block:
+
+```bash
+track package handoff
+track package notes
+npm run package:handoff
+```
+
+The handoff note includes:
+
+- release status summary derived from the readiness gate
+- recommended verification commands
+- public package subpaths
+- package boundary release entrypoints
+- reference docs for the handoff receiver
+
+When the package is still `private-root`, the note explicitly says it is ready for artifact handoff but not for npm publish.
 
 ## Extraction Rule
 

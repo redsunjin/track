@@ -2,15 +2,25 @@
 
 ## Active
 
-- `TRK-049` OpenClaw Bot Push Hooks
+- `TRK-050` Release Handoff Notes
 
 ## Queued
 
-- `TRK-050 Release Handoff Notes`
+- `TRK-051 Publish Mode Switch Guard`
 
 ## Parked
 
 ## Done
+
+### TRK-050 Release Handoff Notes
+
+- completed:
+  - `track package handoff`
+  - `track package notes` alias
+  - `npm run package:handoff`
+  - release status summary derived from package readiness
+  - public subpath and boundary handoff listing
+  - reference docs and verification command handoff block
 
 ### TRK-049 OpenClaw Bot Push Hooks
 

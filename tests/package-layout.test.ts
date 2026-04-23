@@ -3,12 +3,14 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  buildTrackPackageHandoff,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   checkTrackPublishReadiness,
   isPackagePathCovered,
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
+  renderPackageHandoffNote,
   renderPackageLayoutCheck,
   renderPackageReadinessCheck,
 } from "../src/package-layout.js";
@@ -65,6 +67,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof openclawLive.captureOpenClawTelemetry, "function");
   assert.equal(typeof openclawMonitor.buildOpenClawMonitorSnapshot, "function");
   assert.equal(typeof pitwallMonitor.buildPitwallMonitorView, "function");
+  assert.equal(typeof layout.buildTrackPackageHandoff, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -107,6 +110,20 @@ test("package readiness gate checks release verification scripts and pack readin
   assert.ok(result.gates.every((gate) => gate.ok));
   assert.match(renderPackageReadinessCheck(result), /PACKAGE READINESS GATE OK/);
   assert.match(renderPackageReadinessCheck(result), /npm pack --dry-run --json/);
+});
+
+test("package handoff notes summarize release status, commands, subpaths, and docs", async () => {
+  const result = await buildTrackPackageHandoff(path.resolve("."));
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, "ready-private-root");
+  assert.equal(result.mode, "private-root");
+  assert.ok(result.publicSubpaths.includes("./core"));
+  assert.ok(result.docs.includes("docs/package-layout.md"));
+  assert.ok(result.recommendedCommands.includes("npm run package:readiness"));
+  assert.equal(result.boundaries.length, 6);
+  assert.match(renderPackageHandoffNote(result), /PACKAGE RELEASE HANDOFF/);
+  assert.match(renderPackageHandoffNote(result), /ready-private-root/);
 });
 
 test("package coverage helper matches directories and exact files", () => {

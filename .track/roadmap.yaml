@@ -681,3 +681,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-24
+      title: Release handoff notes
+      goal: Generate an executable release handoff note from the current package readiness state.
+      kind: build
+      checkpoints:
+        - id: cp-63
+          title: Package handoff note builder
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-64
+          title: Handoff CLI and npm script
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-65
+          title: Handoff docs and verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

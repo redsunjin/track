@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 23
-  active_lap: 23
+  total_laps: 24
+  active_lap: 24
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -355,6 +355,22 @@ laps:
         title: Push docs and package smoke verification
         status: done
         weight: 2
+  - id: lap-24
+    title: Release handoff notes
+    status: done
+    checkpoints:
+      - id: cp-63
+        title: Package handoff note builder
+        status: done
+        weight: 2
+      - id: cp-64
+        title: Handoff CLI and npm script
+        status: done
+        weight: 2
+      - id: cp-65
+        title: Handoff docs and verification
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -689,6 +705,21 @@ tasks:
   - id: task-067
     title: Verify push docs and package smoke coverage
     checkpoint_id: cp-62
+    status: done
+    owner: codex
+  - id: task-068
+    title: Add package handoff note builder
+    checkpoint_id: cp-63
+    status: done
+    owner: codex
+  - id: task-069
+    title: Wire handoff CLI and npm script
+    checkpoint_id: cp-64
+    status: done
+    owner: codex
+  - id: task-070
+    title: Verify handoff docs and release note output
+    checkpoint_id: cp-65
     status: done
     owner: codex
 flags: []
@@ -1233,3 +1264,28 @@ events:
     actor: codex
     timestamp: 2026-04-23T21:59:00+09:00
     summary: Completed TRK-049 OpenClaw Bot Push Hooks
+  - id: evt-2026-04-24T00:02:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-24T00:02:00+09:00
+    summary: Selected TRK-050 Release Handoff Notes as the next active slice
+  - id: evt-2026-04-24T00:05:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-24T00:05:00+09:00
+    summary: Completed Add package handoff note builder
+  - id: evt-2026-04-24T00:08:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-24T00:08:00+09:00
+    summary: Completed Wire handoff CLI and npm script
+  - id: evt-2026-04-24T00:11:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-24T00:11:00+09:00
+    summary: Completed Verify handoff docs and release note output
+  - id: evt-2026-04-24T00:12:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-24T00:12:00+09:00
+    summary: Completed TRK-050 Release Handoff Notes

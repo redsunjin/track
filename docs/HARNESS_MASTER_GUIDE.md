@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-023-openclaw-bot-push-hooks.md](./worksheets/HW-023-openclaw-bot-push-hooks.md)
+- [HW-024-release-handoff-notes.md](./worksheets/HW-024-release-handoff-notes.md)
 
 Last completed worksheet:
 
-- [HW-022-publish-readiness-gate.md](./worksheets/HW-022-publish-readiness-gate.md)
+- [HW-023-openclaw-bot-push-hooks.md](./worksheets/HW-023-openclaw-bot-push-hooks.md)
 
 ## Adoption Rules
 

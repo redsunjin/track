@@ -83,6 +83,20 @@ export interface PackageReadinessCheckResult {
   version: string | null;
 }
 
+export interface PackageHandoffNoteResult {
+  boundaries: TrackPackageBoundary[];
+  docs: string[];
+  mode: "private-root" | "publishable";
+  ok: boolean;
+  packageName: string | null;
+  publicSubpaths: string[];
+  readiness: PackageReadinessCheckResult;
+  recommendedCommands: string[];
+  status: "blocked" | "ready-private-root" | "ready-publishable";
+  summary: string;
+  version: string | null;
+}
+
 export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
   {
     name: "core",
@@ -144,6 +158,12 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
 ];
 
 const REQUIRED_PACKAGE_DOCS = ["README.md", "docs/package-layout.md"];
+const RELEASE_HANDOFF_DOCS = ["README.md", "docs/package-layout.md", "docs/HARNESS_MASTER_GUIDE.md"] as const;
+const DEFAULT_HANDOFF_COMMANDS = [
+  "npm run package:readiness",
+  "npm run package:install-smoke",
+  "npm pack --dry-run --json",
+] as const;
 const REQUIRED_READINESS_SCRIPTS = [
   { id: "build", name: "build", command: "npm run build", title: "Runtime build" },
   { id: "typecheck", name: "typecheck", command: "npm run typecheck", title: "Typecheck" },
@@ -307,6 +327,35 @@ export async function checkTrackPublishReadiness(repoRoot: string): Promise<Pack
   };
 }
 
+export async function buildTrackPackageHandoff(repoRoot: string): Promise<PackageHandoffNoteResult> {
+  const readiness = await checkTrackPublishReadiness(repoRoot);
+  const docs: string[] = [];
+  for (const docPath of RELEASE_HANDOFF_DOCS) {
+    if (await exists(path.join(repoRoot, docPath))) {
+      docs.push(docPath);
+    }
+  }
+  const publicSubpaths = [
+    ...new Set(readiness.dryRun.exportEntries.map((entry) => entry.subpath ?? ".").filter((value) => value.length > 0)),
+  ].sort((left, right) => left.localeCompare(right));
+  const boundaries = listTrackPackageBoundaries();
+  const status = summarizePackageHandoffStatus(readiness);
+
+  return {
+    boundaries,
+    docs,
+    mode: readiness.mode,
+    ok: readiness.ok,
+    packageName: readiness.packageName,
+    publicSubpaths,
+    readiness,
+    recommendedCommands: [...DEFAULT_HANDOFF_COMMANDS],
+    status: status.id,
+    summary: status.summary,
+    version: readiness.version,
+  };
+}
+
 export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -335,6 +384,54 @@ export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): stri
     lines.push("");
     lines.push("Issues:");
     for (const issue of result.issues) {
+      lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+export function renderPackageHandoffNote(result: PackageHandoffNoteResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const readyGates = result.readiness.gates.filter((gate) => gate.ok).length;
+  const lines = [
+    result.ok ? "PACKAGE RELEASE HANDOFF" : "PACKAGE RELEASE HANDOFF BLOCKED",
+    `PACKAGE  ${packageLabel}`,
+    `STATUS   ${result.status}`,
+    `MODE     ${result.mode}`,
+    `SUMMARY  ${result.summary}`,
+    `GATE     ${readyGates}/${result.readiness.gates.length} ready`,
+    "",
+    "Handoff Commands:",
+  ];
+
+  for (const command of result.recommendedCommands) {
+    lines.push(`- ${command}`);
+  }
+
+  lines.push("");
+  lines.push("Public Subpaths:");
+  for (const subpath of result.publicSubpaths) {
+    lines.push(`- ${subpath}`);
+  }
+
+  lines.push("");
+  lines.push("Boundary Releases:");
+  for (const boundary of result.boundaries) {
+    lines.push(`- ${boundary.packageName} -> ${boundary.releaseEntrypoint}`);
+  }
+
+  lines.push("");
+  lines.push("Docs:");
+  for (const docPath of result.docs) {
+    lines.push(`- ${docPath}`);
+  }
+
+  if (result.readiness.dryRun.issues.length) {
+    lines.push("");
+    lines.push("Blocking package issues:");
+    for (const issue of result.readiness.dryRun.issues) {
       lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
     }
   }
@@ -459,6 +556,30 @@ function readScriptMap(source: Record<string, unknown>): Record<string, string> 
 
 function hasScript(scripts: Record<string, string>, name: string): boolean {
   return typeof scripts[name] === "string" && scripts[name].trim().length > 0;
+}
+
+function summarizePackageHandoffStatus(readiness: PackageReadinessCheckResult): {
+  id: PackageHandoffNoteResult["status"];
+  summary: string;
+} {
+  if (!readiness.ok) {
+    return {
+      id: "blocked",
+      summary: "Release handoff is blocked until package readiness issues are resolved.",
+    };
+  }
+
+  if (readiness.mode === "private-root") {
+    return {
+      id: "ready-private-root",
+      summary: "Ready for artifact handoff. npm publish remains intentionally blocked while the root package is private.",
+    };
+  }
+
+  return {
+    id: "ready-publishable",
+    summary: "Ready for publish handoff. Package readiness gates are green.",
+  };
 }
 
 function readExportEntries(exportsValue: unknown): PackageDryRunEntry[] {

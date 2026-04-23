@@ -26,12 +26,14 @@ export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExt
 export { generateTrackMap, renderTrackMap } from "./generator.js";
 export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServer } from "./mcp.js";
 export {
+  buildTrackPackageHandoff,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   checkTrackPublishReadiness,
   isPackagePathCovered,
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
+  renderPackageHandoffNote,
   renderPackageLayoutCheck,
   renderPackageReadinessCheck,
 } from "./package-layout.js";
@@ -39,6 +41,7 @@ export type {
   PackageDryRunCheckResult,
   PackageDryRunEntry,
   PackageDryRunIssue,
+  PackageHandoffNoteResult,
   PackageLayoutCheckResult,
   PackageReadinessCheckResult,
   PackageReadinessGate,
