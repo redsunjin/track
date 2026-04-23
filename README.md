@@ -106,10 +106,18 @@ Current building blocks:
 
 - `track/openclaw-adapter`
 - `track/openclaw-monitor`
+- `track/pitwall-monitor`
 - runtime helpers exposed through `track/runtime`
 - `docs/openclaw-worker-monitor.md`
 
-This slice focuses on data normalization first so Pitwall and future TUI surfaces can consume real OpenClaw telemetry without inventing a separate state model.
+Current CLI surface:
+
+- `track pitwall --openclaw --source /path/to/openclaw-monitor.json`
+- `track pitwall --openclaw --blocked`
+- `track pitwall --openclaw --errors`
+- `track pitwall --openclaw --json`
+
+This keeps OpenClaw worker monitoring inside the Pitwall control-room language instead of creating a separate dashboard product.
 
 ## Package layout
 

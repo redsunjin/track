@@ -68,6 +68,15 @@ Projects that worker snapshot into operator views:
 - failed workers
 - alert list for yellow/red conditions
 
+### `openclaw-pitwall`
+
+Loads OpenClaw monitor source data and renders the terminal Pitwall worker board:
+
+- default source: `.track/openclaw-monitor.json`
+- explicit source: `--source <file>`
+- filters: `--blocked`, `--errors`, `--running`
+- machine output: `--json`
+
 ### `bot-bridge`
 
 Maps monitor state into lightweight remote interaction patterns:
@@ -88,9 +97,12 @@ Maps monitor state into lightweight remote interaction patterns:
 
 ### Phase 2
 
-- adapter hook that pulls from the real OpenClaw tool/session source
-- `track pitwall --openclaw` style surface or sibling command
+- terminal OpenClaw Pitwall surface
 - filtered views for `running`, `blocked`, and `error`
+- JSON output for bot or script consumers
+
+Status: `track pitwall --openclaw` now renders supplied OpenClaw monitor data through the Pitwall control-room surface.
+The default file is `.track/openclaw-monitor.json`; pass `--source <file>` when another session writes worker telemetry elsewhere.
 
 Status: the normalization adapter now exists in `src/openclaw-adapter.ts` and can combine supplied OpenClaw session-list plus process-list data into one monitor snapshot.
 
@@ -100,13 +112,17 @@ Status: the normalization adapter now exists in `src/openclaw-adapter.ts` and ca
 - optional transcript-tail references when policy allows
 - optional MCP read tools for worker overview
 
-## CLI direction
+## CLI usage
 
-Recommended direction, not implemented in this slice yet:
+OpenClaw source data should be JSON with `sessions` and/or `processes` arrays matching the adapter input shape, or a prebuilt monitor snapshot.
 
-- `track pitwall --openclaw`
-- `track pitwall --openclaw --errors`
-- `track pitwall --openclaw --blocked`
-- `track pitwall --openclaw --json`
+```bash
+track pitwall --openclaw
+track pitwall --openclaw --source /path/to/openclaw-monitor.json
+track pitwall --openclaw --blocked
+track pitwall --openclaw --errors
+track pitwall --openclaw --running
+track pitwall --openclaw --json
+```
 
 The key rule is to preserve `Track`'s existing terminal-first control-room language rather than inventing a separate monitoring product shell.

@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-044`
-- title: `Release Manifest Switch`
+- id: `TRK-045`
+- title: `OpenClaw Pitwall CLI Surface`
 
 ## Goal
 
-Switch Track's public package exports and CLI bin from source-level TypeScript entrypoints to compiled release artifacts under `dist`.
+Connect the OpenClaw worker monitor model to the terminal Pitwall surface so another session can write worker telemetry and Track can monitor it.
 
 ## First Steps
 
-1. point package exports at `dist/**/*.js` with matching declaration targets
-2. point `bin.track` at `dist/cli.js`
-3. update package dry-run checks to validate release targets exist
+1. add an OpenClaw Pitwall loader and renderer
+2. wire `track pitwall --openclaw` plus filtered views
+3. document source file expectations and verify CLI output
 
 ## Constraints
 
 - keep local `.track` files as the source of truth
-- keep source boundary checks intact for future package extraction
-- keep local development scripts using `src/cli.ts`
-- keep root package `private: true`; do not publish in this slice
-- include VS Code extension build output in release-manifest verification
+- default to `.track/openclaw-monitor.json` when no source is supplied
+- do not invent a separate dashboard product shell
+- keep sensitive local worker content summarized, not transcript-heavy
+- keep `--json` available for bot/script consumers
 
 ## Verification
 
@@ -30,15 +30,15 @@ npm test
 npm run typecheck
 npm run check:harness
 npm run build
-npm run vscode:build
 npm run package:dry-run
 npm run package:build-check
-npm pack --dry-run --json
+node dist/cli.js pitwall --openclaw --no-color
+node dist/cli.js pitwall --openclaw --blocked --no-color
 ```
 
 ## Exit Condition
 
-- package subpath imports resolve through compiled `dist` artifacts
-- `bin.track` targets `dist/cli.js`
-- package dry-run validates export/bin target existence
-- npm pack dry-run includes release artifacts without exposing source-level public entrypoints
+- `track pitwall --openclaw` renders a worker control-room board
+- `--blocked`, `--errors`, and `--running` filters work
+- missing default source is handled gracefully
+- JSON output returns the same snapshot/view data

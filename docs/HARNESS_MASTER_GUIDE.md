@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-018-release-manifest-switch.md](./worksheets/HW-018-release-manifest-switch.md)
+- [HW-019-openclaw-pitwall-cli-surface.md](./worksheets/HW-019-openclaw-pitwall-cli-surface.md)
 
 Last completed worksheet:
 
-- [HW-017-build-artifact-baseline.md](./worksheets/HW-017-build-artifact-baseline.md)
+- [HW-018-release-manifest-switch.md](./worksheets/HW-018-release-manifest-switch.md)
 
 ## Adoption Rules
 

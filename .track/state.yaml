@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 18
-  active_lap: 18
+  total_laps: 19
+  active_lap: 19
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -275,6 +275,22 @@ laps:
         title: Manifest switch verification
         status: done
         weight: 2
+  - id: lap-19
+    title: OpenClaw Pitwall CLI surface
+    status: done
+    checkpoints:
+      - id: cp-48
+        title: OpenClaw Pitwall loader and renderer
+        status: done
+        weight: 3
+      - id: cp-49
+        title: Pitwall OpenClaw CLI flags
+        status: done
+        weight: 2
+      - id: cp-50
+        title: OpenClaw CLI docs and verification
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -534,6 +550,21 @@ tasks:
   - id: task-052
     title: Verify release manifest dry-run output
     checkpoint_id: cp-47
+    status: done
+    owner: codex
+  - id: task-053
+    title: Add OpenClaw Pitwall loader and renderer
+    checkpoint_id: cp-48
+    status: done
+    owner: codex
+  - id: task-054
+    title: Wire Pitwall OpenClaw CLI flags
+    checkpoint_id: cp-49
+    status: done
+    owner: codex
+  - id: task-055
+    title: Verify OpenClaw CLI docs and output
+    checkpoint_id: cp-50
     status: done
     owner: codex
 flags: []
@@ -953,3 +984,28 @@ events:
     actor: codex
     timestamp: 2026-04-23T20:38:00+09:00
     summary: Completed TRK-044 Release Manifest Switch
+  - id: evt-2026-04-23T20:39:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-23T20:39:00+09:00
+    summary: Selected TRK-045 OpenClaw Pitwall CLI Surface as the next active slice
+  - id: evt-2026-04-23T20:43:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:43:00+09:00
+    summary: Completed Add OpenClaw Pitwall loader and renderer
+  - id: evt-2026-04-23T20:45:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:45:00+09:00
+    summary: Completed Wire Pitwall OpenClaw CLI flags
+  - id: evt-2026-04-23T20:47:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:47:00+09:00
+    summary: Completed Verify OpenClaw CLI docs and output
+  - id: evt-2026-04-23T20:48:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-23T20:48:00+09:00
+    summary: Completed TRK-045 OpenClaw Pitwall CLI Surface

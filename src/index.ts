@@ -48,6 +48,12 @@ export {
   normalizeSessionEntry,
 } from "./openclaw-adapter.js";
 export {
+  filterOpenClawWorkers,
+  loadOpenClawPitwallResult,
+  renderOpenClawPitwall,
+  resolveOpenClawPitwallFilter,
+} from "./openclaw-pitwall.js";
+export {
   advanceCheckpoint,
   applyEventToState,
   blockTask,
@@ -95,6 +101,7 @@ export type {
   OpenClawSessionListEntry,
   OpenClawSessionListMessage,
 } from "./openclaw-adapter.js";
+export type { OpenClawPitwallFilter, OpenClawPitwallLoadOptions, OpenClawPitwallResult } from "./openclaw-pitwall.js";
 export type { PitwallMonitorAlert, PitwallMonitorView } from "./pitwall-monitor.js";
 export type {
   OpenClawMonitorSnapshot,

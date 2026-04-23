@@ -20,6 +20,11 @@ import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan
 import { generateTrackMap, renderTrackMap } from "./generator.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
 import {
+  loadOpenClawPitwallResult,
+  renderOpenClawPitwall,
+  resolveOpenClawPitwallFilter,
+} from "./openclaw-pitwall.js";
+import {
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   listTrackPackageBoundaries,
@@ -63,6 +68,8 @@ async function main(): Promise<void> {
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
+  const openClawMode = args.includes("--openclaw");
+  const includeMainSessions = args.includes("--include-main");
 
   if (command === "mcp") {
     await runStdioServer({
@@ -135,6 +142,30 @@ async function main(): Promise<void> {
     const detailSelector = readFlag(args, "--detail");
     const ownersMode = args.includes("--owners");
     const queueMode = args.includes("--queue");
+    if (openClawMode) {
+      const filter = resolveOpenClawPitwallFilter(args);
+      const loadResult = () =>
+        loadOpenClawPitwallResult({
+          filter,
+          includeMainSessions,
+          sourceFile,
+          workspaceRoot: pitwallRoot,
+        });
+
+      if (watch) {
+        ensureWatchable(json);
+        await runWatchLoop(async () => renderOpenClawPitwall(await loadResult(), { color }), { intervalMs });
+        return;
+      }
+
+      const result = await loadResult();
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+        return;
+      }
+      process.stdout.write(`${renderOpenClawPitwall(result, { color })}\n`);
+      return;
+    }
     if (ownersMode) {
       if (watch) {
         ensureWatchable(json);

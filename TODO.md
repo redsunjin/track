@@ -2,16 +2,25 @@
 
 ## Active
 
-- `TRK-044` Release Manifest Switch
+- `TRK-045` OpenClaw Pitwall CLI Surface
 
 ## Queued
 
-- `TRK-045` OpenClaw Pitwall CLI Surface
 - `TRK-046` Publish/Install Smoke
+- `TRK-047` OpenClaw Live Adapter Hook
 
 ## Parked
 
 ## Done
+
+### TRK-044 Release Manifest Switch
+
+- completed:
+  - public package exports switched to `dist`
+  - `bin.track` switched to `dist/cli.js`
+  - release export/bin target existence checks
+  - package dry-run through built CLI
+  - npm pack dry-run verification
 
 ### TRK-043 Build Artifact Baseline
 

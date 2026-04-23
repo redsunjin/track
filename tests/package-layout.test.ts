@@ -44,6 +44,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   const mcp = await import("track/mcp");
   const agents = await import("track/agents");
   const botBridge = await import("track/bot-bridge");
+  const cli = await import("track/cli");
   const openclawAdapter = await import("track/openclaw-adapter");
   const openclawMonitor = await import("track/openclaw-monitor");
   const pitwallMonitor = await import("track/pitwall-monitor");
@@ -55,6 +56,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
   assert.equal(typeof botBridge.renderMonitorBotSummary, "function");
+  assert.equal(typeof cli.renderOpenClawPitwall, "function");
   assert.equal(typeof openclawAdapter.buildOpenClawSnapshotFromToolData, "function");
   assert.equal(typeof openclawMonitor.buildOpenClawMonitorSnapshot, "function");
   assert.equal(typeof pitwallMonitor.buildPitwallMonitorView, "function");

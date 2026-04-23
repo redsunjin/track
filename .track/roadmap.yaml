@@ -521,3 +521,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-19
+      title: OpenClaw Pitwall CLI surface
+      goal: Render OpenClaw worker telemetry through the terminal Pitwall control-room surface with filtered views.
+      kind: integration
+      checkpoints:
+        - id: cp-48
+          title: OpenClaw Pitwall loader and renderer
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-49
+          title: Pitwall OpenClaw CLI flags
+          kind: integration
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-50
+          title: OpenClaw CLI docs and verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
