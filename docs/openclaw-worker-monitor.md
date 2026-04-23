@@ -94,6 +94,7 @@ Maps monitor state into lightweight remote interaction patterns:
 - concise bot summaries
 - alert push text
 - small command vocabulary for status queries
+- state-transition push payloads for failed, blocked, approval-needed, and completed workers
 
 ## MVP target
 
@@ -123,6 +124,9 @@ Status: the normalization adapter now exists in `src/openclaw-adapter.ts` and ca
 - optional transcript-tail references when policy allows
 - optional MCP read tools for worker overview
 
+Status: bot push hooks now emit local payloads and renderable messages through `track openclaw push`.
+The command compares the current snapshot with an optional `--previous` snapshot so push adapters can avoid duplicate alerts.
+
 ## CLI usage
 
 OpenClaw source data should be JSON with `sessions` and/or `processes` arrays matching the adapter input shape, or a prebuilt monitor snapshot.
@@ -132,6 +136,10 @@ track openclaw capture --source /path/to/raw-openclaw.json
 track openclaw capture --sessions /path/to/sessions.json --processes /path/to/processes.json
 track openclaw capture --source /path/to/raw-openclaw.json --dry-run --json
 track openclaw capture --source /path/to/raw-openclaw.json --watch --interval 1000
+track openclaw push --source /path/to/openclaw-monitor.json
+track openclaw push --source current.json --previous previous.json
+track openclaw push --source current.json --previous previous.json --include-completed --json
+track openclaw push --source current.json --watch --interval 1000
 track pitwall --openclaw
 track pitwall --openclaw --source /path/to/openclaw-monitor.json
 track pitwall --openclaw --blocked

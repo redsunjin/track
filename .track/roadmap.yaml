@@ -649,3 +649,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-23
+      title: OpenClaw bot push hooks
+      goal: Build transport-neutral bot push payloads for OpenClaw worker state transitions.
+      kind: integration
+      checkpoints:
+        - id: cp-60
+          title: Bot push event model
+          kind: integration
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-61
+          title: OpenClaw push CLI
+          kind: integration
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-62
+          title: Push docs and package smoke verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

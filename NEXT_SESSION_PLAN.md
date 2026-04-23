@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-048`
-- title: `Publish Readiness Gate`
+- id: `TRK-049`
+- title: `OpenClaw Bot Push Hooks`
 
 ## Goal
 
-Add a single executable gate that tells whether Track is ready for a release handoff before a physical npm pack or future publish attempt.
+Turn OpenClaw worker state changes into local bot-push payloads that can be handed to Telegram, Slack, or another remote adapter later without coupling Track to a network transport.
 
 ## First Steps
 
-1. add a package readiness checker over the existing package dry-run
-2. wire `track package readiness` and `track package gate`
-3. document the gate and update the release verification path
+1. add bot push event construction over OpenClaw monitor snapshots
+2. wire `track openclaw push` for current and previous snapshot comparison
+3. document push usage and update package/install smoke coverage
 
 ## Constraints
 
-- do not publish to npm
-- keep root package `private: true`
-- keep the gate deterministic and fast
-- report private-root mode explicitly instead of hiding it
-- reuse package dry-run results instead of duplicating manifest checks
+- do not add a network transport yet
+- avoid duplicate alerts when a previous snapshot is supplied
+- keep payloads status-focused, not transcript-heavy
+- keep `track pitwall --openclaw` as the recommended operator command
+- keep completion pushes opt-in with `--include-completed`
 
 ## Verification
 
@@ -38,7 +38,7 @@ npm pack --dry-run --json
 
 ## Exit Condition
 
-- `track package readiness` reports `PACKAGE READINESS GATE OK`
-- the gate lists required verification commands
-- the gate reports `private-root` mode
-- JSON output is available for automation
+- `track openclaw push --source <file>` emits push-ready bot messages
+- `--previous` suppresses duplicate unchanged alerts
+- `--include-completed` enables completion pushes
+- JSON output is available for adapter integration

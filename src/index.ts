@@ -44,7 +44,14 @@ export type {
   PackageReadinessGate,
   TrackPackageBoundary,
 } from "./package-layout.js";
-export { listMonitorBotCommands, renderMonitorAlertMessage, renderMonitorBotSummary } from "./bot-bridge.js";
+export {
+  buildMonitorBotPushEvents,
+  listMonitorBotCommands,
+  renderMonitorAlertMessage,
+  renderMonitorBotPushBatch,
+  renderMonitorBotPushMessage,
+  renderMonitorBotSummary,
+} from "./bot-bridge.js";
 export {
   buildOpenClawSnapshotFromToolData,
   isOpenClawWorkerSession,
@@ -99,7 +106,13 @@ export type {
   TrackTaskView,
 } from "./types.js";
 export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "./adapter-schema.js";
-export type { MonitorBotCommand } from "./bot-bridge.js";
+export type {
+  MonitorBotCommand,
+  MonitorBotPushEvent,
+  MonitorBotPushKind,
+  MonitorBotPushOptions,
+  MonitorBotPushSeverity,
+} from "./bot-bridge.js";
 export type {
   BuildOpenClawSnapshotFromToolDataInput,
   OpenClawProcessListEntry,

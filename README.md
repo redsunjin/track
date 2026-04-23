@@ -119,6 +119,8 @@ Current CLI surface:
 - `track pitwall --openclaw --json`
 - `track openclaw capture --source /path/to/raw-openclaw.json`
 - `track openclaw capture --sessions /path/to/sessions.json --processes /path/to/processes.json`
+- `track openclaw push --source /path/to/openclaw-monitor.json`
+- `track openclaw push --source current.json --previous previous.json --include-completed --json`
 
 This keeps OpenClaw worker monitoring inside the Pitwall control-room language instead of creating a separate dashboard product.
 

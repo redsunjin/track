@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { renderMonitorAlertMessage, renderMonitorBotSummary } from "../src/bot-bridge.js";
+import {
+  buildMonitorBotPushEvents,
+  renderMonitorAlertMessage,
+  renderMonitorBotPushBatch,
+  renderMonitorBotSummary,
+} from "../src/bot-bridge.js";
 import { buildOpenClawMonitorSnapshot, deriveOpenClawWorkerStatus } from "../src/openclaw-monitor.js";
 import { buildPitwallMonitorView } from "../src/pitwall-monitor.js";
 
@@ -53,4 +58,53 @@ test("pitwall and bot bridge build operator-friendly summaries", () => {
 
   const alert = renderMonitorAlertMessage(snapshot);
   assert.match(alert ?? "", /Worker/);
+});
+
+test("bot push hooks emit only actionable OpenClaw state transitions", () => {
+  const previous = buildOpenClawMonitorSnapshot({
+    generatedAt: "2026-04-23T13:00:00Z",
+    sessions: [
+      { id: "approval", label: "phase2", runtime: "acp", updatedAt: "2026-04-23T12:59:00Z" },
+      { id: "failure", label: "phase3", runtime: "exec", updatedAt: "2026-04-23T12:59:00Z" },
+      { id: "blocked", label: "phase4", runtime: "acp", blockedReason: "waiting on files" },
+    ],
+    workspaceRoot: "/tmp/workspace",
+  });
+  const current = buildOpenClawMonitorSnapshot({
+    generatedAt: "2026-04-23T13:05:00Z",
+    sessions: [
+      { id: "approval", label: "phase2", runtime: "acp", blockedReason: "approval needed before write" },
+      { id: "failure", label: "phase3", runtime: "exec", exitCode: 2, lastMessage: "Process exited with code 2" },
+      { id: "done", label: "phase5", runtime: "exec", exitCode: 0, lastMessage: "completed" },
+      { id: "blocked", label: "phase4", runtime: "acp", blockedReason: "waiting on files" },
+    ],
+    workspaceRoot: "/tmp/workspace",
+  });
+
+  const events = buildMonitorBotPushEvents(current, {
+    generatedAt: "2026-04-23T13:06:00Z",
+    includeCompleted: true,
+    previousSnapshot: previous,
+  });
+
+  assert.deepEqual(
+    events.map((event) => event.kind),
+    ["approval_needed", "failed", "completed"]
+  );
+  assert.equal(events[0]?.recommendedCommand, "track pitwall --openclaw --blocked");
+  assert.equal(events[1]?.severity, "red");
+  assert.match(renderMonitorBotPushBatch(events), /BOT PUSH EVENTS/);
+  assert.match(renderMonitorBotPushBatch(events), /Approval needed/);
+});
+
+test("bot push hooks skip completed workers unless requested", () => {
+  const snapshot = buildOpenClawMonitorSnapshot({
+    generatedAt: "2026-04-23T13:10:00Z",
+    sessions: [{ id: "done", label: "phase5", runtime: "exec", exitCode: 0 }],
+    workspaceRoot: "/tmp/workspace",
+  });
+
+  assert.equal(buildMonitorBotPushEvents(snapshot).length, 0);
+  assert.equal(buildMonitorBotPushEvents(snapshot, { includeCompleted: true })[0]?.kind, "completed");
+  assert.match(renderMonitorBotPushBatch([]), /QUEUE CLEAR/);
 });

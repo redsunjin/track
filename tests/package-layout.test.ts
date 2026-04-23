@@ -59,6 +59,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
   assert.equal(typeof botBridge.renderMonitorBotSummary, "function");
+  assert.equal(typeof botBridge.buildMonitorBotPushEvents, "function");
   assert.equal(typeof cli.renderOpenClawPitwall, "function");
   assert.equal(typeof openclawAdapter.buildOpenClawSnapshotFromToolData, "function");
   assert.equal(typeof openclawLive.captureOpenClawTelemetry, "function");

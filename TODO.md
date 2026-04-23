@@ -2,15 +2,25 @@
 
 ## Active
 
-- `TRK-048` Publish Readiness Gate
+- `TRK-049` OpenClaw Bot Push Hooks
 
 ## Queued
 
-- `TRK-049` OpenClaw Bot Push Hooks
+- `TRK-050 Release Handoff Notes`
 
 ## Parked
 
 ## Done
+
+### TRK-049 OpenClaw Bot Push Hooks
+
+- completed:
+  - bot push event payload builder
+  - failed, blocked, approval-needed, and completed event kinds
+  - previous/current snapshot dedupe behavior
+  - `track openclaw push`
+  - `--previous`, `--include-completed`, `--json`, and `--watch`
+  - package export and install-smoke coverage
 
 ### TRK-048 Publish Readiness Gate
 

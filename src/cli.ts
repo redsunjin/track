@@ -14,6 +14,7 @@ import {
 import type { TrackMutationCommand } from "./actions.js";
 import { expandCommandAliases } from "./aliases.js";
 import { renderBuddy } from "./buddy.js";
+import { buildMonitorBotPushEvents, renderMonitorBotPushBatch } from "./bot-bridge.js";
 import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
 import { buildTrackControlSnapshot } from "./control.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
@@ -70,11 +71,13 @@ async function main(): Promise<void> {
   const sourceFile = readFlag(args, "--source");
   const sessionsFile = readFlag(args, "--sessions");
   const processesFile = readFlag(args, "--processes");
+  const previousSourceFile = readFlag(args, "--previous");
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
   const openClawMode = args.includes("--openclaw");
   const includeMainSessions = args.includes("--include-main");
+  const includeCompleted = args.includes("--include-completed");
 
   if (command === "mcp") {
     await runStdioServer({
@@ -170,6 +173,59 @@ async function main(): Promise<void> {
       }
 
       process.stdout.write(`${renderOpenClawCaptureSummary(result)}\n`);
+      return;
+    }
+
+    if (subcommand === "push") {
+      const workspaceRoot = root ?? process.cwd();
+      const loadCurrent = () =>
+        loadOpenClawPitwallResult({
+          includeMainSessions,
+          sourceFile,
+          workspaceRoot,
+        });
+      const loadPrevious = () =>
+        previousSourceFile
+          ? loadOpenClawPitwallResult({
+              includeMainSessions,
+              sourceFile: previousSourceFile,
+              workspaceRoot,
+            })
+          : Promise.resolve(undefined);
+
+      if (watch) {
+        ensureWatchable(json);
+        let previousSnapshot = (await loadPrevious())?.snapshot;
+        await runWatchLoop(async () => {
+          const current = await loadCurrent();
+          const events = buildMonitorBotPushEvents(current.snapshot, {
+            includeCompleted,
+            previousSnapshot,
+          });
+          previousSnapshot = current.snapshot;
+          return renderMonitorBotPushBatch(events);
+        }, { intervalMs });
+        return;
+      }
+
+      const [current, previous] = await Promise.all([loadCurrent(), loadPrevious()]);
+      const events = buildMonitorBotPushEvents(current.snapshot, {
+        includeCompleted,
+        previousSnapshot: previous?.snapshot,
+      });
+      const result = {
+        events,
+        previousSourceFound: previous?.sourceFound ?? false,
+        previousSourcePath: previous?.sourcePath ?? null,
+        sourceFound: current.sourceFound,
+        sourcePath: current.sourcePath,
+      };
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+        return;
+      }
+
+      process.stdout.write(`${renderMonitorBotPushBatch(events)}\n`);
       return;
     }
 
