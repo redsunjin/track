@@ -28,16 +28,20 @@ export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServe
 export {
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
+  checkTrackPublishReadiness,
   isPackagePathCovered,
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
   renderPackageLayoutCheck,
+  renderPackageReadinessCheck,
 } from "./package-layout.js";
 export type {
   PackageDryRunCheckResult,
   PackageDryRunEntry,
   PackageDryRunIssue,
   PackageLayoutCheckResult,
+  PackageReadinessCheckResult,
+  PackageReadinessGate,
   TrackPackageBoundary,
 } from "./package-layout.js";
 export { listMonitorBotCommands, renderMonitorAlertMessage, renderMonitorBotSummary } from "./bot-bridge.js";

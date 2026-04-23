@@ -28,9 +28,11 @@ import { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./opencl
 import {
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
+  checkTrackPublishReadiness,
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
   renderPackageLayoutCheck,
+  renderPackageReadinessCheck,
 } from "./package-layout.js";
 import {
   loadPitwallDetail,
@@ -392,6 +394,19 @@ async function main(): Promise<void> {
         process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       } else {
         process.stdout.write(`${renderPackageDryRunCheck(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
+    if (subcommand === "readiness" || subcommand === "gate") {
+      const result = await checkTrackPublishReadiness(process.cwd());
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackageReadinessCheck(result)}\n`);
       }
       if (!result.ok) {
         process.exitCode = 1;

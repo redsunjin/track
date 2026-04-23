@@ -66,6 +66,23 @@ export interface PackageDryRunCheckResult {
   version: string | null;
 }
 
+export interface PackageReadinessGate {
+  command?: string;
+  detail: string;
+  id: string;
+  ok: boolean;
+  title: string;
+}
+
+export interface PackageReadinessCheckResult {
+  dryRun: PackageDryRunCheckResult;
+  gates: PackageReadinessGate[];
+  mode: "private-root" | "publishable";
+  ok: boolean;
+  packageName: string | null;
+  version: string | null;
+}
+
 export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
   {
     name: "core",
@@ -127,6 +144,19 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
 ];
 
 const REQUIRED_PACKAGE_DOCS = ["README.md", "docs/package-layout.md"];
+const REQUIRED_READINESS_SCRIPTS = [
+  { id: "build", name: "build", command: "npm run build", title: "Runtime build" },
+  { id: "typecheck", name: "typecheck", command: "npm run typecheck", title: "Typecheck" },
+  { id: "test", name: "test", command: "npm test", title: "Regression test" },
+  { id: "harness", name: "check:harness", command: "npm run check:harness", title: "Harness consistency" },
+  { id: "package-dry-run", name: "package:dry-run", command: "npm run package:dry-run", title: "Package dry-run" },
+  {
+    id: "install-smoke",
+    name: "package:install-smoke",
+    command: "npm run package:install-smoke",
+    title: "Install smoke",
+  },
+] as const;
 
 export function listTrackPackageBoundaries(): TrackPackageBoundary[] {
   return TRACK_PACKAGE_BOUNDARIES.map((boundary) => ({
@@ -227,6 +257,56 @@ export async function checkTrackPackageDryRun(repoRoot: string): Promise<Package
   };
 }
 
+export async function checkTrackPublishReadiness(repoRoot: string): Promise<PackageReadinessCheckResult> {
+  const dryRun = await checkTrackPackageDryRun(repoRoot);
+  const manifestIssues: PackageDryRunIssue[] = [];
+  const manifest = await readPackageManifest(repoRoot, manifestIssues);
+  const packageName = dryRun.packageName;
+  const version = dryRun.version;
+  const privatePackage = dryRun.privatePackage;
+  const scripts = readScriptMap(manifest);
+  const gates: PackageReadinessGate[] = [
+    ...REQUIRED_READINESS_SCRIPTS.map((script) => ({
+      command: script.command,
+      detail: hasScript(scripts, script.name) ? `script ${script.name}` : `missing script ${script.name}`,
+      id: script.id,
+      ok: hasScript(scripts, script.name),
+      title: script.title,
+    })),
+    {
+      command: "npm pack --dry-run --json",
+      detail: dryRun.ok ? "manifest, exports, bin, docs, and files are covered" : "package dry-run has blocking issues",
+      id: "npm-pack-dry-run",
+      ok: dryRun.ok,
+      title: "npm pack dry-run",
+    },
+    {
+      detail: privatePackage ? "root package is still private; publish is intentionally blocked" : "root package is publishable",
+      id: "release-mode",
+      ok: true,
+      title: "Release mode",
+    },
+  ];
+
+  if (manifestIssues.length) {
+    gates.push({
+      detail: manifestIssues.map((issue) => issue.message).join("; "),
+      id: "package-manifest",
+      ok: false,
+      title: "Package manifest",
+    });
+  }
+
+  return {
+    dryRun,
+    gates,
+    mode: privatePackage ? "private-root" : "publishable",
+    ok: dryRun.ok && gates.every((gate) => gate.ok),
+    packageName,
+    version,
+  };
+}
+
 export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -255,6 +335,37 @@ export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): stri
     lines.push("");
     lines.push("Issues:");
     for (const issue of result.issues) {
+      lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+export function renderPackageReadinessCheck(result: PackageReadinessCheckResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const readyGates = result.gates.filter((gate) => gate.ok).length;
+  const lines = [
+    result.ok ? "PACKAGE READINESS GATE OK" : "PACKAGE READINESS GATE FAIL",
+    `PACKAGE  ${packageLabel}`,
+    `MODE     ${result.mode}`,
+    `DRY-RUN  ${result.dryRun.ok ? "ok" : "failed"}`,
+    `GATES    ${readyGates}/${result.gates.length} ready`,
+    "",
+    "Gates:",
+  ];
+
+  for (const gate of result.gates) {
+    const command = gate.command ? ` ${gate.command}` : "";
+    lines.push(`- ${gate.id.padEnd(18)} ${gate.ok ? "ready" : "blocked"}${command}`);
+    lines.push(`  ${gate.detail}`);
+  }
+
+  if (result.dryRun.issues.length) {
+    lines.push("");
+    lines.push("Blocking package issues:");
+    for (const issue of result.dryRun.issues) {
       lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
     }
   }
@@ -333,6 +444,21 @@ function readStringArray(source: Record<string, unknown>, key: string): string[]
     return [];
   }
   return value.filter((item): item is string => typeof item === "string" && item.length > 0);
+}
+
+function readScriptMap(source: Record<string, unknown>): Record<string, string> {
+  const scripts = source.scripts;
+  if (!scripts || typeof scripts !== "object" || Array.isArray(scripts)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(scripts).filter((entry): entry is [string, string] => typeof entry[1] === "string")
+  );
+}
+
+function hasScript(scripts: Record<string, string>, name: string): boolean {
+  return typeof scripts[name] === "string" && scripts[name].trim().length > 0;
 }
 
 function readExportEntries(exportsValue: unknown): PackageDryRunEntry[] {

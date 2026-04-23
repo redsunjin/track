@@ -33,6 +33,7 @@ test("package scripts expose a build artifact verification path", async () => {
   );
   assert.equal(manifest.scripts?.["package:dry-run"], "npm run package:build-check");
   assert.equal(manifest.scripts?.["package:install-smoke"], "node scripts/package-install-smoke.mjs");
+  assert.equal(manifest.scripts?.["package:readiness"], "node --import tsx ./src/cli.ts package readiness");
   assert.equal(manifest.scripts?.test, "npm run build && node --import tsx --test tests/**/*.test.ts");
   assert.ok(manifest.files?.includes("dist"));
 });

@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 21
-  active_lap: 21
+  total_laps: 22
+  active_lap: 22
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -323,6 +323,22 @@ laps:
         title: Capture docs and package smoke verification
         status: done
         weight: 2
+  - id: lap-22
+    title: Publish readiness gate
+    status: done
+    checkpoints:
+      - id: cp-57
+        title: Package readiness checker
+        status: done
+        weight: 2
+      - id: cp-58
+        title: Readiness CLI and npm script
+        status: done
+        weight: 2
+      - id: cp-59
+        title: Readiness docs and verification
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -627,6 +643,21 @@ tasks:
   - id: task-061
     title: Verify capture docs and package smoke coverage
     checkpoint_id: cp-56
+    status: done
+    owner: codex
+  - id: task-062
+    title: Add package readiness checker
+    checkpoint_id: cp-57
+    status: done
+    owner: codex
+  - id: task-063
+    title: Wire readiness CLI and npm script
+    checkpoint_id: cp-58
+    status: done
+    owner: codex
+  - id: task-064
+    title: Verify readiness docs and release gate
+    checkpoint_id: cp-59
     status: done
     owner: codex
 flags: []
@@ -1121,3 +1152,28 @@ events:
     actor: codex
     timestamp: 2026-04-23T21:39:00+09:00
     summary: Completed TRK-047 OpenClaw Live Adapter Hook
+  - id: evt-2026-04-23T21:42:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-23T21:42:00+09:00
+    summary: Selected TRK-048 Publish Readiness Gate as the next active slice
+  - id: evt-2026-04-23T21:44:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T21:44:00+09:00
+    summary: Completed Add package readiness checker
+  - id: evt-2026-04-23T21:46:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T21:46:00+09:00
+    summary: Completed Wire readiness CLI and npm script
+  - id: evt-2026-04-23T21:48:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T21:48:00+09:00
+    summary: Completed Verify readiness docs and release gate
+  - id: evt-2026-04-23T21:49:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-23T21:49:00+09:00
+    summary: Completed TRK-048 Publish Readiness Gate

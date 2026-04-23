@@ -2,15 +2,25 @@
 
 ## Active
 
-- `TRK-047` OpenClaw Live Adapter Hook
+- `TRK-048` Publish Readiness Gate
 
 ## Queued
 
-- `TRK-048` Publish Readiness Gate
+- `TRK-049` OpenClaw Bot Push Hooks
 
 ## Parked
 
 ## Done
+
+### TRK-048 Publish Readiness Gate
+
+- completed:
+  - `track package readiness`
+  - `track package gate` alias
+  - `npm run package:readiness`
+  - required release-script gate checks
+  - npm pack dry-run readiness signal
+  - private-root release mode reporting
 
 ### TRK-047 OpenClaw Live Adapter Hook
 

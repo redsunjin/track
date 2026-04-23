@@ -5,10 +5,12 @@ import test from "node:test";
 import {
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
+  checkTrackPublishReadiness,
   isPackagePathCovered,
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
   renderPackageLayoutCheck,
+  renderPackageReadinessCheck,
 } from "../src/package-layout.js";
 
 test("package boundaries define the publishable Track package split", () => {
@@ -80,6 +82,30 @@ test("package dry-run verifies manifest allowlist coverage", async () => {
   assert.deepEqual(result.issues, []);
   assert.match(renderPackageDryRunCheck(result), /PACKAGE DRY-RUN OK/);
   assert.match(renderPackageDryRunCheck(result), /private-root/);
+});
+
+test("package readiness gate checks release verification scripts and pack readiness", async () => {
+  const result = await checkTrackPublishReadiness(path.resolve("."));
+
+  assert.equal(result.ok, true);
+  assert.equal(result.mode, "private-root");
+  assert.equal(result.dryRun.ok, true);
+  assert.deepEqual(
+    result.gates.map((gate) => gate.id),
+    [
+      "build",
+      "typecheck",
+      "test",
+      "harness",
+      "package-dry-run",
+      "install-smoke",
+      "npm-pack-dry-run",
+      "release-mode",
+    ]
+  );
+  assert.ok(result.gates.every((gate) => gate.ok));
+  assert.match(renderPackageReadinessCheck(result), /PACKAGE READINESS GATE OK/);
+  assert.match(renderPackageReadinessCheck(result), /npm pack --dry-run --json/);
 });
 
 test("package coverage helper matches directories and exact files", () => {

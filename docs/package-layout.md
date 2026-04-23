@@ -69,6 +69,7 @@ npm run package:check
 npm run package:dry-run
 npm run package:build-check
 npm run package:install-smoke
+npm run package:readiness
 npm pack --dry-run --json
 ```
 
@@ -79,6 +80,26 @@ The install smoke creates a temporary tarball and consumer project, installs Tra
 
 Track's root package remains `private: true`.
 `package dry-run` is therefore a distribution-readiness check, not a publishing command.
+
+## Readiness Gate
+
+Use the release gate before treating the package as ready for a handoff:
+
+```bash
+track package readiness
+track package gate
+npm run package:readiness
+```
+
+The gate verifies:
+
+- required verification scripts exist: build, typecheck, test, harness, package dry-run, and install smoke
+- package dry-run is clean
+- `npm pack --dry-run --json` has the manifest coverage it needs
+- release mode is explicit
+
+Current release mode is `private-root`.
+That means distribution artifacts can be checked and handed off, but npm publish is intentionally blocked until `private` is changed deliberately.
 
 ## Extraction Rule
 

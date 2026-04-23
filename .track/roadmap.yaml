@@ -617,3 +617,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-22
+      title: Publish readiness gate
+      goal: Add one executable gate for release handoff readiness before pack or future publish attempts.
+      kind: build
+      checkpoints:
+        - id: cp-57
+          title: Package readiness checker
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-58
+          title: Readiness CLI and npm script
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-59
+          title: Readiness docs and verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

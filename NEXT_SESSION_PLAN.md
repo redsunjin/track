@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-047`
-- title: `OpenClaw Live Adapter Hook`
+- id: `TRK-048`
+- title: `Publish Readiness Gate`
 
 ## Goal
 
-Let Track capture raw OpenClaw session/process telemetry into the default Pitwall monitor file so another session can produce telemetry while `track pitwall --openclaw` consumes it.
+Add a single executable gate that tells whether Track is ready for a release handoff before a physical npm pack or future publish attempt.
 
 ## First Steps
 
-1. add an OpenClaw capture runtime helper
-2. wire `track openclaw capture` with source, split-file, dry-run, JSON, and watch modes
-3. expose the helper through package exports and install smoke checks
+1. add a package readiness checker over the existing package dry-run
+2. wire `track package readiness` and `track package gate`
+3. document the gate and update the release verification path
 
 ## Constraints
 
-- keep the manager surface read-oriented and terminal-first
-- do not require a browser dashboard
-- keep `.track/openclaw-monitor.json` as the local handoff file
-- preserve `track pitwall --openclaw` as the operator display
-- avoid storing raw transcript content beyond supplied status fields
+- do not publish to npm
+- keep root package `private: true`
+- keep the gate deterministic and fast
+- report private-root mode explicitly instead of hiding it
+- reuse package dry-run results instead of duplicating manifest checks
 
 ## Verification
 
@@ -29,14 +29,16 @@ Let Track capture raw OpenClaw session/process telemetry into the default Pitwal
 npm test
 npm run typecheck
 npm run check:harness
+npm run package:check
 npm run package:dry-run
+npm run package:readiness
 npm run package:install-smoke
 npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- `track openclaw capture --source <file>` writes `.track/openclaw-monitor.json`
-- split `--sessions` and `--processes` inputs normalize into one monitor snapshot
-- `--dry-run --json` can be used by scripts without writing
-- package consumers can import `track/openclaw-live`
+- `track package readiness` reports `PACKAGE READINESS GATE OK`
+- the gate lists required verification commands
+- the gate reports `private-root` mode
+- JSON output is available for automation
