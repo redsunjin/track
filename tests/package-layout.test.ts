@@ -46,6 +46,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   const botBridge = await import("track/bot-bridge");
   const cli = await import("track/cli");
   const openclawAdapter = await import("track/openclaw-adapter");
+  const openclawLive = await import("track/openclaw-live");
   const openclawMonitor = await import("track/openclaw-monitor");
   const pitwallMonitor = await import("track/pitwall-monitor");
   const layout = await import("track/package-layout");
@@ -58,6 +59,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof botBridge.renderMonitorBotSummary, "function");
   assert.equal(typeof cli.renderOpenClawPitwall, "function");
   assert.equal(typeof openclawAdapter.buildOpenClawSnapshotFromToolData, "function");
+  assert.equal(typeof openclawLive.captureOpenClawTelemetry, "function");
   assert.equal(typeof openclawMonitor.buildOpenClawMonitorSnapshot, "function");
   assert.equal(typeof pitwallMonitor.buildPitwallMonitorView, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);

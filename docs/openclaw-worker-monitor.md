@@ -34,6 +34,7 @@ Initial source layout:
 Backed by implementation modules:
 
 - `src/openclaw-adapter.ts`
+- `src/openclaw-live.ts`
 - `src/openclaw-monitor.ts`
 - `src/pitwall-monitor.ts`
 - `src/bot-bridge.ts`
@@ -77,6 +78,15 @@ Loads OpenClaw monitor source data and renders the terminal Pitwall worker board
 - filters: `--blocked`, `--errors`, `--running`
 - machine output: `--json`
 
+### `openclaw-live`
+
+Captures raw OpenClaw session/process telemetry into the default Pitwall input file:
+
+- default output: `.track/openclaw-monitor.json`
+- combined source: `--source <file>`
+- split sources: `--sessions <file>` and/or `--processes <file>`
+- dry run and machine output: `--dry-run`, `--json`
+
 ### `bot-bridge`
 
 Maps monitor state into lightweight remote interaction patterns:
@@ -108,6 +118,7 @@ Status: the normalization adapter now exists in `src/openclaw-adapter.ts` and ca
 
 ### Phase 3
 
+- live adapter hook that writes `.track/openclaw-monitor.json` from raw OpenClaw source files
 - bot push hooks for completion, blocked, approval-needed, and failure
 - optional transcript-tail references when policy allows
 - optional MCP read tools for worker overview
@@ -117,6 +128,10 @@ Status: the normalization adapter now exists in `src/openclaw-adapter.ts` and ca
 OpenClaw source data should be JSON with `sessions` and/or `processes` arrays matching the adapter input shape, or a prebuilt monitor snapshot.
 
 ```bash
+track openclaw capture --source /path/to/raw-openclaw.json
+track openclaw capture --sessions /path/to/sessions.json --processes /path/to/processes.json
+track openclaw capture --source /path/to/raw-openclaw.json --dry-run --json
+track openclaw capture --source /path/to/raw-openclaw.json --watch --interval 1000
 track pitwall --openclaw
 track pitwall --openclaw --source /path/to/openclaw-monitor.json
 track pitwall --openclaw --blocked
@@ -124,5 +139,8 @@ track pitwall --openclaw --errors
 track pitwall --openclaw --running
 track pitwall --openclaw --json
 ```
+
+`track openclaw capture` writes `.track/openclaw-monitor.json` by default.
+After capture, `track pitwall --openclaw` reads that file without extra flags.
 
 The key rule is to preserve `Track`'s existing terminal-first control-room language rather than inventing a separate monitoring product shell.

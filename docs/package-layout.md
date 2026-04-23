@@ -51,6 +51,7 @@ The repo may also expose experimental extension subpaths when a new operator sur
 Current extension-oriented subpaths:
 
 - `track/openclaw-adapter`
+- `track/openclaw-live`
 - `track/openclaw-monitor`
 - `track/pitwall-monitor`
 - `track/bot-bridge`

@@ -105,6 +105,7 @@ Track now includes an adapter layer that can normalize OpenClaw session-list and
 Current building blocks:
 
 - `track/openclaw-adapter`
+- `track/openclaw-live`
 - `track/openclaw-monitor`
 - `track/pitwall-monitor`
 - runtime helpers exposed through `track/runtime`
@@ -116,6 +117,8 @@ Current CLI surface:
 - `track pitwall --openclaw --blocked`
 - `track pitwall --openclaw --errors`
 - `track pitwall --openclaw --json`
+- `track openclaw capture --source /path/to/raw-openclaw.json`
+- `track openclaw capture --sessions /path/to/sessions.json --processes /path/to/processes.json`
 
 This keeps OpenClaw worker monitoring inside the Pitwall control-room language instead of creating a separate dashboard product.
 

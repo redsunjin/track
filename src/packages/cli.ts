@@ -6,6 +6,7 @@ export {
   renderOpenClawPitwall,
   resolveOpenClawPitwallFilter,
 } from "../openclaw-pitwall.js";
+export { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "../openclaw-live.js";
 export { renderNext, renderStatus } from "../render.js";
 export {
   renderPitwall,
@@ -14,4 +15,5 @@ export {
   renderPitwallQueue,
 } from "../pitwall.js";
 export { runWatchLoop } from "../watch.js";
+export type { CaptureOpenClawTelemetryOptions, CaptureOpenClawTelemetryResult } from "../openclaw-live.js";
 export type { OpenClawPitwallFilter, OpenClawPitwallLoadOptions, OpenClawPitwallResult } from "../openclaw-pitwall.js";

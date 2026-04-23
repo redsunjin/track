@@ -41,6 +41,10 @@
       "types": "./dist/packages/openclaw-adapter.d.ts",
       "import": "./dist/packages/openclaw-adapter.js"
     },
+    "./openclaw-live": {
+      "types": "./dist/packages/openclaw-live.d.ts",
+      "import": "./dist/packages/openclaw-live.js"
+    },
     "./openclaw-monitor": {
       "types": "./dist/packages/openclaw-monitor.d.ts",
       "import": "./dist/packages/openclaw-monitor.js"

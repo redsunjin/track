@@ -43,7 +43,7 @@ async function main() {
       "PACKAGE INSTALL SMOKE OK",
       `TARBALL  ${tarballPath}`,
       `CONSUMER ${consumerRoot}`,
-      "IMPORTS  track, track/core, track/cli, track/openclaw-adapter",
+      "IMPORTS  track, track/core, track/cli, track/openclaw-adapter, track/openclaw-live",
       "CLI      track pitwall --openclaw --no-color",
     ].join("\n") + "\n"
   );
@@ -73,10 +73,12 @@ const root = await import("track");
 const core = await import("track/core");
 const cli = await import("track/cli");
 const adapter = await import("track/openclaw-adapter");
+const openclawLive = await import("track/openclaw-live");
 if (typeof root.summarizeTrack !== "function") throw new Error("missing root summarizeTrack export");
 if (typeof core.summarizeTrack !== "function") throw new Error("missing track/core summarizeTrack export");
 if (typeof cli.renderOpenClawPitwall !== "function") throw new Error("missing track/cli OpenClaw Pitwall export");
 if (typeof adapter.buildOpenClawSnapshotFromToolData !== "function") throw new Error("missing OpenClaw adapter export");
+if (typeof openclawLive.captureOpenClawTelemetry !== "function") throw new Error("missing OpenClaw live export");
 `;
 }
 

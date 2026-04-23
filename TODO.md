@@ -2,16 +2,33 @@
 
 ## Active
 
-- `TRK-046` Publish/Install Smoke
+- `TRK-047` OpenClaw Live Adapter Hook
 
 ## Queued
 
-- `TRK-047` OpenClaw Live Adapter Hook
 - `TRK-048` Publish Readiness Gate
 
 ## Parked
 
 ## Done
+
+### TRK-047 OpenClaw Live Adapter Hook
+
+- completed:
+  - `track openclaw capture`
+  - combined `--source` capture
+  - split `--sessions` and `--processes` capture
+  - `--dry-run`, `--json`, and watch-friendly summary output
+  - `track/openclaw-live` package export and install-smoke coverage
+
+### TRK-046 Publish/Install Smoke
+
+- completed:
+  - temporary package install smoke
+  - tarball install into a clean consumer project
+  - public subpath import smoke
+  - installed `track` bin smoke
+  - package install-smoke docs and verification
 
 ### TRK-045 OpenClaw Pitwall CLI Surface
 

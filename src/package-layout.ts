@@ -96,7 +96,16 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     packageName: "track-cli",
     description: "Terminal commands, renderers, aliases, watch loop, and race telemetry text surfaces.",
     entrypoint: "src/packages/cli.ts",
-    owns: ["src/cli.ts", "src/render.ts", "src/buddy.ts", "src/aliases.ts", "src/watch.ts", "src/ansi.ts", "src/openclaw-pitwall.ts"],
+    owns: [
+      "src/cli.ts",
+      "src/render.ts",
+      "src/buddy.ts",
+      "src/aliases.ts",
+      "src/watch.ts",
+      "src/ansi.ts",
+      "src/openclaw-pitwall.ts",
+      "src/openclaw-live.ts",
+    ],
     releaseEntrypoint: "dist/packages/cli.js",
   },
   {

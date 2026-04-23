@@ -585,3 +585,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-21
+      title: OpenClaw live adapter hook
+      goal: Capture raw OpenClaw telemetry into the default Pitwall monitor handoff file.
+      kind: integration
+      checkpoints:
+        - id: cp-54
+          title: OpenClaw capture runtime helper
+          kind: integration
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-55
+          title: OpenClaw capture CLI and package export
+          kind: integration
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-56
+          title: Capture docs and package smoke verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

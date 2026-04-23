@@ -24,6 +24,7 @@ import {
   renderOpenClawPitwall,
   resolveOpenClawPitwallFilter,
 } from "./openclaw-pitwall.js";
+import { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./openclaw-live.js";
 import {
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
@@ -65,6 +66,8 @@ async function main(): Promise<void> {
   const packKind = readFlag(args, "--tool");
   const outDir = readFlag(args, "--out");
   const sourceFile = readFlag(args, "--source");
+  const sessionsFile = readFlag(args, "--sessions");
+  const processesFile = readFlag(args, "--processes");
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
@@ -135,6 +138,40 @@ async function main(): Promise<void> {
       )}\n`
     );
     return;
+  }
+
+  if (command === "openclaw") {
+    const subcommand = args[1] ?? "capture";
+    if (subcommand === "capture") {
+      const workspaceRoot = root ?? process.cwd();
+      const capture = () =>
+        captureOpenClawTelemetry({
+          includeMainSessions,
+          outputFile: outDir,
+          processesFile,
+          sessionsFile,
+          sourceFile,
+          workspaceRoot,
+          write: !dryRun,
+        });
+
+      if (watch) {
+        ensureWatchable(json);
+        await runWatchLoop(async () => renderOpenClawCaptureSummary(await capture()), { intervalMs });
+        return;
+      }
+
+      const result = await capture();
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+        return;
+      }
+
+      process.stdout.write(`${renderOpenClawCaptureSummary(result)}\n`);
+      return;
+    }
+
+    throw new Error(`Unknown Track openclaw command: ${subcommand}`);
   }
 
   if (command === "pitwall") {

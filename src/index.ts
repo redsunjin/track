@@ -53,6 +53,7 @@ export {
   renderOpenClawPitwall,
   resolveOpenClawPitwallFilter,
 } from "./openclaw-pitwall.js";
+export { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./openclaw-live.js";
 export {
   advanceCheckpoint,
   applyEventToState,
@@ -102,6 +103,7 @@ export type {
   OpenClawSessionListMessage,
 } from "./openclaw-adapter.js";
 export type { OpenClawPitwallFilter, OpenClawPitwallLoadOptions, OpenClawPitwallResult } from "./openclaw-pitwall.js";
+export type { CaptureOpenClawTelemetryOptions, CaptureOpenClawTelemetryResult } from "./openclaw-live.js";
 export type { PitwallMonitorAlert, PitwallMonitorView } from "./pitwall-monitor.js";
 export type {
   OpenClawMonitorSnapshot,
