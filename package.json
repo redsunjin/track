@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "files": [
+    "dist",
     "src",
     "agents",
     "docs",
@@ -14,10 +15,14 @@
   "exports": {
     ".": "./src/index.ts",
     "./agents": "./src/packages/agents.ts",
+    "./bot-bridge": "./src/packages/bot-bridge.ts",
     "./cli": "./src/packages/cli.ts",
     "./core": "./src/packages/core.ts",
     "./mcp": "./src/packages/mcp.ts",
+    "./openclaw-adapter": "./src/packages/openclaw-adapter.ts",
+    "./openclaw-monitor": "./src/packages/openclaw-monitor.ts",
     "./package-layout": "./src/package-layout.ts",
+    "./pitwall-monitor": "./src/packages/pitwall-monitor.ts",
     "./runtime": "./src/packages/runtime.ts",
     "./vscode": "./vscode-extension/src/extension.ts"
   },
@@ -25,12 +30,14 @@
     "track": "./src/cli.ts"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "buddy": "node --import tsx ./src/cli.ts buddy",
     "check:harness": "node --import tsx ./src/cli.ts check:harness",
     "companion": "node --import tsx ./src/cli.ts companion",
     "import": "node --import tsx ./src/cli.ts import",
     "lab": "node --import tsx ./src/cli.ts lab",
     "mcp:smoke": "node --import tsx ./src/cli.ts mcp-smoke-test",
+    "package:build-check": "npm run build && node dist/cli.js package dry-run",
     "package:check": "node --import tsx ./src/cli.ts package check",
     "package:dry-run": "node --import tsx ./src/cli.ts package dry-run",
     "status": "node --import tsx ./src/cli.ts status",

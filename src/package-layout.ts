@@ -31,6 +31,8 @@ export interface PackageDryRunIssue {
   boundary?: string;
   code:
     | "invalid_manifest"
+    | "missing_build_artifact_allowlist"
+    | "missing_build_script"
     | "missing_bin"
     | "missing_export"
     | "missing_files_allowlist"
@@ -176,6 +178,7 @@ export async function checkTrackPackageDryRun(repoRoot: string): Promise<Package
   const binEntries = readBinEntries(manifest.bin).map((entry) => withCoverage(entry, filesAllowlist));
 
   validatePackageBoundaryExports(exportEntries, issues);
+  validateBuildArtifactReadiness(manifest, filesAllowlist, issues);
   validateCoveredEntries(exportEntries, "export", issues);
   validateCoveredEntries(binEntries, "bin", issues);
   validateRequiredBin(binEntries, issues);
@@ -386,6 +389,36 @@ function validatePackageBoundaryExports(exportEntries: PackageDryRunEntry[], iss
         severity: "error",
       });
     }
+  }
+}
+
+function validateBuildArtifactReadiness(
+  manifest: Record<string, unknown>,
+  filesAllowlist: string[],
+  issues: PackageDryRunIssue[]
+): void {
+  const scripts = manifest.scripts;
+  const buildScript =
+    scripts && typeof scripts === "object" && !Array.isArray(scripts)
+      ? (scripts as Record<string, unknown>).build
+      : undefined;
+
+  if (typeof buildScript !== "string" || buildScript.trim().length === 0) {
+    issues.push({
+      code: "missing_build_script",
+      message: "package.json must define a build script before release artifacts can be verified.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (!isPackagePathCovered(filesAllowlist, "dist")) {
+    issues.push({
+      code: "missing_build_artifact_allowlist",
+      message: "package.json files must include dist so compiled build artifacts are packageable.",
+      path: "package.json",
+      severity: "error",
+    });
   }
 }
 

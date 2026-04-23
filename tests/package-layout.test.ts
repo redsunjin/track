@@ -41,12 +41,14 @@ test("package subpath exports resolve the source-level package entrypoints", asy
   const runtime = await import("track/runtime");
   const mcp = await import("track/mcp");
   const agents = await import("track/agents");
+  const openclawAdapter = await import("track/openclaw-adapter");
   const layout = await import("track/package-layout");
 
   assert.equal(typeof core.summarizeTrack, "function");
   assert.equal(typeof runtime.loadTrackState, "function");
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
+  assert.equal(typeof openclawAdapter.buildOpenClawSnapshotFromToolData, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -56,6 +58,7 @@ test("package dry-run verifies manifest allowlist coverage", async () => {
   assert.equal(result.ok, true);
   assert.equal(result.privatePackage, true);
   assert.equal(result.publishable, false);
+  assert.ok(result.filesAllowlist.includes("dist"));
   assert.ok(result.filesAllowlist.includes("src"));
   assert.ok(result.filesAllowlist.includes("docs"));
   assert.ok(result.exportEntries.find((entry) => entry.subpath === "./core")?.covered);

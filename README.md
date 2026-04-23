@@ -36,6 +36,7 @@ V1 is a plugin-first architecture:
 - VS Code companion with webview, course tree, and compact corner telemetry
 - exportable Claude/Codex/Gemini operating-pack bundles
 - source-level package boundaries for `track-core`, `track-runtime`, `track-mcp`, `track-cli`, `track-agents`, and `track-vscode`
+- compiled `dist` build artifacts for package readiness checks
 
 ## Security defaults
 
@@ -97,17 +98,35 @@ Current usage:
 - `track pack install --tool codex --out ./tmp/track-codex-install --dry-run --json`
 - `track pack install --tool codex --out ./tmp/track-codex-install`
 
+## OpenClaw worker monitor adapter
+
+Track now includes an adapter layer that can normalize OpenClaw session-list and process-list data into the worker-monitor snapshot model.
+
+Current building blocks:
+
+- `track/openclaw-adapter`
+- `track/openclaw-monitor`
+- runtime helpers exposed through `track/runtime`
+- `docs/openclaw-worker-monitor.md`
+
+This slice focuses on data normalization first so Pitwall and future TUI surfaces can consume real OpenClaw telemetry without inventing a separate state model.
+
 ## Package layout
 
 Track now exposes source-level package boundaries and subpath exports for future package extraction.
 
 Current checks:
 
+- `npm run build`
 - `npm run package:check`
 - `npm run package:dry-run`
+- `npm run package:build-check`
 - `track package list`
 - `track package check`
 - `track package dry-run`
+
+`package:build-check` runs the compiled CLI from `dist/cli.js` after build.
+The package exports remain source-level until the release manifest is switched in a later slice.
 
 Reference:
 
@@ -141,6 +160,7 @@ The terminal map now renders a wrapped retro course board with sector markers an
 - Agent operating packs: [docs/agent-operating-packs.md](docs/agent-operating-packs.md)
 - VS Code companion scaffold: [vscode-extension/README.md](vscode-extension/README.md)
 - Pitwall concept: [docs/pitwall-concept.md](docs/pitwall-concept.md)
+- OpenClaw worker monitor: [docs/openclaw-worker-monitor.md](docs/openclaw-worker-monitor.md)
 - Retro telemetry dashboard plan: [docs/retro-telemetry-dashboard-plan.md](docs/retro-telemetry-dashboard-plan.md)
 - Track generator: [docs/track-generator-method.md](docs/track-generator-method.md)
 - Runtime requirements: [docs/runtime-feature-matrix.md](docs/runtime-feature-matrix.md)

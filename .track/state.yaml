@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 16
-  active_lap: 16
+  total_laps: 17
+  active_lap: 17
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -243,6 +243,22 @@ laps:
         title: Color and plain fallback verification
         status: done
         weight: 2
+  - id: lap-17
+    title: Build artifact baseline
+    status: done
+    checkpoints:
+      - id: cp-42
+        title: Runtime build config
+        status: done
+        weight: 2
+      - id: cp-43
+        title: Build artifact package guardrails
+        status: done
+        weight: 2
+      - id: cp-44
+        title: Built CLI dry-run verification
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -472,6 +488,21 @@ tasks:
   - id: task-046
     title: Verify color and no-color map output
     checkpoint_id: cp-41
+    status: done
+    owner: codex
+  - id: task-047
+    title: Add runtime build config
+    checkpoint_id: cp-42
+    status: done
+    owner: codex
+  - id: task-048
+    title: Add build artifact package guardrails
+    checkpoint_id: cp-43
+    status: done
+    owner: codex
+  - id: task-049
+    title: Verify built CLI dry-run path
+    checkpoint_id: cp-44
     status: done
     owner: codex
 flags: []
@@ -841,3 +872,28 @@ events:
     actor: codex
     timestamp: 2026-04-22T21:52:00+09:00
     summary: Completed TRK-042 Retro Track Color Pass
+  - id: evt-2026-04-23T20:18:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-23T20:18:00+09:00
+    summary: Selected TRK-043 Build Artifact Baseline as the next active slice
+  - id: evt-2026-04-23T20:22:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:22:00+09:00
+    summary: Completed Add runtime build config
+  - id: evt-2026-04-23T20:24:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:24:00+09:00
+    summary: Completed Add build artifact package guardrails
+  - id: evt-2026-04-23T20:26:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-23T20:26:00+09:00
+    summary: Completed Verify built CLI dry-run path
+  - id: evt-2026-04-23T20:27:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-23T20:27:00+09:00
+    summary: Completed TRK-043 Build Artifact Baseline

@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-016-retro-track-color-pass.md](./worksheets/HW-016-retro-track-color-pass.md)
+- [HW-017-build-artifact-baseline.md](./worksheets/HW-017-build-artifact-baseline.md)
 
 Last completed worksheet:
 
-- [HW-015-package-artifact-dry-run.md](./worksheets/HW-015-package-artifact-dry-run.md)
+- [HW-016-retro-track-color-pass.md](./worksheets/HW-016-retro-track-color-pass.md)
 
 ## Adoption Rules
 

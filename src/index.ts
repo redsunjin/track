@@ -40,6 +40,13 @@ export type {
   PackageLayoutCheckResult,
   TrackPackageBoundary,
 } from "./package-layout.js";
+export { listMonitorBotCommands, renderMonitorAlertMessage, renderMonitorBotSummary } from "./bot-bridge.js";
+export {
+  buildOpenClawSnapshotFromToolData,
+  isOpenClawWorkerSession,
+  normalizeProcessEntry,
+  normalizeSessionEntry,
+} from "./openclaw-adapter.js";
 export {
   advanceCheckpoint,
   applyEventToState,
@@ -60,6 +67,8 @@ export {
   resolvePitwallRepo,
   scanPitwall,
 } from "./pitwall.js";
+export { buildPitwallMonitorView, listPitwallMonitorAlerts } from "./pitwall-monitor.js";
+export { buildOpenClawMonitorSnapshot, deriveOpenClawWorkerStatus, toOpenClawWorkerSession } from "./openclaw-monitor.js";
 export { renderNext, renderStatus } from "./render.js";
 export { sanitizeInlineText } from "./security.js";
 export { summarizeTrack } from "./summary.js";
@@ -79,3 +88,19 @@ export type {
   TrackTaskView,
 } from "./types.js";
 export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "./adapter-schema.js";
+export type { MonitorBotCommand } from "./bot-bridge.js";
+export type {
+  BuildOpenClawSnapshotFromToolDataInput,
+  OpenClawProcessListEntry,
+  OpenClawSessionListEntry,
+  OpenClawSessionListMessage,
+} from "./openclaw-adapter.js";
+export type { PitwallMonitorAlert, PitwallMonitorView } from "./pitwall-monitor.js";
+export type {
+  OpenClawMonitorSnapshot,
+  OpenClawRuntimeKind,
+  OpenClawSignal,
+  OpenClawWorkerInput,
+  OpenClawWorkerSession,
+  OpenClawWorkerState,
+} from "./openclaw-monitor.js";

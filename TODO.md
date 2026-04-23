@@ -2,13 +2,25 @@
 
 ## Active
 
-- `TRK-042` Retro Track Color Pass
+- `TRK-043` Build Artifact Baseline
 
 ## Queued
+
+- `TRK-044` Release Manifest Switch
+- `TRK-045` OpenClaw Pitwall CLI Surface
 
 ## Parked
 
 ## Done
+
+### TRK-042 Retro Track Color Pass
+
+- completed:
+  - wrapped retro course board for `track map`
+  - sector-numbered progress tokens
+  - type-aware ANSI color legend
+  - readable `--no-color` fallback
+  - map and companion visual verification
 
 ### TRK-041 Package Artifact Dry Run
 

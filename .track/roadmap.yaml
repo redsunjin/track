@@ -457,3 +457,35 @@ roadmap:
             dependencies: 1
             coordination: 1
             risk: 1
+    - id: phase-17
+      title: Build artifact baseline
+      goal: Add deterministic compiled dist artifacts and built-CLI verification before switching release exports.
+      kind: build
+      checkpoints:
+        - id: cp-42
+          title: Runtime build config
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-43
+          title: Build artifact package guardrails
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-44
+          title: Built CLI dry-run verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 1
