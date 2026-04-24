@@ -28,6 +28,7 @@ import {
 import { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./openclaw-live.js";
 import {
   buildTrackPackageHandoff,
+  buildTrackReleaseCandidateTagDryRun,
   checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
@@ -38,6 +39,7 @@ import {
   renderPackageLayoutCheck,
   renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
+  renderPackageReleaseCandidateTagDryRun,
 } from "./package-layout.js";
 import type { PackagePublishModeTarget } from "./package-layout.js";
 import {
@@ -78,6 +80,8 @@ async function main(): Promise<void> {
   const processesFile = readFlag(args, "--processes");
   const previousSourceFile = readFlag(args, "--previous");
   const packageTargetMode = readFlag(args, "--target");
+  const packageCandidateTag = readFlag(args, "--tag");
+  const packageCandidateRc = parseOptionalInteger(readFlag(args, "--rc"));
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
@@ -504,6 +508,22 @@ async function main(): Promise<void> {
       return;
     }
 
+    if (subcommand === "rc-tag" || subcommand === "tag-dry-run") {
+      const result = await buildTrackReleaseCandidateTagDryRun(process.cwd(), {
+        candidateTag: packageCandidateTag,
+        rc: packageCandidateRc,
+      });
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackageReleaseCandidateTagDryRun(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
     throw new Error(`Unknown Track package command: ${subcommand}`);
   }
 
@@ -656,6 +676,14 @@ function ensureReadableCommand(command: string): void {
 function parseInterval(raw: string | undefined): number {
   const parsed = Number(raw ?? "1000");
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1000;
+}
+
+function parseOptionalInteger(raw: string | undefined): number | undefined {
+  if (!raw) {
+    return undefined;
+  }
+  const parsed = Number(raw);
+  return Number.isInteger(parsed) ? parsed : Number.NaN;
 }
 
 function readColorPreference(args: string[]): boolean | undefined {

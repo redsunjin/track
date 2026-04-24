@@ -4,6 +4,7 @@ import test from "node:test";
 
 import {
   buildTrackPackageHandoff,
+  buildTrackReleaseCandidateTagDryRun,
   checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
@@ -15,6 +16,7 @@ import {
   renderPackageLayoutCheck,
   renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
+  renderPackageReleaseCandidateTagDryRun,
 } from "../src/package-layout.js";
 
 test("package boundaries define the publishable Track package split", () => {
@@ -71,6 +73,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof pitwallMonitor.buildPitwallMonitorView, "function");
   assert.equal(typeof layout.buildTrackPackageHandoff, "function");
   assert.equal(typeof layout.checkTrackPublishModeGuard, "function");
+  assert.equal(typeof layout.buildTrackReleaseCandidateTagDryRun, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -152,6 +155,31 @@ test("publish mode guard blocks a publishable switch without explicit publishCon
   assert.ok(result.issues.some((issue) => issue.code === "missing_publish_config"));
   assert.match(renderPackagePublishModeGuard(result), /PACKAGE PUBLISH MODE GUARD BLOCKED/);
   assert.match(renderPackagePublishModeGuard(result), /missing_publish_config/);
+});
+
+test("release candidate tag dry-run prepares a tag command without creating a tag", async () => {
+  const result = await buildTrackReleaseCandidateTagDryRun(path.resolve("."), { existingTags: [] });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, "tag-dry-run-ready");
+  assert.equal(result.candidateTag, "v0.1.0-rc.0");
+  assert.equal(result.rc, 0);
+  assert.ok(result.commands.includes('git tag -a v0.1.0-rc.0 -m "track v0.1.0-rc.0"'));
+  assert.ok(result.commands.includes("git push origin v0.1.0-rc.0"));
+  assert.match(renderPackageReleaseCandidateTagDryRun(result), /PACKAGE RC TAG DRY-RUN/);
+  assert.match(renderPackageReleaseCandidateTagDryRun(result), /tag-dry-run-ready/);
+});
+
+test("release candidate tag dry-run blocks an existing candidate tag", async () => {
+  const result = await buildTrackReleaseCandidateTagDryRun(path.resolve("."), {
+    existingTags: ["v0.1.0-rc.0"],
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.status, "tag-dry-run-blocked");
+  assert.ok(result.issues.some((issue) => issue.code === "tag_already_exists"));
+  assert.match(renderPackageReleaseCandidateTagDryRun(result), /PACKAGE RC TAG DRY-RUN BLOCKED/);
+  assert.match(renderPackageReleaseCandidateTagDryRun(result), /tag_already_exists/);
 });
 
 test("package coverage helper matches directories and exact files", () => {

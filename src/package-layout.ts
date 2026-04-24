@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 export interface TrackPackageBoundary {
@@ -140,6 +140,47 @@ export interface PackagePublishModeGuardResult {
   status: "private-held" | "publish-switch-ready" | "publishable-ready" | "switch-blocked";
   summary: string;
   targetMode: PackagePublishModeTarget;
+  version: string | null;
+}
+
+export interface PackageReleaseCandidateTagDryRunOptions {
+  candidateTag?: string;
+  existingTags?: string[];
+  rc?: number;
+}
+
+export interface PackageReleaseCandidateTagIssue {
+  code:
+    | "git_metadata_unavailable"
+    | "invalid_candidate_tag"
+    | "missing_package_version"
+    | "package_readiness_failed"
+    | "publish_guard_failed"
+    | "tag_already_exists";
+  message: string;
+  severity: "error" | "warning";
+}
+
+export interface PackageReleaseCandidateTagCheck {
+  detail: string;
+  id: string;
+  ok: boolean;
+  title: string;
+}
+
+export interface PackageReleaseCandidateTagDryRunResult {
+  candidateTag: string | null;
+  checks: PackageReleaseCandidateTagCheck[];
+  commands: string[];
+  existingTags: string[];
+  issues: PackageReleaseCandidateTagIssue[];
+  ok: boolean;
+  packageName: string | null;
+  publishGuard: PackagePublishModeGuardResult;
+  rc: number | null;
+  readiness: PackageReadinessCheckResult;
+  status: "tag-dry-run-blocked" | "tag-dry-run-ready";
+  summary: string;
   version: string | null;
 }
 
@@ -522,6 +563,128 @@ export async function checkTrackPublishModeGuard(
   };
 }
 
+export async function buildTrackReleaseCandidateTagDryRun(
+  repoRoot: string,
+  options: PackageReleaseCandidateTagDryRunOptions = {}
+): Promise<PackageReleaseCandidateTagDryRunResult> {
+  const readiness = await checkTrackPublishReadiness(repoRoot);
+  const publishGuard = await checkTrackPublishModeGuard(repoRoot);
+  const rc = options.rc ?? 0;
+  const candidateTag = options.candidateTag ?? (readiness.version ? `v${readiness.version}-rc.${rc}` : null);
+  const tagSource = options.existingTags ? { found: true, tags: options.existingTags } : await readLocalGitTags(repoRoot);
+  const existingTags = [...new Set(tagSource.tags)].sort((left, right) => left.localeCompare(right));
+  const issues: PackageReleaseCandidateTagIssue[] = [];
+
+  if (!readiness.version) {
+    issues.push({
+      code: "missing_package_version",
+      message: "package.json must define a version before an RC tag can be prepared.",
+      severity: "error",
+    });
+  }
+
+  if (!readiness.ok) {
+    issues.push({
+      code: "package_readiness_failed",
+      message: "Package readiness must pass before preparing an RC tag.",
+      severity: "error",
+    });
+  }
+
+  if (!publishGuard.ok) {
+    issues.push({
+      code: "publish_guard_failed",
+      message: "Publish mode guard must pass before preparing an RC tag.",
+      severity: "error",
+    });
+  }
+
+  if (!tagSource.found) {
+    issues.push({
+      code: "git_metadata_unavailable",
+      message: "No local .git metadata was found, so tag conflicts cannot be checked.",
+      severity: "error",
+    });
+  }
+
+  if (!Number.isInteger(rc) || rc < 0) {
+    issues.push({
+      code: "invalid_candidate_tag",
+      message: "RC number must be a non-negative integer.",
+      severity: "error",
+    });
+  }
+
+  if (!candidateTag || !isReleaseCandidateTag(candidateTag)) {
+    issues.push({
+      code: "invalid_candidate_tag",
+      message: `RC tag must match v<major>.<minor>.<patch>-rc.<n>, got ${candidateTag ?? "missing"}.`,
+      severity: "error",
+    });
+  }
+
+  if (candidateTag && existingTags.includes(candidateTag)) {
+    issues.push({
+      code: "tag_already_exists",
+      message: `Local tag ${candidateTag} already exists.`,
+      severity: "error",
+    });
+  }
+
+  const commands = candidateTag
+    ? [`git tag -a ${candidateTag} -m "${readiness.packageName ?? "track"} ${candidateTag}"`, `git push origin ${candidateTag}`]
+    : [];
+  const checks: PackageReleaseCandidateTagCheck[] = [
+    {
+      detail: readiness.ok ? "package readiness gates are green" : "package readiness has blocking gates",
+      id: "readiness",
+      ok: readiness.ok,
+      title: "Readiness gate",
+    },
+    {
+      detail: publishGuard.ok ? `publish mode guard is ${publishGuard.status}` : "publish mode guard is blocked",
+      id: "publish-guard",
+      ok: publishGuard.ok,
+      title: "Publish guard",
+    },
+    {
+      detail: candidateTag ? candidateTag : "missing candidate tag",
+      id: "tag-format",
+      ok: Boolean(candidateTag && isReleaseCandidateTag(candidateTag) && Number.isInteger(rc) && rc >= 0),
+      title: "Tag format",
+    },
+    {
+      detail: tagSource.found
+        ? candidateTag && existingTags.includes(candidateTag)
+          ? `${candidateTag} already exists`
+          : "candidate tag is not present locally"
+        : "local git metadata missing",
+      id: "tag-conflict",
+      ok: tagSource.found && Boolean(candidateTag && !existingTags.includes(candidateTag)),
+      title: "Tag conflict",
+    },
+  ];
+  const ok = !issues.some((issue) => issue.severity === "error");
+
+  return {
+    candidateTag,
+    checks,
+    commands,
+    existingTags,
+    issues,
+    ok,
+    packageName: readiness.packageName,
+    publishGuard,
+    rc: Number.isInteger(rc) && rc >= 0 ? rc : null,
+    readiness,
+    status: ok ? "tag-dry-run-ready" : "tag-dry-run-blocked",
+    summary: ok
+      ? "Release candidate tag command is ready to run manually; no tag was created."
+      : "Release candidate tag dry-run is blocked until package and tag issues are resolved.",
+    version: readiness.version,
+  };
+}
+
 export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -549,6 +712,45 @@ export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): stri
   if (result.issues.length) {
     lines.push("");
     lines.push("Issues:");
+    for (const issue of result.issues) {
+      lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+export function renderPackageReleaseCandidateTagDryRun(result: PackageReleaseCandidateTagDryRunResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const readyChecks = result.checks.filter((check) => check.ok).length;
+  const lines = [
+    result.ok ? "PACKAGE RC TAG DRY-RUN" : "PACKAGE RC TAG DRY-RUN BLOCKED",
+    `PACKAGE  ${packageLabel}`,
+    `STATUS   ${result.status}`,
+    `TAG      ${result.candidateTag ?? "missing"}`,
+    `SUMMARY  ${result.summary}`,
+    `CHECKS   ${readyChecks}/${result.checks.length} ready`,
+    "",
+    "Checks:",
+  ];
+
+  for (const check of result.checks) {
+    lines.push(`- ${check.id.padEnd(16)} ${check.ok ? "ready" : "blocked"}`);
+    lines.push(`  ${check.detail}`);
+  }
+
+  if (result.commands.length) {
+    lines.push("");
+    lines.push("Dry-run commands:");
+    for (const command of result.commands) {
+      lines.push(`- ${command}`);
+    }
+  }
+
+  if (result.issues.length) {
+    lines.push("");
+    lines.push("RC tag issues:");
     for (const issue of result.issues) {
       lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
     }
@@ -866,6 +1068,80 @@ function describePublishConfig(publishConfig: PackagePublishConfigSummary): stri
   ].filter((value): value is string => Boolean(value));
 
   return fields.length ? fields.join(", ") : "present with no tracked fields";
+}
+
+function isReleaseCandidateTag(candidateTag: string): boolean {
+  return /^v\d+\.\d+\.\d+-rc\.\d+$/.test(candidateTag);
+}
+
+async function readLocalGitTags(repoRoot: string): Promise<{ found: boolean; tags: string[] }> {
+  const gitDir = await resolveGitDir(repoRoot);
+  if (!gitDir) {
+    return { found: false, tags: [] };
+  }
+
+  const [looseTags, packedTags] = await Promise.all([readLooseGitTags(path.join(gitDir, "refs", "tags")), readPackedGitTags(gitDir)]);
+  return {
+    found: true,
+    tags: [...new Set([...looseTags, ...packedTags])].sort((left, right) => left.localeCompare(right)),
+  };
+}
+
+async function resolveGitDir(repoRoot: string): Promise<string | null> {
+  const dotGitPath = path.join(repoRoot, ".git");
+  try {
+    const dotGitStat = await stat(dotGitPath);
+    if (dotGitStat.isDirectory()) {
+      return dotGitPath;
+    }
+    if (!dotGitStat.isFile()) {
+      return null;
+    }
+    const contents = await readFile(dotGitPath, "utf8");
+    const match = contents.match(/^gitdir:\s*(.+)\s*$/m);
+    if (!match) {
+      return null;
+    }
+    return path.resolve(repoRoot, match[1]);
+  } catch {
+    return null;
+  }
+}
+
+async function readLooseGitTags(tagsDir: string): Promise<string[]> {
+  try {
+    const entries = await readdir(tagsDir, { withFileTypes: true });
+    const tags = await Promise.all(
+      entries.map(async (entry) => {
+        const entryPath = path.join(tagsDir, entry.name);
+        if (entry.isDirectory()) {
+          return (await readLooseGitTags(entryPath)).map((tag) => `${entry.name}/${tag}`);
+        }
+        if (entry.isFile()) {
+          return [entry.name];
+        }
+        return [];
+      })
+    );
+    return tags.flat();
+  } catch {
+    return [];
+  }
+}
+
+async function readPackedGitTags(gitDir: string): Promise<string[]> {
+  try {
+    const contents = await readFile(path.join(gitDir, "packed-refs"), "utf8");
+    return contents
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith("#") && !line.startsWith("^"))
+      .map((line) => line.split(" ")[1])
+      .filter((ref): ref is string => typeof ref === "string" && ref.startsWith("refs/tags/"))
+      .map((ref) => ref.replace(/^refs\/tags\//, ""));
+  } catch {
+    return [];
+  }
 }
 
 function readExportEntries(exportsValue: unknown): PackageDryRunEntry[] {

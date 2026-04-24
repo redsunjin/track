@@ -138,12 +138,14 @@ Current checks:
 - `npm run package:handoff`
 - `npm run package:readiness`
 - `npm run package:publish-guard`
+- `npm run package:rc-tag`
 - `track package list`
 - `track package check`
 - `track package dry-run`
 - `track package handoff`
 - `track package readiness`
 - `track package publish-guard`
+- `track package rc-tag`
 
 `package:build-check` runs the compiled CLI from `dist/cli.js` after build.
 The public package exports and `bin.track` now point at compiled release artifacts under `dist`.
@@ -151,6 +153,7 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:handoff` emits a concise release handoff note with status, commands, public subpaths, package boundaries, and reference docs.
 `package:readiness` is the release gate: it verifies the required build/test/harness/package scripts exist and that the package dry-run is clean before a physical `npm pack --dry-run --json`.
 `package:publish-guard` keeps the current `private-root` package state explicit and blocks a publishable-mode switch unless the manifest shape and publish configuration are ready.
+`package:rc-tag` prepares the release-candidate git tag commands as a dry-run after readiness and publish guard checks; it does not create or push a tag.
 
 Reference:
 

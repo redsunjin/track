@@ -745,3 +745,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-26
+      title: Release candidate tag dry run
+      goal: Prepare release-candidate git tag commands without creating or pushing a tag.
+      kind: build
+      checkpoints:
+        - id: cp-69
+          title: RC tag dry-run builder
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-70
+          title: RC tag CLI and npm script
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-71
+          title: RC tag docs and verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

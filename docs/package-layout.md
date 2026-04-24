@@ -72,6 +72,7 @@ npm run package:install-smoke
 npm run package:handoff
 npm run package:readiness
 npm run package:publish-guard
+npm run package:rc-tag
 npm pack --dry-run --json
 ```
 
@@ -147,6 +148,31 @@ That path checks:
 
 If any of those checks fail, the guard reports `switch-blocked`.
 The guard does not publish, tag, or modify `package.json`.
+
+## Release Candidate Tag Dry Run
+
+Use the RC tag dry-run when the package state is ready and the next step is a human-reviewed git tag:
+
+```bash
+track package rc-tag
+track package tag-dry-run
+track package rc-tag --rc 1
+track package rc-tag --tag v0.1.0-rc.1
+npm run package:rc-tag
+```
+
+The default candidate is derived from `package.json.version`.
+For `0.1.0`, the default tag is `v0.1.0-rc.0`.
+
+The dry-run checks:
+
+- package readiness is green
+- publish mode guard is green
+- the candidate tag matches `v<major>.<minor>.<patch>-rc.<n>`
+- the candidate tag does not already exist in local git tags
+
+The command prints the exact `git tag -a ...` and `git push origin ...` commands to run manually.
+It does not create a tag, push a tag, mutate `package.json`, or publish to npm.
 
 ## Extraction Rule
 

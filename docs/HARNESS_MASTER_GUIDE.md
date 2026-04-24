@@ -213,11 +213,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-025-publish-mode-switch-guard.md](./worksheets/HW-025-publish-mode-switch-guard.md)
+- [HW-026-release-candidate-tag-dry-run.md](./worksheets/HW-026-release-candidate-tag-dry-run.md)
 
 Last completed worksheet:
 
-- [HW-024-release-handoff-notes.md](./worksheets/HW-024-release-handoff-notes.md)
+- [HW-025-publish-mode-switch-guard.md](./worksheets/HW-025-publish-mode-switch-guard.md)
 
 ## Adoption Rules
 

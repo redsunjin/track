@@ -2,15 +2,27 @@
 
 ## Active
 
-- `TRK-051` Publish Mode Switch Guard
+- `TRK-052` Release Candidate Tag Dry Run
 
 ## Queued
 
-- `TRK-052 Release Candidate Tag Dry Run`
+- `TRK-053 Release Notes Draft Generator`
 
 ## Parked
 
 ## Done
+
+### TRK-052 Release Candidate Tag Dry Run
+
+- completed:
+  - `track package rc-tag`
+  - `track package tag-dry-run` alias
+  - `npm run package:rc-tag`
+  - default `v<version>-rc.0` tag candidate derivation
+  - `--rc` and `--tag` candidate controls
+  - readiness, publish guard, tag format, and local tag conflict checks
+  - dry-run git tag and push command output without creating a tag
+  - JSON output and regression coverage
 
 ### TRK-051 Publish Mode Switch Guard
 

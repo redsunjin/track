@@ -2,25 +2,25 @@
 
 ## Active Slice
 
-- id: `TRK-051`
-- title: `Publish Mode Switch Guard`
+- id: `TRK-052`
+- title: `Release Candidate Tag Dry Run`
 
 ## Goal
 
-Add a deterministic guard that keeps the current private package state explicit and blocks an accidental publishable-mode switch until the manifest and package readiness signals are safe.
+Add a safe release-candidate tag dry-run that derives the next RC tag, checks package readiness and publish guard state, detects local tag conflicts, and prints the exact git commands without creating or pushing a tag.
 
 ## First Steps
 
-1. add a publish mode guard on top of package readiness and dry-run state
-2. wire `track package publish-guard`, `track package mode-guard`, and `npm run package:publish-guard`
-3. document private-root and publishable target behavior with regression coverage
+1. add an RC tag dry-run builder on top of package readiness and publish guard results
+2. wire `track package rc-tag`, `track package tag-dry-run`, and `npm run package:rc-tag`
+3. document tag derivation, safety behavior, and regression coverage
 
 ## Constraints
 
-- do not change `package.json.private`
-- do not publish, tag, or push release artifacts
-- keep the default command safe for the current `private-root` state
-- require an explicit `--target publishable` check before evaluating a publish switch
+- do not create a git tag
+- do not push a git tag
+- do not publish to npm
+- do not mutate `package.json`
 - keep JSON output available for automation
 
 ## Verification
@@ -34,14 +34,15 @@ npm run package:dry-run
 npm run package:handoff
 npm run package:readiness
 npm run package:publish-guard
-node --import tsx ./src/cli.ts package publish-guard --target publishable --json
+npm run package:rc-tag
+node --import tsx ./src/cli.ts package tag-dry-run --rc 1 --json
 npm run package:install-smoke
 npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- default guard reports the current `private-held` state
-- publishable target evaluation blocks when explicit publish configuration is missing
-- package readiness and dry-run results are reused rather than duplicated
-- docs explain that the guard does not publish or mutate the manifest
+- default RC tag dry-run reports `v0.1.0-rc.0`
+- custom RC candidate controls work through `--rc` and `--tag`
+- existing tag conflicts block the dry-run
+- rendered output includes only manual git commands and does not execute them
