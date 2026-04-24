@@ -2,15 +2,26 @@
 
 ## Active
 
-- `TRK-050` Release Handoff Notes
+- `TRK-051` Publish Mode Switch Guard
 
 ## Queued
 
-- `TRK-051 Publish Mode Switch Guard`
+- `TRK-052 Release Candidate Tag Dry Run`
 
 ## Parked
 
 ## Done
+
+### TRK-051 Publish Mode Switch Guard
+
+- completed:
+  - `track package publish-guard`
+  - `track package mode-guard` alias
+  - `npm run package:publish-guard`
+  - current `private-root` status guard
+  - `--target publishable` switch evaluation
+  - manifest `private`, `publishConfig`, exports/files/bin readiness checks
+  - JSON output and regression coverage
 
 ### TRK-050 Release Handoff Notes
 

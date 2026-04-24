@@ -713,3 +713,35 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-25
+      title: Publish mode switch guard
+      goal: Guard the transition from private-root to publishable package mode before manifest changes or npm publish.
+      kind: build
+      checkpoints:
+        - id: cp-66
+          title: Publish mode guard checker
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-67
+          title: Guard CLI and npm script
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-68
+          title: Guard docs and verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1

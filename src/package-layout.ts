@@ -97,6 +97,52 @@ export interface PackageHandoffNoteResult {
   version: string | null;
 }
 
+export type PackagePublishMode = "private-root" | "publishable";
+export type PackagePublishModeTarget = "current" | PackagePublishMode;
+
+export interface PackagePublishConfigSummary {
+  access: string | null;
+  present: boolean;
+  provenance: boolean | null;
+  registry: string | null;
+  tag: string | null;
+}
+
+export interface PackagePublishModeGuardIssue {
+  code:
+    | "invalid_publish_config"
+    | "missing_private_field"
+    | "missing_publish_config"
+    | "package_readiness_failed"
+    | "private_mode_mismatch"
+    | "unsafe_publish_access";
+  message: string;
+  path?: string;
+  severity: "error" | "warning";
+}
+
+export interface PackagePublishModeGuardCheck {
+  detail: string;
+  id: string;
+  ok: boolean;
+  title: string;
+}
+
+export interface PackagePublishModeGuardResult {
+  checks: PackagePublishModeGuardCheck[];
+  currentMode: PackagePublishMode;
+  issues: PackagePublishModeGuardIssue[];
+  ok: boolean;
+  packageName: string | null;
+  privatePackage: boolean;
+  publishConfig: PackagePublishConfigSummary;
+  readiness: PackageReadinessCheckResult;
+  status: "private-held" | "publish-switch-ready" | "publishable-ready" | "switch-blocked";
+  summary: string;
+  targetMode: PackagePublishModeTarget;
+  version: string | null;
+}
+
 export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
   {
     name: "core",
@@ -356,6 +402,126 @@ export async function buildTrackPackageHandoff(repoRoot: string): Promise<Packag
   };
 }
 
+export async function checkTrackPublishModeGuard(
+  repoRoot: string,
+  options: { targetMode?: PackagePublishModeTarget } = {}
+): Promise<PackagePublishModeGuardResult> {
+  const targetMode = options.targetMode ?? "current";
+  const readiness = await checkTrackPublishReadiness(repoRoot);
+  const issues: PackagePublishModeGuardIssue[] = [];
+  const manifestIssues: PackageDryRunIssue[] = [];
+  const manifest = await readPackageManifest(repoRoot, manifestIssues);
+  const privateValue = readBoolean(manifest, "private");
+  const privatePackage = privateValue === true;
+  const currentMode: PackagePublishMode = privatePackage ? "private-root" : "publishable";
+  const publishConfig = readPublishConfigSummary(manifest, issues);
+  const evaluatingPublishable = targetMode === "publishable" || (targetMode === "current" && currentMode === "publishable");
+  const evaluatingPrivateRoot = targetMode === "private-root" || (targetMode === "current" && currentMode === "private-root");
+
+  if (privateValue === null) {
+    issues.push({
+      code: "missing_private_field",
+      message: "package.json must explicitly define private before release mode can be trusted.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (!readiness.ok) {
+    issues.push({
+      code: "package_readiness_failed",
+      message: "Package readiness must pass before changing publish mode.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (evaluatingPrivateRoot && !privatePackage) {
+    issues.push({
+      code: "private_mode_mismatch",
+      message: "Target private-root requires package.json private to be true.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (evaluatingPublishable && !publishConfig.present) {
+    issues.push({
+      code: "missing_publish_config",
+      message: "Add an explicit package.json publishConfig before switching private to false.",
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  if (evaluatingPublishable && publishConfig.access && publishConfig.access !== "public") {
+    issues.push({
+      code: "unsafe_publish_access",
+      message: `publishConfig.access must be public for a public Track release, got ${publishConfig.access}.`,
+      path: "package.json",
+      severity: "error",
+    });
+  }
+
+  for (const issue of manifestIssues) {
+    issues.push({
+      code: "invalid_publish_config",
+      message: issue.message,
+      path: issue.path,
+      severity: issue.severity,
+    });
+  }
+
+  const checks: PackagePublishModeGuardCheck[] = [
+    {
+      detail: privatePackage ? "package.json private is true" : "package.json private is false",
+      id: "private-field",
+      ok: privateValue !== null && (!evaluatingPrivateRoot || privatePackage),
+      title: "Private field",
+    },
+    {
+      detail: publishConfig.present ? describePublishConfig(publishConfig) : "missing; required only for publishable mode",
+      id: "publish-config",
+      ok: !evaluatingPublishable || publishConfig.present,
+      title: "Publish config",
+    },
+    {
+      detail: readiness.dryRun.ok ? "exports, files, bin, docs, and boundaries are covered" : "package dry-run has blocking issues",
+      id: "package-shape",
+      ok: readiness.dryRun.ok,
+      title: "Package shape",
+    },
+    {
+      detail: readiness.ok ? "all release readiness gates are green" : "release readiness has blocking gates",
+      id: "readiness",
+      ok: readiness.ok,
+      title: "Readiness gate",
+    },
+  ];
+
+  const status = summarizePublishModeGuardStatus({
+    currentMode,
+    issues,
+    readiness,
+    targetMode,
+  });
+
+  return {
+    checks,
+    currentMode,
+    issues,
+    ok: !issues.some((issue) => issue.severity === "error"),
+    packageName: readiness.packageName,
+    privatePackage,
+    publishConfig,
+    readiness,
+    status: status.id,
+    summary: status.summary,
+    targetMode,
+    version: readiness.version,
+  };
+}
+
 export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -383,6 +549,38 @@ export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): stri
   if (result.issues.length) {
     lines.push("");
     lines.push("Issues:");
+    for (const issue of result.issues) {
+      lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+export function renderPackagePublishModeGuard(result: PackagePublishModeGuardResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const readyChecks = result.checks.filter((check) => check.ok).length;
+  const lines = [
+    result.ok ? "PACKAGE PUBLISH MODE GUARD" : "PACKAGE PUBLISH MODE GUARD BLOCKED",
+    `PACKAGE  ${packageLabel}`,
+    `STATUS   ${result.status}`,
+    `CURRENT  ${result.currentMode}`,
+    `TARGET   ${result.targetMode}`,
+    `SUMMARY  ${result.summary}`,
+    `CHECKS   ${readyChecks}/${result.checks.length} ready`,
+    "",
+    "Checks:",
+  ];
+
+  for (const check of result.checks) {
+    lines.push(`- ${check.id.padEnd(16)} ${check.ok ? "ready" : "blocked"}`);
+    lines.push(`  ${check.detail}`);
+  }
+
+  if (result.issues.length) {
+    lines.push("");
+    lines.push("Publish mode issues:");
     for (const issue of result.issues) {
       lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
     }
@@ -580,6 +778,94 @@ function summarizePackageHandoffStatus(readiness: PackageReadinessCheckResult): 
     id: "ready-publishable",
     summary: "Ready for publish handoff. Package readiness gates are green.",
   };
+}
+
+function summarizePublishModeGuardStatus(input: {
+  currentMode: PackagePublishMode;
+  issues: PackagePublishModeGuardIssue[];
+  readiness: PackageReadinessCheckResult;
+  targetMode: PackagePublishModeTarget;
+}): {
+  id: PackagePublishModeGuardResult["status"];
+  summary: string;
+} {
+  if (input.issues.some((issue) => issue.severity === "error")) {
+    return {
+      id: "switch-blocked",
+      summary: "Publish mode switch is blocked until manifest and readiness issues are resolved.",
+    };
+  }
+
+  if (input.targetMode === "publishable" && input.readiness.ok) {
+    return {
+      id: "publish-switch-ready",
+      summary: "Ready to switch package.json private to false after release-owner review.",
+    };
+  }
+
+  if (input.currentMode === "publishable") {
+    return {
+      id: "publishable-ready",
+      summary: "Package is publishable and release readiness gates are green.",
+    };
+  }
+
+  return {
+    id: "private-held",
+    summary: "Package remains private; npm publish is still blocked by package.json.",
+  };
+}
+
+function readPublishConfigSummary(
+  source: Record<string, unknown>,
+  issues: PackagePublishModeGuardIssue[]
+): PackagePublishConfigSummary {
+  const value = source.publishConfig;
+  if (value === undefined) {
+    return {
+      access: null,
+      present: false,
+      provenance: null,
+      registry: null,
+      tag: null,
+    };
+  }
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    issues.push({
+      code: "invalid_publish_config",
+      message: "package.json publishConfig must be an object when present.",
+      path: "package.json",
+      severity: "error",
+    });
+    return {
+      access: null,
+      present: true,
+      provenance: null,
+      registry: null,
+      tag: null,
+    };
+  }
+
+  const publishConfig = value as Record<string, unknown>;
+  return {
+    access: typeof publishConfig.access === "string" && publishConfig.access.length > 0 ? publishConfig.access : null,
+    present: true,
+    provenance: typeof publishConfig.provenance === "boolean" ? publishConfig.provenance : null,
+    registry: typeof publishConfig.registry === "string" && publishConfig.registry.length > 0 ? publishConfig.registry : null,
+    tag: typeof publishConfig.tag === "string" && publishConfig.tag.length > 0 ? publishConfig.tag : null,
+  };
+}
+
+function describePublishConfig(publishConfig: PackagePublishConfigSummary): string {
+  const fields = [
+    publishConfig.access ? `access=${publishConfig.access}` : null,
+    publishConfig.registry ? `registry=${publishConfig.registry}` : null,
+    publishConfig.tag ? `tag=${publishConfig.tag}` : null,
+    publishConfig.provenance === null ? null : `provenance=${String(publishConfig.provenance)}`,
+  ].filter((value): value is string => Boolean(value));
+
+  return fields.length ? fields.join(", ") : "present with no tracked fields";
 }
 
 function readExportEntries(exportsValue: unknown): PackageDryRunEntry[] {

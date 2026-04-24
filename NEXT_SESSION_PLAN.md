@@ -2,25 +2,25 @@
 
 ## Active Slice
 
-- id: `TRK-050`
-- title: `Release Handoff Notes`
+- id: `TRK-051`
+- title: `Publish Mode Switch Guard`
 
 ## Goal
 
-Generate one executable release handoff note that summarizes current package status, verification commands, public subpaths, boundaries, and reference docs for a human handoff.
+Add a deterministic guard that keeps the current private package state explicit and blocks an accidental publishable-mode switch until the manifest and package readiness signals are safe.
 
 ## First Steps
 
-1. add a package handoff note builder on top of the readiness gate
-2. wire `track package handoff` and `track package notes`
-3. document the handoff flow and update release verification tests
+1. add a publish mode guard on top of package readiness and dry-run state
+2. wire `track package publish-guard`, `track package mode-guard`, and `npm run package:publish-guard`
+3. document private-root and publishable target behavior with regression coverage
 
 ## Constraints
 
-- keep the handoff note deterministic and terminal-friendly
-- reuse readiness and dry-run results instead of re-implementing checks
-- keep `private-root` explicit in the handoff output
-- do not publish or tag a release
+- do not change `package.json.private`
+- do not publish, tag, or push release artifacts
+- keep the default command safe for the current `private-root` state
+- require an explicit `--target publishable` check before evaluating a publish switch
 - keep JSON output available for automation
 
 ## Verification
@@ -33,13 +33,15 @@ npm run package:check
 npm run package:dry-run
 npm run package:handoff
 npm run package:readiness
+npm run package:publish-guard
+node --import tsx ./src/cli.ts package publish-guard --target publishable --json
 npm run package:install-smoke
 npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- `track package handoff` prints a usable release handoff block
-- `track package notes` is an alias
-- the output includes commands, subpaths, boundaries, and docs
-- JSON output is available for structured handoff tooling
+- default guard reports the current `private-held` state
+- publishable target evaluation blocks when explicit publish configuration is missing
+- package readiness and dry-run results are reused rather than duplicated
+- docs explain that the guard does not publish or mutate the manifest

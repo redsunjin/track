@@ -27,6 +27,7 @@ export { generateTrackMap, renderTrackMap } from "./generator.js";
 export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServer } from "./mcp.js";
 export {
   buildTrackPackageHandoff,
+  checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   checkTrackPublishReadiness,
@@ -35,6 +36,7 @@ export {
   renderPackageDryRunCheck,
   renderPackageHandoffNote,
   renderPackageLayoutCheck,
+  renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
 } from "./package-layout.js";
 export type {
@@ -43,6 +45,12 @@ export type {
   PackageDryRunIssue,
   PackageHandoffNoteResult,
   PackageLayoutCheckResult,
+  PackagePublishConfigSummary,
+  PackagePublishMode,
+  PackagePublishModeGuardCheck,
+  PackagePublishModeGuardIssue,
+  PackagePublishModeGuardResult,
+  PackagePublishModeTarget,
   PackageReadinessCheckResult,
   PackageReadinessGate,
   TrackPackageBoundary,

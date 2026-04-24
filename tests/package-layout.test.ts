@@ -4,6 +4,7 @@ import test from "node:test";
 
 import {
   buildTrackPackageHandoff,
+  checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   checkTrackPublishReadiness,
@@ -12,6 +13,7 @@ import {
   renderPackageDryRunCheck,
   renderPackageHandoffNote,
   renderPackageLayoutCheck,
+  renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
 } from "../src/package-layout.js";
 
@@ -68,6 +70,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof openclawMonitor.buildOpenClawMonitorSnapshot, "function");
   assert.equal(typeof pitwallMonitor.buildPitwallMonitorView, "function");
   assert.equal(typeof layout.buildTrackPackageHandoff, "function");
+  assert.equal(typeof layout.checkTrackPublishModeGuard, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -124,6 +127,31 @@ test("package handoff notes summarize release status, commands, subpaths, and do
   assert.equal(result.boundaries.length, 6);
   assert.match(renderPackageHandoffNote(result), /PACKAGE RELEASE HANDOFF/);
   assert.match(renderPackageHandoffNote(result), /ready-private-root/);
+});
+
+test("publish mode guard keeps the current private root publish-safe", async () => {
+  const result = await checkTrackPublishModeGuard(path.resolve("."));
+
+  assert.equal(result.ok, true);
+  assert.equal(result.currentMode, "private-root");
+  assert.equal(result.targetMode, "current");
+  assert.equal(result.status, "private-held");
+  assert.equal(result.privatePackage, true);
+  assert.equal(result.publishConfig.present, false);
+  assert.ok(result.checks.find((check) => check.id === "package-shape")?.ok);
+  assert.match(renderPackagePublishModeGuard(result), /PACKAGE PUBLISH MODE GUARD/);
+  assert.match(renderPackagePublishModeGuard(result), /private-held/);
+});
+
+test("publish mode guard blocks a publishable switch without explicit publishConfig", async () => {
+  const result = await checkTrackPublishModeGuard(path.resolve("."), { targetMode: "publishable" });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.targetMode, "publishable");
+  assert.equal(result.status, "switch-blocked");
+  assert.ok(result.issues.some((issue) => issue.code === "missing_publish_config"));
+  assert.match(renderPackagePublishModeGuard(result), /PACKAGE PUBLISH MODE GUARD BLOCKED/);
+  assert.match(renderPackagePublishModeGuard(result), /missing_publish_config/);
 });
 
 test("package coverage helper matches directories and exact files", () => {

@@ -79,6 +79,7 @@
     "package:dry-run": "npm run package:build-check",
     "package:handoff": "node --import tsx ./src/cli.ts package handoff",
     "package:install-smoke": "node scripts/package-install-smoke.mjs",
+    "package:publish-guard": "node --import tsx ./src/cli.ts package publish-guard",
     "package:readiness": "node --import tsx ./src/cli.ts package readiness",
     "status": "node --import tsx ./src/cli.ts status",
     "next": "node --import tsx ./src/cli.ts next",

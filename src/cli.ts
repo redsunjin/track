@@ -28,6 +28,7 @@ import {
 import { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./openclaw-live.js";
 import {
   buildTrackPackageHandoff,
+  checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
   checkTrackPackageLayout,
   checkTrackPublishReadiness,
@@ -35,8 +36,10 @@ import {
   renderPackageDryRunCheck,
   renderPackageHandoffNote,
   renderPackageLayoutCheck,
+  renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
 } from "./package-layout.js";
+import type { PackagePublishModeTarget } from "./package-layout.js";
 import {
   loadPitwallDetail,
   loadPitwallOwnerLoad,
@@ -74,6 +77,7 @@ async function main(): Promise<void> {
   const sessionsFile = readFlag(args, "--sessions");
   const processesFile = readFlag(args, "--processes");
   const previousSourceFile = readFlag(args, "--previous");
+  const packageTargetMode = readFlag(args, "--target");
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
@@ -485,6 +489,21 @@ async function main(): Promise<void> {
       return;
     }
 
+    if (subcommand === "publish-guard" || subcommand === "mode-guard") {
+      const result = await checkTrackPublishModeGuard(process.cwd(), {
+        targetMode: normalizePackagePublishModeTarget(packageTargetMode),
+      });
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackagePublishModeGuard(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
     throw new Error(`Unknown Track package command: ${subcommand}`);
   }
 
@@ -596,6 +615,16 @@ function readFlag(args: string[], flag: string): string | undefined {
     return undefined;
   }
   return args[index + 1];
+}
+
+function normalizePackagePublishModeTarget(raw: string | undefined): PackagePublishModeTarget {
+  if (!raw) {
+    return "current";
+  }
+  if (raw === "current" || raw === "private-root" || raw === "publishable") {
+    return raw;
+  }
+  throw new Error("`--target` must be one of current, private-root, or publishable.");
 }
 
 function requireTarget(command: string, target: string | undefined): string {

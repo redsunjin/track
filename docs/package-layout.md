@@ -71,6 +71,7 @@ npm run package:build-check
 npm run package:install-smoke
 npm run package:handoff
 npm run package:readiness
+npm run package:publish-guard
 npm pack --dry-run --json
 ```
 
@@ -121,6 +122,31 @@ The handoff note includes:
 - reference docs for the handoff receiver
 
 When the package is still `private-root`, the note explicitly says it is ready for artifact handoff but not for npm publish.
+
+## Publish Mode Guard
+
+Use the publish mode guard before changing `package.json.private`:
+
+```bash
+track package publish-guard
+track package mode-guard
+track package publish-guard --target publishable
+npm run package:publish-guard
+```
+
+The default guard describes the current mode.
+In the current repo state it should report `private-held`, meaning `private: true` is still blocking `npm publish`.
+
+`--target publishable` evaluates a deliberate switch before the manifest is edited.
+That path checks:
+
+- package readiness is green
+- exports, files, docs, and bin targets are covered by the dry-run
+- `private` is explicit
+- publishable mode has explicit `publishConfig`
+
+If any of those checks fail, the guard reports `switch-blocked`.
+The guard does not publish, tag, or modify `package.json`.
 
 ## Extraction Rule
 

@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 24
-  active_lap: 24
+  total_laps: 25
+  active_lap: 25
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -371,6 +371,22 @@ laps:
         title: Handoff docs and verification
         status: done
         weight: 2
+  - id: lap-25
+    title: Publish mode switch guard
+    status: done
+    checkpoints:
+      - id: cp-66
+        title: Publish mode guard checker
+        status: done
+        weight: 2
+      - id: cp-67
+        title: Guard CLI and npm script
+        status: done
+        weight: 2
+      - id: cp-68
+        title: Guard docs and verification
+        status: done
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -720,6 +736,21 @@ tasks:
   - id: task-070
     title: Verify handoff docs and release note output
     checkpoint_id: cp-65
+    status: done
+    owner: codex
+  - id: task-071
+    title: Add publish mode guard checker
+    checkpoint_id: cp-66
+    status: done
+    owner: codex
+  - id: task-072
+    title: Wire guard CLI and npm script
+    checkpoint_id: cp-67
+    status: done
+    owner: codex
+  - id: task-073
+    title: Verify publish guard docs and output
+    checkpoint_id: cp-68
     status: done
     owner: codex
 flags: []
@@ -1289,3 +1320,28 @@ events:
     actor: codex
     timestamp: 2026-04-24T00:12:00+09:00
     summary: Completed TRK-050 Release Handoff Notes
+  - id: evt-2026-04-24T00:16:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-24T00:16:00+09:00
+    summary: Selected TRK-051 Publish Mode Switch Guard as the next active slice
+  - id: evt-2026-04-24T00:18:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-24T00:18:00+09:00
+    summary: Completed Add publish mode guard checker
+  - id: evt-2026-04-24T00:20:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-24T00:20:00+09:00
+    summary: Completed Wire guard CLI and npm script
+  - id: evt-2026-04-24T00:22:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-24T00:22:00+09:00
+    summary: Completed Verify publish guard docs and output
+  - id: evt-2026-04-24T00:23:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-24T00:23:00+09:00
+    summary: Completed TRK-051 Publish Mode Switch Guard
