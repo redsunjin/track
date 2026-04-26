@@ -54,6 +54,7 @@ These are the current boundary docs:
 - [pitwall-concept.md](./pitwall-concept.md)
 - [track-generator-method.md](./track-generator-method.md)
 - [visual-direction.md](./visual-direction.md)
+- [public-npm-release-roadmap.md](./public-npm-release-roadmap.md)
 
 Rule:
 
@@ -213,11 +214,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-026-release-candidate-tag-dry-run.md](./worksheets/HW-026-release-candidate-tag-dry-run.md)
+- [HW-027-public-npm-release-roadmap-lock.md](./worksheets/HW-027-public-npm-release-roadmap-lock.md)
 
 Last completed worksheet:
 
-- [HW-025-publish-mode-switch-guard.md](./worksheets/HW-025-publish-mode-switch-guard.md)
+- [HW-026-release-candidate-tag-dry-run.md](./worksheets/HW-026-release-candidate-tag-dry-run.md)
 
 ## Adoption Rules
 

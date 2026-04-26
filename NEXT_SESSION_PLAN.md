@@ -2,47 +2,38 @@
 
 ## Active Slice
 
-- id: `TRK-052`
-- title: `Release Candidate Tag Dry Run`
+- id: `TRK-053`
+- title: `Public NPM Release Roadmap Lock`
 
 ## Goal
 
-Add a safe release-candidate tag dry-run that derives the next RC tag, checks package readiness and publish guard state, detects local tag conflicts, and prints the exact git commands without creating or pushing a tag.
+Lock the public npm release target and remaining release sequence before changing package identity or running publish commands.
 
 ## First Steps
 
-1. add an RC tag dry-run builder on top of package readiness and publish guard results
-2. wire `track package rc-tag`, `track package tag-dry-run`, and `npm run package:rc-tag`
-3. document tag derivation, safety behavior, and regression coverage
+1. document the public package target as `@redsunjin/track`
+2. define public release completion criteria
+3. lock TRK-054 through TRK-058 as the release path
 
 ## Constraints
 
-- do not create a git tag
-- do not push a git tag
 - do not publish to npm
-- do not mutate `package.json`
-- keep JSON output available for automation
+- do not create or push git tags
+- do not change `package.json.name` in this slice
+- keep the current `private-root` package state intact until the scoped package switch
 
 ## Verification
 
 ```bash
-npm test
-npm run typecheck
 npm run check:harness
-npm run package:check
-npm run package:dry-run
-npm run package:handoff
 npm run package:readiness
 npm run package:publish-guard
 npm run package:rc-tag
-node --import tsx ./src/cli.ts package tag-dry-run --rc 1 --json
-npm run package:install-smoke
-npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- default RC tag dry-run reports `v0.1.0-rc.0`
-- custom RC candidate controls work through `--rc` and `--tag`
-- existing tag conflicts block the dry-run
-- rendered output includes only manual git commands and does not execute them
+- public release target is documented as `@redsunjin/track`
+- remaining release sequence is explicit through public release execution
+- TODO, roadmap, state, and worksheet all agree on `TRK-053`
+- next implementation slice is `TRK-054 Scoped Package Manifest Switch`

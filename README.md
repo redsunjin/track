@@ -155,6 +155,12 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:publish-guard` keeps the current `private-root` package state explicit and blocks a publishable-mode switch unless the manifest shape and publish configuration are ready.
 `package:rc-tag` prepares the release-candidate git tag commands as a dry-run after readiness and publish guard checks; it does not create or push a tag.
 
+Public npm release target:
+
+- package: `@redsunjin/track`
+- CLI bin: `track`
+- release roadmap: [docs/public-npm-release-roadmap.md](docs/public-npm-release-roadmap.md)
+
 Reference:
 
 - [docs/package-layout.md](docs/package-layout.md)
@@ -182,6 +188,7 @@ The terminal map now renders a wrapped retro course board with sector markers an
 - Harness guide: [docs/HARNESS_MASTER_GUIDE.md](docs/HARNESS_MASTER_GUIDE.md)
 - MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
 - Package layout: [docs/package-layout.md](docs/package-layout.md)
+- Public npm release roadmap: [docs/public-npm-release-roadmap.md](docs/public-npm-release-roadmap.md)
 - Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
 - External adapters: [docs/external-adapters.md](docs/external-adapters.md)
 - Agent operating packs: [docs/agent-operating-packs.md](docs/agent-operating-packs.md)

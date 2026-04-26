@@ -777,3 +777,168 @@ roadmap:
             dependencies: 2
             coordination: 2
             risk: 1
+    - id: phase-27
+      title: Public npm release roadmap lock
+      goal: Lock the public npm package target and remaining release sequence before manifest changes.
+      kind: build
+      checkpoints:
+        - id: cp-72
+          title: Public npm target decision
+          kind: build
+          difficulty:
+            effort: 1
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+        - id: cp-73
+          title: Release sequence lock
+          kind: build
+          difficulty:
+            effort: 1
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1
+        - id: cp-74
+          title: Public release docs and harness state
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 1
+            dependencies: 2
+            coordination: 2
+            risk: 1
+    - id: phase-28
+      title: Scoped package manifest switch
+      goal: Switch package identity to @redsunjin/track while keeping the CLI bin as track.
+      kind: build
+      checkpoints:
+        - id: cp-75
+          title: Scoped package manifest
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+        - id: cp-76
+          title: Scoped import smoke coverage
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+        - id: cp-77
+          title: Publishable guard verification
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 3
+            coordination: 2
+            risk: 2
+    - id: phase-29
+      title: Publishable RC gate tightening
+      goal: Make release-candidate tag readiness require publishable release readiness.
+      kind: build
+      checkpoints:
+        - id: cp-78
+          title: Publishable RC guard rule
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-79
+          title: Private artifact mode distinction
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+    - id: phase-30
+      title: Release notes draft generator
+      goal: Generate a release note draft from package state and completed release slices.
+      kind: build
+      checkpoints:
+        - id: cp-80
+          title: Release notes draft source
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+        - id: cp-81
+          title: Release notes CLI or script
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 1
+    - id: phase-31
+      title: npm publish dry run
+      goal: Verify public npm publish readiness without publishing.
+      kind: release
+      checkpoints:
+        - id: cp-82
+          title: npm auth preflight
+          kind: release
+          difficulty:
+            effort: 1
+            uncertainty: 3
+            dependencies: 4
+            coordination: 3
+            risk: 2
+        - id: cp-83
+          title: Public publish dry-run
+          kind: release
+          difficulty:
+            effort: 2
+            uncertainty: 3
+            dependencies: 4
+            coordination: 3
+            risk: 3
+    - id: phase-32
+      title: Public release execution
+      goal: Publish @redsunjin/track only after release-owner confirmation.
+      kind: release
+      checkpoints:
+        - id: cp-84
+          title: Release owner approval
+          kind: release
+          difficulty:
+            effort: 1
+            uncertainty: 2
+            dependencies: 4
+            coordination: 4
+            risk: 3
+        - id: cp-85
+          title: Tag and npm publish execution
+          kind: release
+          difficulty:
+            effort: 2
+            uncertainty: 3
+            dependencies: 4
+            coordination: 4
+            risk: 4
+        - id: cp-86
+          title: Post-publish clean install verification
+          kind: release
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 4
+            coordination: 3
+            risk: 3

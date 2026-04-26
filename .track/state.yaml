@@ -8,8 +8,8 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 26
-  active_lap: 26
+  total_laps: 32
+  active_lap: 27
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -403,6 +403,90 @@ laps:
         title: RC tag docs and verification
         status: done
         weight: 2
+  - id: lap-27
+    title: Public npm release roadmap lock
+    status: done
+    checkpoints:
+      - id: cp-72
+        title: Public npm target decision
+        status: done
+        weight: 1
+      - id: cp-73
+        title: Release sequence lock
+        status: done
+        weight: 1
+      - id: cp-74
+        title: Public release docs and harness state
+        status: done
+        weight: 2
+  - id: lap-28
+    title: Scoped package manifest switch
+    status: todo
+    checkpoints:
+      - id: cp-75
+        title: Scoped package manifest
+        status: todo
+        weight: 2
+      - id: cp-76
+        title: Scoped import smoke coverage
+        status: todo
+        weight: 2
+      - id: cp-77
+        title: Publishable guard verification
+        status: todo
+        weight: 2
+  - id: lap-29
+    title: Publishable RC gate tightening
+    status: todo
+    checkpoints:
+      - id: cp-78
+        title: Publishable RC guard rule
+        status: todo
+        weight: 2
+      - id: cp-79
+        title: Private artifact mode distinction
+        status: todo
+        weight: 2
+  - id: lap-30
+    title: Release notes draft generator
+    status: todo
+    checkpoints:
+      - id: cp-80
+        title: Release notes draft source
+        status: todo
+        weight: 2
+      - id: cp-81
+        title: Release notes CLI or script
+        status: todo
+        weight: 2
+  - id: lap-31
+    title: npm publish dry run
+    status: todo
+    checkpoints:
+      - id: cp-82
+        title: npm auth preflight
+        status: todo
+        weight: 1
+      - id: cp-83
+        title: Public publish dry-run
+        status: todo
+        weight: 2
+  - id: lap-32
+    title: Public release execution
+    status: todo
+    checkpoints:
+      - id: cp-84
+        title: Release owner approval
+        status: todo
+        weight: 1
+      - id: cp-85
+        title: Tag and npm publish execution
+        status: todo
+        weight: 2
+      - id: cp-86
+        title: Post-publish clean install verification
+        status: todo
+        weight: 2
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -783,6 +867,81 @@ tasks:
     title: Verify RC tag docs and output
     checkpoint_id: cp-71
     status: done
+    owner: codex
+  - id: task-077
+    title: Document public npm target decision
+    checkpoint_id: cp-72
+    status: done
+    owner: codex
+  - id: task-078
+    title: Lock public release sequence
+    checkpoint_id: cp-73
+    status: done
+    owner: codex
+  - id: task-079
+    title: Update public release docs and harness state
+    checkpoint_id: cp-74
+    status: done
+    owner: codex
+  - id: task-080
+    title: Switch manifest to scoped package identity
+    checkpoint_id: cp-75
+    status: todo
+    owner: codex
+  - id: task-081
+    title: Update scoped package import smoke coverage
+    checkpoint_id: cp-76
+    status: todo
+    owner: codex
+  - id: task-082
+    title: Verify publishable manifest guard
+    checkpoint_id: cp-77
+    status: todo
+    owner: codex
+  - id: task-083
+    title: Require publishable state for RC tags
+    checkpoint_id: cp-78
+    status: todo
+    owner: codex
+  - id: task-084
+    title: Document private artifact RC distinction
+    checkpoint_id: cp-79
+    status: todo
+    owner: codex
+  - id: task-085
+    title: Build release notes draft source
+    checkpoint_id: cp-80
+    status: todo
+    owner: codex
+  - id: task-086
+    title: Wire release notes draft command
+    checkpoint_id: cp-81
+    status: todo
+    owner: codex
+  - id: task-087
+    title: Verify npm authentication preflight
+    checkpoint_id: cp-82
+    status: todo
+    owner: release-owner
+  - id: task-088
+    title: Run public npm publish dry-run
+    checkpoint_id: cp-83
+    status: todo
+    owner: release-owner
+  - id: task-089
+    title: Approve public release execution
+    checkpoint_id: cp-84
+    status: todo
+    owner: release-owner
+  - id: task-090
+    title: Create release tag and publish package
+    checkpoint_id: cp-85
+    status: todo
+    owner: release-owner
+  - id: task-091
+    title: Verify clean public install
+    checkpoint_id: cp-86
+    status: todo
     owner: codex
 flags: []
 events:
@@ -1401,3 +1560,28 @@ events:
     actor: codex
     timestamp: 2026-04-24T00:34:00+09:00
     summary: Completed TRK-052 Release Candidate Tag Dry Run
+  - id: evt-2026-04-27T00:05:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-27T00:05:00+09:00
+    summary: Selected TRK-053 Public NPM Release Roadmap Lock as the next active slice
+  - id: evt-2026-04-27T00:08:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:08:00+09:00
+    summary: Completed Document public npm target decision
+  - id: evt-2026-04-27T00:10:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:10:00+09:00
+    summary: Completed Lock public release sequence
+  - id: evt-2026-04-27T00:12:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:12:00+09:00
+    summary: Completed Update public release docs and harness state
+  - id: evt-2026-04-27T00:13:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-27T00:13:00+09:00
+    summary: Completed TRK-053 Public NPM Release Roadmap Lock

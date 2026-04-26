@@ -2,15 +2,29 @@
 
 ## Active
 
-- `TRK-052` Release Candidate Tag Dry Run
+- `TRK-053` Public NPM Release Roadmap Lock
 
 ## Queued
 
-- `TRK-053 Release Notes Draft Generator`
+- `TRK-054 Scoped Package Manifest Switch`
+- `TRK-055 Publishable RC Gate Tightening`
+- `TRK-056 Release Notes Draft Generator`
+- `TRK-057 npm Publish Dry Run`
+- `TRK-058 Public Release Execution`
 
 ## Parked
 
 ## Done
+
+### TRK-053 Public NPM Release Roadmap Lock
+
+- completed:
+  - public package target set to `@redsunjin/track`
+  - unscoped `track` package name treated as unavailable
+  - public release definition of done documented
+  - TRK-054 through TRK-058 release sequence locked
+  - private-root state preserved until manifest switch
+  - final npm publish kept behind release-owner confirmation
 
 ### TRK-052 Release Candidate Tag Dry Run
 

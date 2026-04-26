@@ -44,6 +44,9 @@ This is the current release baseline:
 
 The root package still remains `private: true`, so this is a release-manifest readiness baseline rather than an npm publishing step.
 
+The public npm package target is now `@redsunjin/track`.
+The unscoped `track` package name is already unavailable on npm, so public release work must move through the scoped package path documented in [public-npm-release-roadmap.md](./public-npm-release-roadmap.md).
+
 ## Extension subpaths
 
 The repo may also expose experimental extension subpaths when a new operator surface is being incubated inside the monorepo before its long-term package boundary is settled.
@@ -83,6 +86,14 @@ The install smoke creates a temporary tarball and consumer project, installs Tra
 
 Track's root package remains `private: true`.
 `package dry-run` is therefore a distribution-readiness check, not a publishing command.
+
+The next public-release manifest step is the scoped package switch:
+
+- `package.json.name` -> `@redsunjin/track`
+- `private` -> `false`
+- `publishConfig.access` -> `public`
+- package import smokes -> `@redsunjin/track` subpaths
+- CLI bin remains `track`
 
 ## Readiness Gate
 
