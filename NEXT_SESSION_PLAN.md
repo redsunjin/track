@@ -2,35 +2,35 @@
 
 ## Active Slice
 
-- id: `TRK-057`
-- title: `npm Publish Dry Run`
+- id: `TRK-058`
+- title: `Public Release Execution`
 
 ## Goal
 
-Complete the public npm dry-run lane without publishing, and make the remaining release-owner blocker explicit.
+Execute the public npm release only after explicit release-owner approval, then verify the published package from a clean consumer path.
 
 ## First Steps
 
-1. release owner runs `npm login` or `npm adduser` on the release machine
-2. verify `npm whoami`
+1. get explicit release-owner approval for actual public npm publish
+2. verify `git status --short --branch`
 3. rerun `npm run package:publish-dry-run`
-4. confirm `npm publish --dry-run --access public` and `npm run package:install-smoke` are both ready inside the report
-5. confirm the final publish command remains `npm publish --access public`
+4. create and push the release tag selected by the release owner
+5. run `npm publish --access public`
+6. verify registry metadata and clean consumer install
 
 ## Current Result
 
-- `npm pack --dry-run --json`: passed
-- `npm publish --dry-run --access public`: passed as a dry-run after normalizing `bin.track` to `dist/cli.js`
-- `npm run package:install-smoke`: passed
-- `npm whoami`: blocked with `ENEEDAUTH`
-- `track package publish-dry-run`: added to summarize npm auth, pack dry-run, publish dry-run, install smoke, and final publish command
+- `npm whoami`: passed as `redsunjin`
+- `npm run package:publish-dry-run`: passed with `publish-dry-run-ready`
+- final publish command: `npm publish --access public`
+- no package has been published yet
 
 ## Constraints
 
-- do not publish to npm
-- do not create or push git tags
-- do not proceed to `TRK-058` until npm authentication is available and the release owner confirms final execution
-- keep npm auth failures visible instead of treating the dry-run as release-ready
+- do not publish to npm without explicit final approval
+- do not create or push git tags without explicit final approval
+- do not change the package name away from `@redsunjin/track`
+- keep release verification output available for handoff
 
 ## Verification
 
@@ -39,16 +39,16 @@ npm test
 npm run typecheck
 npm run check:harness
 npm run package:publish-dry-run
-npm pack --dry-run --json
-npm publish --dry-run --access public
-npm run package:install-smoke
 npm whoami
+npm view @redsunjin/track version
+npm install @redsunjin/track
+npx @redsunjin/track status
 git diff --check
 ```
 
 ## Exit Condition
 
-- npm auth preflight passes on the release machine
-- public publish dry-run still passes after auth is available
-- docs and harness state show whether `TRK-057` is ready or blocked
-- final publish command is visible but not executed
+- release tag is created and pushed
+- `@redsunjin/track` is published to npm
+- clean consumer install works
+- documented CLI entrypoint works from the published package

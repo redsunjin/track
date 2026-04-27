@@ -62,8 +62,8 @@
   - `npm pack --dry-run --json`: passed
   - `npm publish --dry-run --access public`: passed as a dry-run after `bin.track` normalization
   - `npm run package:install-smoke`: passed
-  - `npm whoami`: blocked with `ENEEDAUTH`
-  - `npm run package:publish-dry-run`: reports `publish-dry-run-blocked` until npm auth passes
+  - `npm whoami`: passed as `redsunjin`
+  - `npm run package:publish-dry-run`: passed with `publish-dry-run-ready`
 - control_surface_checks:
   - active slice points at `TRK-057`
   - next queued release slice is `TRK-058`

@@ -9,11 +9,10 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 32
-  active_lap: 31
-  health: red
-  next_action: Resolve blocker on Verify npm authentication preflight
-  blocked_reason: npm whoami failed with ENEEDAUTH; release owner must run npm
-    login or npm adduser before final publish
+  active_lap: 32
+  health: green
+  next_action: Approve public release execution
+  blocked_reason: null
   percent_complete: 97
 laps:
   - id: lap-1
@@ -462,11 +461,11 @@ laps:
         weight: 2
   - id: lap-31
     title: npm publish dry run
-    status: blocked
+    status: done
     checkpoints:
       - id: cp-82
         title: npm auth preflight
-        status: blocked
+        status: done
         weight: 1
       - id: cp-83
         title: Public publish dry-run
@@ -922,7 +921,7 @@ tasks:
   - id: task-087
     title: Verify npm authentication preflight
     checkpoint_id: cp-82
-    status: blocked
+    status: done
     owner: release-owner
   - id: task-088
     title: Run public npm publish dry-run
@@ -944,13 +943,7 @@ tasks:
     checkpoint_id: cp-86
     status: todo
     owner: codex
-flags:
-  - id: auto-block:task-087
-    level: red
-    title: Blocked Verify npm authentication preflight
-    detail: npm whoami failed with ENEEDAUTH; release owner must run npm login or
-      npm adduser before final publish
-    source: track:auto-block
+flags: []
 events:
   - id: evt-001
     type: project.created
@@ -1670,3 +1663,18 @@ events:
     summary: "Blocked Verify npm authentication preflight: npm whoami failed with
       ENEEDAUTH; release owner must run npm login or npm adduser before final
       publish"
+  - id: evt-2026-04-27T16:19:30.704Z-mwxxa4
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T16:19:30.704Z
+    summary: Completed Verify npm authentication preflight
+  - id: evt-2026-04-28T01:20:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-28T01:20:00+09:00
+    summary: Completed TRK-057 npm Publish Dry Run
+  - id: evt-2026-04-28T01:21:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-28T01:21:00+09:00
+    summary: Selected TRK-058 Public Release Execution as the next active slice

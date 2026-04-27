@@ -108,14 +108,14 @@ Current result:
 - `npm pack --dry-run --json`: passed
 - `npm publish --dry-run --access public`: passed as a dry-run
 - `npm run package:install-smoke`: passed
-- `npm whoami`: blocked with `ENEEDAUTH`
+- `npm whoami`: passed as `redsunjin`
 - `bin.track`: normalized to `dist/cli.js` so npm does not auto-correct the manifest during publish dry-run
-- `track package publish-dry-run`: added as the combined release-owner preflight report
+- `track package publish-dry-run`: passed with `publish-dry-run-ready`
 
 Exit condition:
 
 - release owner can see the exact final publish command and all dry-runs are green
-- npm authentication must pass before this slice can be treated as release-ready
+- npm authentication passed before moving to `TRK-058`
 
 ### TRK-058 Public Release Execution
 
@@ -128,6 +128,12 @@ Expected steps:
 - publish `@redsunjin/track`
 - verify npm registry metadata
 - verify clean consumer install
+
+Current gate:
+
+- `TRK-058` is active
+- final publish command is `npm publish --access public`
+- actual tag creation and npm publish still require explicit release-owner approval
 
 Exit condition:
 

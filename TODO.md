@@ -2,15 +2,24 @@
 
 ## Active
 
-- `TRK-057` npm Publish Dry Run
+- `TRK-058` Public Release Execution
 
 ## Queued
-
-- `TRK-058 Public Release Execution`
 
 ## Parked
 
 ## Done
+
+### TRK-057 npm Publish Dry Run
+
+- completed:
+  - `npm whoami` passes as `redsunjin`
+  - `npm run package:publish-dry-run` reports `publish-dry-run-ready`
+  - `npm pack --dry-run --json` passes
+  - `npm publish --dry-run --access public` passes without publishing
+  - `npm run package:install-smoke` passes
+  - final publish command is visible as `npm publish --access public`
+  - no package was published during the dry-run slice
 
 ### TRK-056 Release Notes Draft Generator
 
