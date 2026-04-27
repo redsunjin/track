@@ -2,38 +2,46 @@
 
 ## Active Slice
 
-- id: `TRK-053`
-- title: `Public NPM Release Roadmap Lock`
+- id: `TRK-054`
+- title: `Scoped Package Manifest Switch`
 
 ## Goal
 
-Lock the public npm release target and remaining release sequence before changing package identity or running publish commands.
+Switch Track from the unavailable unscoped `track` package identity to the public scoped package `@redsunjin/track` while keeping the installed CLI command as `track`.
 
 ## First Steps
 
-1. document the public package target as `@redsunjin/track`
-2. define public release completion criteria
-3. lock TRK-054 through TRK-058 as the release path
+1. update `package.json` and `package-lock.json` to `@redsunjin/track`
+2. set `private: false` and `publishConfig.access: public`
+3. switch package import tests and install smoke to `@redsunjin/track` subpaths
+4. verify publishable manifest guard output
 
 ## Constraints
 
 - do not publish to npm
 - do not create or push git tags
-- do not change `package.json.name` in this slice
-- keep the current `private-root` package state intact until the scoped package switch
+- keep CLI bin name as `track`
+- keep actual release execution behind release-owner confirmation
 
 ## Verification
 
 ```bash
+npm test
+npm run typecheck
 npm run check:harness
+npm run package:check
+npm run package:dry-run
 npm run package:readiness
 npm run package:publish-guard
+node --import tsx ./src/cli.ts package publish-guard --target publishable
 npm run package:rc-tag
+npm run package:install-smoke
+npm pack --dry-run --json
 ```
 
 ## Exit Condition
 
-- public release target is documented as `@redsunjin/track`
-- remaining release sequence is explicit through public release execution
-- TODO, roadmap, state, and worksheet all agree on `TRK-053`
-- next implementation slice is `TRK-054 Scoped Package Manifest Switch`
+- scoped public manifest is in place
+- install smoke uses `@redsunjin/track` imports
+- publish guard reports the package as publishable-ready
+- package dry-run, readiness, RC tag dry-run, install smoke, and npm pack dry-run are green

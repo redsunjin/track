@@ -10,13 +10,13 @@ The unscoped `track` package name is already taken on npm, so the public package
 - CLI bin: `track`
 - release access: public scoped package
 
-The current repo state is still a private-root artifact baseline:
+The current repo state is now a scoped publishable manifest baseline:
 
-- `package.json.name`: `track`
-- `package.json.private`: `true`
-- `package.json.publishConfig`: missing
+- `package.json.name`: `@redsunjin/track`
+- `package.json.private`: `false`
+- `package.json.publishConfig.access`: `public`
 
-This is intentionally not publishable yet.
+The package has not been published from this repo in this slice.
 
 ## Release Definition Of Done
 
@@ -43,13 +43,13 @@ Exit condition:
 
 - this document exists
 - TODO, session plan, roadmap, state, and worksheet all point at the public npm target
-- package remains private and unpublished
+- package remained private and unpublished during the roadmap-lock slice
 
 ### TRK-054 Scoped Package Manifest Switch
 
 Switch package identity from `track` to `@redsunjin/track`.
 
-Expected changes:
+Completed changes:
 
 - update `package.json.name`
 - set `private: false`

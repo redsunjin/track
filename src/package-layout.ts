@@ -495,10 +495,10 @@ export async function checkTrackPublishModeGuard(
     });
   }
 
-  if (evaluatingPublishable && publishConfig.access && publishConfig.access !== "public") {
+  if (evaluatingPublishable && publishConfig.present && publishConfig.access !== "public") {
     issues.push({
       code: "unsafe_publish_access",
-      message: `publishConfig.access must be public for a public Track release, got ${publishConfig.access}.`,
+      message: `publishConfig.access must be public for a public Track release, got ${publishConfig.access ?? "missing"}.`,
       path: "package.json",
       severity: "error",
     });
@@ -998,17 +998,17 @@ function summarizePublishModeGuardStatus(input: {
     };
   }
 
-  if (input.targetMode === "publishable" && input.readiness.ok) {
-    return {
-      id: "publish-switch-ready",
-      summary: "Ready to switch package.json private to false after release-owner review.",
-    };
-  }
-
   if (input.currentMode === "publishable") {
     return {
       id: "publishable-ready",
       summary: "Package is publishable and release readiness gates are green.",
+    };
+  }
+
+  if (input.targetMode === "publishable" && input.readiness.ok) {
+    return {
+      id: "publish-switch-ready",
+      summary: "Ready to switch package.json private to false after release-owner review.",
     };
   }
 

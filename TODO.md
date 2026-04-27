@@ -2,11 +2,10 @@
 
 ## Active
 
-- `TRK-053` Public NPM Release Roadmap Lock
+- `TRK-054` Scoped Package Manifest Switch
 
 ## Queued
 
-- `TRK-054 Scoped Package Manifest Switch`
 - `TRK-055 Publishable RC Gate Tightening`
 - `TRK-056 Release Notes Draft Generator`
 - `TRK-057 npm Publish Dry Run`
@@ -15,6 +14,17 @@
 ## Parked
 
 ## Done
+
+### TRK-054 Scoped Package Manifest Switch
+
+- completed:
+  - package name switched to `@redsunjin/track`
+  - `private` set to `false`
+  - `publishConfig.access` set to `public`
+  - install smoke imports switched to `@redsunjin/track` subpaths
+  - public package import tests switched to scoped imports
+  - publish guard target `publishable` passes for the scoped manifest
+  - CLI bin remains `track`
 
 ### TRK-053 Public NPM Release Roadmap Lock
 

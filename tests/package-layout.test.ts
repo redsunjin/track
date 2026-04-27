@@ -46,18 +46,18 @@ test("package layout check passes when boundary entrypoints and owned paths exis
 });
 
 test("package subpath exports resolve the release package entrypoints", async () => {
-  const root = await import("track");
-  const core = await import("track/core");
-  const runtime = await import("track/runtime");
-  const mcp = await import("track/mcp");
-  const agents = await import("track/agents");
-  const botBridge = await import("track/bot-bridge");
-  const cli = await import("track/cli");
-  const openclawAdapter = await import("track/openclaw-adapter");
-  const openclawLive = await import("track/openclaw-live");
-  const openclawMonitor = await import("track/openclaw-monitor");
-  const pitwallMonitor = await import("track/pitwall-monitor");
-  const layout = await import("track/package-layout");
+  const root = await import("@redsunjin/track");
+  const core = await import("@redsunjin/track/core");
+  const runtime = await import("@redsunjin/track/runtime");
+  const mcp = await import("@redsunjin/track/mcp");
+  const agents = await import("@redsunjin/track/agents");
+  const botBridge = await import("@redsunjin/track/bot-bridge");
+  const cli = await import("@redsunjin/track/cli");
+  const openclawAdapter = await import("@redsunjin/track/openclaw-adapter");
+  const openclawLive = await import("@redsunjin/track/openclaw-live");
+  const openclawMonitor = await import("@redsunjin/track/openclaw-monitor");
+  const pitwallMonitor = await import("@redsunjin/track/pitwall-monitor");
+  const layout = await import("@redsunjin/track/package-layout");
 
   assert.equal(typeof root.summarizeTrack, "function");
   assert.equal(typeof core.summarizeTrack, "function");
@@ -81,8 +81,9 @@ test("package dry-run verifies manifest allowlist coverage", async () => {
   const result = await checkTrackPackageDryRun(path.resolve("."));
 
   assert.equal(result.ok, true);
-  assert.equal(result.privatePackage, true);
-  assert.equal(result.publishable, false);
+  assert.equal(result.packageName, "@redsunjin/track");
+  assert.equal(result.privatePackage, false);
+  assert.equal(result.publishable, true);
   assert.ok(result.filesAllowlist.includes("dist"));
   assert.ok(result.filesAllowlist.includes("src"));
   assert.ok(result.filesAllowlist.includes("docs"));
@@ -91,14 +92,14 @@ test("package dry-run verifies manifest allowlist coverage", async () => {
   assert.ok(result.binEntries.find((entry) => entry.name === "track" && entry.target === "dist/cli.js")?.covered);
   assert.deepEqual(result.issues, []);
   assert.match(renderPackageDryRunCheck(result), /PACKAGE DRY-RUN OK/);
-  assert.match(renderPackageDryRunCheck(result), /private-root/);
+  assert.match(renderPackageDryRunCheck(result), /publishable/);
 });
 
 test("package readiness gate checks release verification scripts and pack readiness", async () => {
   const result = await checkTrackPublishReadiness(path.resolve("."));
 
   assert.equal(result.ok, true);
-  assert.equal(result.mode, "private-root");
+  assert.equal(result.mode, "publishable");
   assert.equal(result.dryRun.ok, true);
   assert.deepEqual(
     result.gates.map((gate) => gate.id),
@@ -122,39 +123,44 @@ test("package handoff notes summarize release status, commands, subpaths, and do
   const result = await buildTrackPackageHandoff(path.resolve("."));
 
   assert.equal(result.ok, true);
-  assert.equal(result.status, "ready-private-root");
-  assert.equal(result.mode, "private-root");
+  assert.equal(result.status, "ready-publishable");
+  assert.equal(result.mode, "publishable");
   assert.ok(result.publicSubpaths.includes("./core"));
   assert.ok(result.docs.includes("docs/package-layout.md"));
   assert.ok(result.recommendedCommands.includes("npm run package:readiness"));
   assert.equal(result.boundaries.length, 6);
   assert.match(renderPackageHandoffNote(result), /PACKAGE RELEASE HANDOFF/);
-  assert.match(renderPackageHandoffNote(result), /ready-private-root/);
+  assert.match(renderPackageHandoffNote(result), /ready-publishable/);
 });
 
-test("publish mode guard keeps the current private root publish-safe", async () => {
+test("publish mode guard reports the current scoped package as publishable-ready", async () => {
   const result = await checkTrackPublishModeGuard(path.resolve("."));
 
   assert.equal(result.ok, true);
-  assert.equal(result.currentMode, "private-root");
+  assert.equal(result.currentMode, "publishable");
   assert.equal(result.targetMode, "current");
-  assert.equal(result.status, "private-held");
-  assert.equal(result.privatePackage, true);
-  assert.equal(result.publishConfig.present, false);
+  assert.equal(result.status, "publishable-ready");
+  assert.equal(result.privatePackage, false);
+  assert.equal(result.publishConfig.present, true);
+  assert.equal(result.publishConfig.access, "public");
   assert.ok(result.checks.find((check) => check.id === "package-shape")?.ok);
   assert.match(renderPackagePublishModeGuard(result), /PACKAGE PUBLISH MODE GUARD/);
-  assert.match(renderPackagePublishModeGuard(result), /private-held/);
+  assert.match(renderPackagePublishModeGuard(result), /publishable-ready/);
 });
 
-test("publish mode guard blocks a publishable switch without explicit publishConfig", async () => {
+test("publish mode guard accepts an explicit publishable target for the scoped package", async () => {
   const result = await checkTrackPublishModeGuard(path.resolve("."), { targetMode: "publishable" });
 
-  assert.equal(result.ok, false);
+  assert.equal(result.ok, true);
+  assert.equal(result.currentMode, "publishable");
   assert.equal(result.targetMode, "publishable");
-  assert.equal(result.status, "switch-blocked");
-  assert.ok(result.issues.some((issue) => issue.code === "missing_publish_config"));
-  assert.match(renderPackagePublishModeGuard(result), /PACKAGE PUBLISH MODE GUARD BLOCKED/);
-  assert.match(renderPackagePublishModeGuard(result), /missing_publish_config/);
+  assert.equal(result.status, "publishable-ready");
+  assert.equal(result.privatePackage, false);
+  assert.equal(result.publishConfig.present, true);
+  assert.equal(result.publishConfig.access, "public");
+  assert.deepEqual(result.issues, []);
+  assert.match(renderPackagePublishModeGuard(result), /PACKAGE PUBLISH MODE GUARD/);
+  assert.match(renderPackagePublishModeGuard(result), /publishable-ready/);
 });
 
 test("release candidate tag dry-run prepares a tag command without creating a tag", async () => {
@@ -164,7 +170,7 @@ test("release candidate tag dry-run prepares a tag command without creating a ta
   assert.equal(result.status, "tag-dry-run-ready");
   assert.equal(result.candidateTag, "v0.1.0-rc.0");
   assert.equal(result.rc, 0);
-  assert.ok(result.commands.includes('git tag -a v0.1.0-rc.0 -m "track v0.1.0-rc.0"'));
+  assert.ok(result.commands.includes('git tag -a v0.1.0-rc.0 -m "@redsunjin/track v0.1.0-rc.0"'));
   assert.ok(result.commands.includes("git push origin v0.1.0-rc.0"));
   assert.match(renderPackageReleaseCandidateTagDryRun(result), /PACKAGE RC TAG DRY-RUN/);
   assert.match(renderPackageReleaseCandidateTagDryRun(result), /tag-dry-run-ready/);

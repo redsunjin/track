@@ -9,7 +9,7 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 32
-  active_lap: 27
+  active_lap: 28
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -421,19 +421,19 @@ laps:
         weight: 2
   - id: lap-28
     title: Scoped package manifest switch
-    status: todo
+    status: done
     checkpoints:
       - id: cp-75
         title: Scoped package manifest
-        status: todo
+        status: done
         weight: 2
       - id: cp-76
         title: Scoped import smoke coverage
-        status: todo
+        status: done
         weight: 2
       - id: cp-77
         title: Publishable guard verification
-        status: todo
+        status: done
         weight: 2
   - id: lap-29
     title: Publishable RC gate tightening
@@ -886,17 +886,17 @@ tasks:
   - id: task-080
     title: Switch manifest to scoped package identity
     checkpoint_id: cp-75
-    status: todo
+    status: done
     owner: codex
   - id: task-081
     title: Update scoped package import smoke coverage
     checkpoint_id: cp-76
-    status: todo
+    status: done
     owner: codex
   - id: task-082
     title: Verify publishable manifest guard
     checkpoint_id: cp-77
-    status: todo
+    status: done
     owner: codex
   - id: task-083
     title: Require publishable state for RC tags
@@ -1585,3 +1585,28 @@ events:
     actor: codex
     timestamp: 2026-04-27T00:13:00+09:00
     summary: Completed TRK-053 Public NPM Release Roadmap Lock
+  - id: evt-2026-04-27T00:20:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-27T00:20:00+09:00
+    summary: Selected TRK-054 Scoped Package Manifest Switch as the next active slice
+  - id: evt-2026-04-27T00:23:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:23:00+09:00
+    summary: Completed Switch manifest to scoped package identity
+  - id: evt-2026-04-27T00:25:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:25:00+09:00
+    summary: Completed Update scoped package import smoke coverage
+  - id: evt-2026-04-27T00:27:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:27:00+09:00
+    summary: Completed Verify publishable manifest guard
+  - id: evt-2026-04-27T00:28:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-27T00:28:00+09:00
+    summary: Completed TRK-054 Scoped Package Manifest Switch

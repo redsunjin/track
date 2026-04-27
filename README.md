@@ -104,11 +104,11 @@ Track now includes an adapter layer that can normalize OpenClaw session-list and
 
 Current building blocks:
 
-- `track/openclaw-adapter`
-- `track/openclaw-live`
-- `track/openclaw-monitor`
-- `track/pitwall-monitor`
-- runtime helpers exposed through `track/runtime`
+- `@redsunjin/track/openclaw-adapter`
+- `@redsunjin/track/openclaw-live`
+- `@redsunjin/track/openclaw-monitor`
+- `@redsunjin/track/pitwall-monitor`
+- runtime helpers exposed through `@redsunjin/track/runtime`
 - `docs/openclaw-worker-monitor.md`
 
 Current CLI surface:
@@ -152,13 +152,14 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:install-smoke` packs Track into a temporary tarball, installs it into a throwaway consumer project, then verifies package subpath imports and the installed `track` CLI.
 `package:handoff` emits a concise release handoff note with status, commands, public subpaths, package boundaries, and reference docs.
 `package:readiness` is the release gate: it verifies the required build/test/harness/package scripts exist and that the package dry-run is clean before a physical `npm pack --dry-run --json`.
-`package:publish-guard` keeps the current `private-root` package state explicit and blocks a publishable-mode switch unless the manifest shape and publish configuration are ready.
+`package:publish-guard` verifies the current scoped public package manifest and reports `publishable-ready` when the package shape and publish configuration are ready.
 `package:rc-tag` prepares the release-candidate git tag commands as a dry-run after readiness and publish guard checks; it does not create or push a tag.
 
 Public npm release target:
 
 - package: `@redsunjin/track`
 - CLI bin: `track`
+- manifest: `private: false` with `publishConfig.access: public`
 - release roadmap: [docs/public-npm-release-roadmap.md](docs/public-npm-release-roadmap.md)
 
 Reference:

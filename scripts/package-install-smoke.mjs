@@ -43,7 +43,7 @@ async function main() {
       "PACKAGE INSTALL SMOKE OK",
       `TARBALL  ${tarballPath}`,
       `CONSUMER ${consumerRoot}`,
-      "IMPORTS  track, track/core, track/cli, track/bot-bridge, track/openclaw-adapter, track/openclaw-live",
+      "IMPORTS  @redsunjin/track, @redsunjin/track/core, @redsunjin/track/cli, @redsunjin/track/bot-bridge, @redsunjin/track/openclaw-adapter, @redsunjin/track/openclaw-live",
       "CLI      track pitwall --openclaw --no-color",
     ].join("\n") + "\n"
   );
@@ -69,15 +69,15 @@ function run(command, args, cwd) {
 
 function importSmokeSource() {
   return `
-const root = await import("track");
-const core = await import("track/core");
-const cli = await import("track/cli");
-const botBridge = await import("track/bot-bridge");
-const adapter = await import("track/openclaw-adapter");
-const openclawLive = await import("track/openclaw-live");
+const root = await import("@redsunjin/track");
+const core = await import("@redsunjin/track/core");
+const cli = await import("@redsunjin/track/cli");
+const botBridge = await import("@redsunjin/track/bot-bridge");
+const adapter = await import("@redsunjin/track/openclaw-adapter");
+const openclawLive = await import("@redsunjin/track/openclaw-live");
 if (typeof root.summarizeTrack !== "function") throw new Error("missing root summarizeTrack export");
-if (typeof core.summarizeTrack !== "function") throw new Error("missing track/core summarizeTrack export");
-if (typeof cli.renderOpenClawPitwall !== "function") throw new Error("missing track/cli OpenClaw Pitwall export");
+if (typeof core.summarizeTrack !== "function") throw new Error("missing @redsunjin/track/core summarizeTrack export");
+if (typeof cli.renderOpenClawPitwall !== "function") throw new Error("missing @redsunjin/track/cli OpenClaw Pitwall export");
 if (typeof botBridge.buildMonitorBotPushEvents !== "function") throw new Error("missing bot bridge push export");
 if (typeof adapter.buildOpenClawSnapshotFromToolData !== "function") throw new Error("missing OpenClaw adapter export");
 if (typeof openclawLive.captureOpenClawTelemetry !== "function") throw new Error("missing OpenClaw live export");

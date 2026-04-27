@@ -214,11 +214,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-027-public-npm-release-roadmap-lock.md](./worksheets/HW-027-public-npm-release-roadmap-lock.md)
+- [HW-028-scoped-package-manifest-switch.md](./worksheets/HW-028-scoped-package-manifest-switch.md)
 
 Last completed worksheet:
 
-- [HW-026-release-candidate-tag-dry-run.md](./worksheets/HW-026-release-candidate-tag-dry-run.md)
+- [HW-027-public-npm-release-roadmap-lock.md](./worksheets/HW-027-public-npm-release-roadmap-lock.md)
 
 ## Adoption Rules
 

@@ -18,13 +18,13 @@ The goal is to make future package extraction mechanical instead of guessing own
 
 The root package exposes subpaths that mirror the boundary map:
 
-- `track/core`
-- `track/runtime`
-- `track/mcp`
-- `track/cli`
-- `track/agents`
-- `track/vscode`
-- `track/package-layout`
+- `@redsunjin/track/core`
+- `@redsunjin/track/runtime`
+- `@redsunjin/track/mcp`
+- `@redsunjin/track/cli`
+- `@redsunjin/track/agents`
+- `@redsunjin/track/vscode`
+- `@redsunjin/track/package-layout`
 
 These package exports now resolve to compiled release artifacts under `dist/`.
 They are not yet independent npm packages.
@@ -42,9 +42,8 @@ This is the current release baseline:
 - `bin.track` points at `dist/cli.js`
 - `npm run package:build-check` builds root runtime artifacts, builds the VS Code extension, and then runs the package dry-run through `node dist/cli.js`
 
-The root package still remains `private: true`, so this is a release-manifest readiness baseline rather than an npm publishing step.
-
-The public npm package target is now `@redsunjin/track`.
+The root package is now scoped for public npm as `@redsunjin/track` with `private: false` and `publishConfig.access: public`.
+The CLI bin intentionally remains `track`.
 The unscoped `track` package name is already unavailable on npm, so public release work must move through the scoped package path documented in [public-npm-release-roadmap.md](./public-npm-release-roadmap.md).
 
 ## Extension subpaths
@@ -53,11 +52,11 @@ The repo may also expose experimental extension subpaths when a new operator sur
 
 Current extension-oriented subpaths:
 
-- `track/openclaw-adapter`
-- `track/openclaw-live`
-- `track/openclaw-monitor`
-- `track/pitwall-monitor`
-- `track/bot-bridge`
+- `@redsunjin/track/openclaw-adapter`
+- `@redsunjin/track/openclaw-live`
+- `@redsunjin/track/openclaw-monitor`
+- `@redsunjin/track/pitwall-monitor`
+- `@redsunjin/track/bot-bridge`
 
 These are intentionally treated as extension surfaces, not yet part of the formal publishable package split above.
 
@@ -84,16 +83,8 @@ The dry-run check also verifies that `package.json.files` covers `dist`, boundar
 Export and bin targets must exist, so run the build scripts before invoking `node dist/cli.js package dry-run` directly.
 The install smoke creates a temporary tarball and consumer project, installs Track from that tarball, imports public subpaths, and runs the installed `track` bin.
 
-Track's root package remains `private: true`.
-`package dry-run` is therefore a distribution-readiness check, not a publishing command.
-
-The next public-release manifest step is the scoped package switch:
-
-- `package.json.name` -> `@redsunjin/track`
-- `private` -> `false`
-- `publishConfig.access` -> `public`
-- package import smokes -> `@redsunjin/track` subpaths
-- CLI bin remains `track`
+Track's root package is now scoped and publishable in the manifest.
+`package dry-run` is still only a distribution-readiness check; it does not publish, tag, or authenticate with npm.
 
 ## Readiness Gate
 
@@ -112,8 +103,8 @@ The gate verifies:
 - `npm pack --dry-run --json` has the manifest coverage it needs
 - release mode is explicit
 
-Current release mode is `private-root`.
-That means distribution artifacts can be checked and handed off, but npm publish is intentionally blocked until `private` is changed deliberately.
+Current release mode is `publishable`.
+That means the manifest is shaped for public npm, but actual publish execution still requires release-owner npm authentication and an explicit publish command.
 
 ## Handoff Notes
 
@@ -133,11 +124,11 @@ The handoff note includes:
 - package boundary release entrypoints
 - reference docs for the handoff receiver
 
-When the package is still `private-root`, the note explicitly says it is ready for artifact handoff but not for npm publish.
+When the package is `publishable`, the note reports `ready-publishable` and lists the verification commands and public package subpaths for release handoff.
 
 ## Publish Mode Guard
 
-Use the publish mode guard before changing `package.json.private`:
+Use the publish mode guard before publish dry-runs or release handoff:
 
 ```bash
 track package publish-guard
@@ -147,9 +138,9 @@ npm run package:publish-guard
 ```
 
 The default guard describes the current mode.
-In the current repo state it should report `private-held`, meaning `private: true` is still blocking `npm publish`.
+In the current repo state it should report `publishable-ready`, meaning the scoped package manifest is public-ready and release readiness gates are green.
 
-`--target publishable` evaluates a deliberate switch before the manifest is edited.
+`--target publishable` evaluates the public package state explicitly.
 That path checks:
 
 - package readiness is green
