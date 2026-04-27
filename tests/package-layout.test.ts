@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
@@ -167,6 +169,7 @@ test("release candidate tag dry-run prepares a tag command without creating a ta
   const result = await buildTrackReleaseCandidateTagDryRun(path.resolve("."), { existingTags: [] });
 
   assert.equal(result.ok, true);
+  assert.equal(result.allowPrivateRootArtifact, false);
   assert.equal(result.status, "tag-dry-run-ready");
   assert.equal(result.candidateTag, "v0.1.0-rc.0");
   assert.equal(result.rc, 0);
@@ -174,6 +177,33 @@ test("release candidate tag dry-run prepares a tag command without creating a ta
   assert.ok(result.commands.includes("git push origin v0.1.0-rc.0"));
   assert.match(renderPackageReleaseCandidateTagDryRun(result), /PACKAGE RC TAG DRY-RUN/);
   assert.match(renderPackageReleaseCandidateTagDryRun(result), /tag-dry-run-ready/);
+});
+
+test("release candidate tag dry-run blocks private-root artifact tags by default", async () => {
+  const repoRoot = await createPackageLayoutFixture({ privatePackage: true });
+  const result = await buildTrackReleaseCandidateTagDryRun(repoRoot, { existingTags: [] });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.status, "tag-dry-run-blocked");
+  assert.equal(result.publishGuard.status, "private-held");
+  assert.equal(result.checks.find((check) => check.id === "publish-guard")?.ok, false);
+  assert.ok(result.issues.some((issue) => issue.code === "publish_guard_failed"));
+  assert.match(renderPackageReleaseCandidateTagDryRun(result), /expected publishable-ready/);
+});
+
+test("release candidate tag dry-run allows explicit private-root artifact tags", async () => {
+  const repoRoot = await createPackageLayoutFixture({ privatePackage: true });
+  const result = await buildTrackReleaseCandidateTagDryRun(repoRoot, {
+    allowPrivateRootArtifact: true,
+    existingTags: [],
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.allowPrivateRootArtifact, true);
+  assert.equal(result.status, "tag-dry-run-ready");
+  assert.equal(result.publishGuard.status, "private-held");
+  assert.equal(result.checks.find((check) => check.id === "publish-guard")?.ok, true);
+  assert.match(renderPackageReleaseCandidateTagDryRun(result), /private-root artifact override accepted/);
 });
 
 test("release candidate tag dry-run blocks an existing candidate tag", async () => {
@@ -193,3 +223,91 @@ test("package coverage helper matches directories and exact files", () => {
   assert.equal(isPackagePathCovered(["README.md"], "./README.md"), "README.md");
   assert.equal(isPackagePathCovered(["src"], "docs/package-layout.md"), null);
 });
+
+async function createPackageLayoutFixture(options: { privatePackage: boolean }): Promise<string> {
+  const repoRoot = await mkdtemp(path.join(tmpdir(), "track-package-layout-"));
+  const boundaries = listTrackPackageBoundaries();
+  const exportTargets = new Set(["dist/index.js", "dist/index.d.ts", "dist/cli.js"]);
+  const exportsMap: Record<string, unknown> = {
+    ".": {
+      types: "./dist/index.d.ts",
+      import: "./dist/index.js",
+    },
+  };
+
+  for (const boundary of boundaries) {
+    const subpath = `./${boundary.name}`;
+    exportsMap[subpath] =
+      boundary.name === "vscode"
+        ? `./${boundary.releaseEntrypoint}`
+        : {
+            types: `./${boundary.releaseEntrypoint.replace(/\.js$/, ".d.ts")}`,
+            import: `./${boundary.releaseEntrypoint}`,
+          };
+    exportTargets.add(boundary.releaseEntrypoint);
+    if (boundary.releaseEntrypoint.endsWith(".js")) {
+      exportTargets.add(boundary.releaseEntrypoint.replace(/\.js$/, ".d.ts"));
+    }
+  }
+
+  await writePackageFixtureFile(
+    repoRoot,
+    "package.json",
+    `${JSON.stringify(
+      {
+        name: "@redsunjin/track",
+        version: "0.1.0",
+        private: options.privatePackage,
+        type: "module",
+        files: ["dist", "src", "agents", "docs", "vscode-extension", "README.md", "AGENTS.md"],
+        exports: exportsMap,
+        bin: {
+          track: "./dist/cli.js",
+        },
+        scripts: {
+          build: "echo build",
+          typecheck: "echo typecheck",
+          test: "echo test",
+          "check:harness": "echo harness",
+          "package:dry-run": "echo package dry-run",
+          "package:install-smoke": "echo install smoke",
+        },
+        engines: {
+          node: ">=20",
+        },
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  for (const target of exportTargets) {
+    await writePackageFixtureFile(repoRoot, target, "");
+  }
+  for (const requiredPath of ["README.md", "AGENTS.md", "docs/package-layout.md"]) {
+    await writePackageFixtureFile(repoRoot, requiredPath, "");
+  }
+  for (const boundary of boundaries) {
+    await createPackageFixturePath(repoRoot, boundary.entrypoint);
+    for (const ownedPath of boundary.owns) {
+      await createPackageFixturePath(repoRoot, ownedPath);
+    }
+  }
+
+  return repoRoot;
+}
+
+async function createPackageFixturePath(repoRoot: string, relativePath: string): Promise<void> {
+  if (path.extname(relativePath)) {
+    await writePackageFixtureFile(repoRoot, relativePath, "");
+    return;
+  }
+
+  await mkdir(path.join(repoRoot, relativePath), { recursive: true });
+}
+
+async function writePackageFixtureFile(repoRoot: string, relativePath: string, contents: string): Promise<void> {
+  const targetPath = path.join(repoRoot, relativePath);
+  await mkdir(path.dirname(targetPath), { recursive: true });
+  await writeFile(targetPath, contents);
+}

@@ -2,11 +2,10 @@
 
 ## Active
 
-- `TRK-054` Scoped Package Manifest Switch
+- `TRK-055` Publishable RC Gate Tightening
 
 ## Queued
 
-- `TRK-055 Publishable RC Gate Tightening`
 - `TRK-056 Release Notes Draft Generator`
 - `TRK-057 npm Publish Dry Run`
 - `TRK-058 Public Release Execution`
@@ -14,6 +13,15 @@
 ## Parked
 
 ## Done
+
+### TRK-055 Publishable RC Gate Tightening
+
+- completed:
+  - `track package rc-tag` now requires `publishable-ready` by default
+  - private-root artifact RC tags are blocked by default
+  - explicit `--allow-private-root` override added for artifact-only RC tags
+  - RC tag dry-run output explains the publish guard expectation
+  - regression coverage added for default block and explicit artifact override
 
 ### TRK-054 Scoped Package Manifest Switch
 

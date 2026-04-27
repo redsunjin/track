@@ -144,6 +144,7 @@ export interface PackagePublishModeGuardResult {
 }
 
 export interface PackageReleaseCandidateTagDryRunOptions {
+  allowPrivateRootArtifact?: boolean;
   candidateTag?: string;
   existingTags?: string[];
   rc?: number;
@@ -169,6 +170,7 @@ export interface PackageReleaseCandidateTagCheck {
 }
 
 export interface PackageReleaseCandidateTagDryRunResult {
+  allowPrivateRootArtifact: boolean;
   candidateTag: string | null;
   checks: PackageReleaseCandidateTagCheck[];
   commands: string[];
@@ -569,6 +571,9 @@ export async function buildTrackReleaseCandidateTagDryRun(
 ): Promise<PackageReleaseCandidateTagDryRunResult> {
   const readiness = await checkTrackPublishReadiness(repoRoot);
   const publishGuard = await checkTrackPublishModeGuard(repoRoot);
+  const allowPrivateRootArtifact = options.allowPrivateRootArtifact === true;
+  const publishGuardReady =
+    publishGuard.status === "publishable-ready" || (allowPrivateRootArtifact && publishGuard.status === "private-held");
   const rc = options.rc ?? 0;
   const candidateTag = options.candidateTag ?? (readiness.version ? `v${readiness.version}-rc.${rc}` : null);
   const tagSource = options.existingTags ? { found: true, tags: options.existingTags } : await readLocalGitTags(repoRoot);
@@ -591,10 +596,12 @@ export async function buildTrackReleaseCandidateTagDryRun(
     });
   }
 
-  if (!publishGuard.ok) {
+  if (!publishGuardReady) {
     issues.push({
       code: "publish_guard_failed",
-      message: "Publish mode guard must pass before preparing an RC tag.",
+      message: allowPrivateRootArtifact
+        ? "Publish mode guard must be publishable-ready, or private-held only for explicit private-root artifact tags."
+        : "RC tag dry-run requires publishable-ready; use --allow-private-root only for private-root artifact tags.",
       severity: "error",
     });
   }
@@ -642,9 +649,9 @@ export async function buildTrackReleaseCandidateTagDryRun(
       title: "Readiness gate",
     },
     {
-      detail: publishGuard.ok ? `publish mode guard is ${publishGuard.status}` : "publish mode guard is blocked",
+      detail: describeReleaseCandidatePublishGuard(publishGuard.status, publishGuardReady, allowPrivateRootArtifact),
       id: "publish-guard",
-      ok: publishGuard.ok,
+      ok: publishGuardReady,
       title: "Publish guard",
     },
     {
@@ -667,6 +674,7 @@ export async function buildTrackReleaseCandidateTagDryRun(
   const ok = !issues.some((issue) => issue.severity === "error");
 
   return {
+    allowPrivateRootArtifact,
     candidateTag,
     checks,
     commands,
@@ -679,7 +687,9 @@ export async function buildTrackReleaseCandidateTagDryRun(
     readiness,
     status: ok ? "tag-dry-run-ready" : "tag-dry-run-blocked",
     summary: ok
-      ? "Release candidate tag command is ready to run manually; no tag was created."
+      ? publishGuard.status === "private-held"
+        ? "Private-root artifact RC tag command is ready to run manually; no tag was created."
+        : "Release candidate tag command is ready to run manually; no tag was created."
       : "Release candidate tag dry-run is blocked until package and tag issues are resolved.",
     version: readiness.version,
   };
@@ -718,6 +728,23 @@ export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): stri
   }
 
   return lines.join("\n");
+}
+
+function describeReleaseCandidatePublishGuard(
+  status: PackagePublishModeGuardResult["status"],
+  ready: boolean,
+  allowPrivateRootArtifact: boolean
+): string {
+  if (ready && status === "private-held") {
+    return "private-root artifact override accepted; publish mode guard is private-held";
+  }
+  if (ready) {
+    return `publish mode guard is ${status}`;
+  }
+  if (allowPrivateRootArtifact) {
+    return `publish mode guard is ${status}; expected publishable-ready or explicit private-held artifact mode`;
+  }
+  return `publish mode guard is ${status}; expected publishable-ready`;
 }
 
 export function renderPackageReleaseCandidateTagDryRun(result: PackageReleaseCandidateTagDryRunResult): string {

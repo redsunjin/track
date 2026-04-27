@@ -82,6 +82,7 @@ async function main(): Promise<void> {
   const packageTargetMode = readFlag(args, "--target");
   const packageCandidateTag = readFlag(args, "--tag");
   const packageCandidateRc = parseOptionalInteger(readFlag(args, "--rc"));
+  const packageAllowPrivateRootArtifact = args.includes("--allow-private-root");
   const stateOutFile = readFlag(args, "--state-out");
   const roadmapOutFile = readFlag(args, "--roadmap-out");
   const watch = args.includes("--watch");
@@ -510,6 +511,7 @@ async function main(): Promise<void> {
 
     if (subcommand === "rc-tag" || subcommand === "tag-dry-run") {
       const result = await buildTrackReleaseCandidateTagDryRun(process.cwd(), {
+        allowPrivateRootArtifact: packageAllowPrivateRootArtifact,
         candidateTag: packageCandidateTag,
         rc: packageCandidateRc,
       });

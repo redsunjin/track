@@ -153,7 +153,7 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:handoff` emits a concise release handoff note with status, commands, public subpaths, package boundaries, and reference docs.
 `package:readiness` is the release gate: it verifies the required build/test/harness/package scripts exist and that the package dry-run is clean before a physical `npm pack --dry-run --json`.
 `package:publish-guard` verifies the current scoped public package manifest and reports `publishable-ready` when the package shape and publish configuration are ready.
-`package:rc-tag` prepares the release-candidate git tag commands as a dry-run after readiness and publish guard checks; it does not create or push a tag.
+`package:rc-tag` prepares the release-candidate git tag commands as a dry-run only when the publish guard reports `publishable-ready`; it does not create or push a tag.
 
 Public npm release target:
 

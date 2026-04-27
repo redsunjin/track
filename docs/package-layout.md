@@ -160,6 +160,7 @@ track package rc-tag
 track package tag-dry-run
 track package rc-tag --rc 1
 track package rc-tag --tag v0.1.0-rc.1
+track package rc-tag --allow-private-root
 npm run package:rc-tag
 ```
 
@@ -169,9 +170,12 @@ For `0.1.0`, the default tag is `v0.1.0-rc.0`.
 The dry-run checks:
 
 - package readiness is green
-- publish mode guard is green
+- publish mode guard reports `publishable-ready`
 - the candidate tag matches `v<major>.<minor>.<patch>-rc.<n>`
 - the candidate tag does not already exist in local git tags
+
+Private-root artifact RC tags are blocked by default even when private artifact readiness is green.
+Use `--allow-private-root` only when intentionally preparing a non-publishable artifact tag.
 
 The command prints the exact `git tag -a ...` and `git push origin ...` commands to run manually.
 It does not create a tag, push a tag, mutate `package.json`, or publish to npm.

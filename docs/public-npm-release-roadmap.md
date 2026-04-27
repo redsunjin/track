@@ -67,10 +67,10 @@ Exit condition:
 
 Make RC tag readiness mean publishable readiness, not private artifact readiness.
 
-Expected changes:
+Completed changes:
 
 - `track package rc-tag` requires publishable guard success by default
-- private artifact RC behavior, if still useful, must be explicit
+- private artifact RC behavior is explicit through `--allow-private-root`
 - docs explain the distinction
 
 Exit condition:

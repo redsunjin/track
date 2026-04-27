@@ -214,11 +214,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-028-scoped-package-manifest-switch.md](./worksheets/HW-028-scoped-package-manifest-switch.md)
+- [HW-029-publishable-rc-gate-tightening.md](./worksheets/HW-029-publishable-rc-gate-tightening.md)
 
 Last completed worksheet:
 
-- [HW-027-public-npm-release-roadmap-lock.md](./worksheets/HW-027-public-npm-release-roadmap-lock.md)
+- [HW-028-scoped-package-manifest-switch.md](./worksheets/HW-028-scoped-package-manifest-switch.md)
 
 ## Adoption Rules
 
