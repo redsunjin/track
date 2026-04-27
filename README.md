@@ -138,6 +138,7 @@ Current checks:
 - `npm run package:handoff`
 - `npm run package:readiness`
 - `npm run package:publish-guard`
+- `npm run package:publish-dry-run`
 - `npm run package:rc-tag`
 - `npm run package:release-notes`
 - `track package list`
@@ -146,6 +147,7 @@ Current checks:
 - `track package handoff`
 - `track package readiness`
 - `track package publish-guard`
+- `track package publish-dry-run`
 - `track package rc-tag`
 - `track package release-notes`
 
@@ -155,6 +157,7 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:handoff` emits a concise release handoff note with status, commands, public subpaths, package boundaries, and reference docs.
 `package:readiness` is the release gate: it verifies the required build/test/harness/package scripts exist and that the package dry-run is clean before a physical `npm pack --dry-run --json`.
 `package:publish-guard` verifies the current scoped public package manifest and reports `publishable-ready` when the package shape and publish configuration are ready.
+`package:publish-dry-run` runs the public npm preflight lane and reports npm auth, pack dry-run, publish dry-run, install smoke, and the final publish command without publishing.
 `package:rc-tag` prepares the release-candidate git tag commands as a dry-run only when the publish guard reports `publishable-ready`; it does not create or push a tag.
 `package:release-notes` generates a Markdown release-notes draft from package state, install commands, CLI usage, verification commands, and recent release slices.
 

@@ -96,6 +96,8 @@ Run the full public npm publish dry-run path.
 
 Expected checks:
 
+- `track package publish-dry-run`
+- `npm run package:publish-dry-run`
 - `npm whoami`
 - `npm pack --dry-run --json`
 - `npm publish --dry-run --access public`
@@ -108,6 +110,7 @@ Current result:
 - `npm run package:install-smoke`: passed
 - `npm whoami`: blocked with `ENEEDAUTH`
 - `bin.track`: normalized to `dist/cli.js` so npm does not auto-correct the manifest during publish dry-run
+- `track package publish-dry-run`: added as the combined release-owner preflight report
 
 Exit condition:
 

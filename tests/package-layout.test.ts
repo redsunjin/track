@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   buildTrackPackageHandoff,
+  buildTrackNpmPublishDryRun,
   buildTrackReleaseNotesDraft,
   buildTrackReleaseCandidateTagDryRun,
   checkTrackPublishModeGuard,
@@ -16,6 +17,7 @@ import {
   listTrackPackageBoundaries,
   renderPackageDryRunCheck,
   renderPackageHandoffNote,
+  renderPackageNpmPublishDryRun,
   renderPackageLayoutCheck,
   renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
@@ -79,6 +81,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof layout.checkTrackPublishModeGuard, "function");
   assert.equal(typeof layout.buildTrackReleaseCandidateTagDryRun, "function");
   assert.equal(typeof layout.buildTrackReleaseNotesDraft, "function");
+  assert.equal(typeof layout.buildTrackNpmPublishDryRun, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -250,6 +253,54 @@ test("release notes draft is blocked when RC tag readiness is blocked", async ()
   assert.equal(result.status, "release-notes-blocked");
   assert.equal(result.releaseCandidate.status, "tag-dry-run-blocked");
   assert.match(renderPackageReleaseNotesDraft(result), /release-notes-blocked/);
+});
+
+test("npm publish dry-run report blocks on missing npm auth without hiding dry-run results", async () => {
+  const result = await buildTrackNpmPublishDryRun(path.resolve("."), {
+    existingTags: [],
+    runner: async (_repoRoot, command, args) => {
+      const fullCommand = [command, ...args].join(" ");
+      if (fullCommand === "npm whoami") {
+        return {
+          exitCode: 1,
+          stderr: "npm error code ENEEDAUTH\n",
+          stdout: "",
+        };
+      }
+      return {
+        exitCode: 0,
+        stderr: "",
+        stdout: fullCommand === "npm publish --dry-run --access public" ? "+ @redsunjin/track@0.1.0\n" : "ok\n",
+      };
+    },
+  });
+  const rendered = renderPackageNpmPublishDryRun(result);
+
+  assert.equal(result.ok, false);
+  assert.equal(result.status, "publish-dry-run-blocked");
+  assert.equal(result.commandResults.find((entry) => entry.id === "npm-auth")?.ok, false);
+  assert.equal(result.commandResults.find((entry) => entry.id === "npm-publish-dry-run")?.ok, true);
+  assert.ok(result.issues.some((issue) => issue.code === "npm_auth_failed"));
+  assert.equal(result.finalPublishCommand, "npm publish --access public");
+  assert.match(rendered, /PACKAGE NPM PUBLISH DRY-RUN BLOCKED/);
+  assert.match(rendered, /npm_auth_failed/);
+});
+
+test("npm publish dry-run report is ready when release gates and npm commands pass", async () => {
+  const result = await buildTrackNpmPublishDryRun(path.resolve("."), {
+    existingTags: [],
+    runner: async (_repoRoot, command, args) => ({
+      exitCode: 0,
+      stderr: "",
+      stdout: [command, ...args].join(" ") === "npm whoami" ? "redsunjin\n" : "ok\n",
+    }),
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, "publish-dry-run-ready");
+  assert.ok(result.commandResults.every((entry) => entry.ok));
+  assert.equal(result.issues.length, 0);
+  assert.match(renderPackageNpmPublishDryRun(result), /npm publish --access public/);
 });
 
 test("package coverage helper matches directories and exact files", () => {

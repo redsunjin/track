@@ -210,11 +210,23 @@ If readiness, publish guard, or RC tag dry-run is blocked, the draft renders `re
 Use the registry publish dry-run only after the package readiness, publish guard, RC tag dry-run, and release notes draft are green:
 
 ```bash
+track package publish-dry-run
+track package npm-publish-dry-run
+npm run package:publish-dry-run
 npm whoami
 npm pack --dry-run --json
 npm publish --dry-run --access public
 npm run package:install-smoke
 ```
+
+The Track command runs the same preflight lane and reports:
+
+- npm authentication
+- npm pack dry-run
+- npm publish dry-run
+- package install smoke
+- release readiness, publish guard, RC tag dry-run, and release notes status
+- final publish command
 
 The publish dry-run does not publish the package, but real publish execution still requires npm authentication.
 The final publish command remains:

@@ -15,6 +15,8 @@
   - `npm pack --dry-run --json`
   - `npm publish --dry-run --access public`
   - package install smoke
+  - `track package publish-dry-run`
+  - `npm run package:publish-dry-run`
   - manifest normalization for the published `track` bin path
   - blocked-state handoff for release-owner npm authentication
 - out:
@@ -37,7 +39,11 @@
   - this worksheet
 - state_files_touched:
   - `.track/state.yaml`
+  - `src/package-layout.ts`
+  - `src/cli.ts`
+  - `src/index.ts`
   - `package.json`
+  - `tests/package-layout.test.ts`
 
 ## 4. Evaluators
 
@@ -46,6 +52,7 @@
   - `npm run typecheck`
   - `npm run check:harness`
 - runtime_checks:
+  - `npm run package:publish-dry-run`
   - `npm pack --dry-run --json`
   - `npm publish --dry-run --access public`
   - `npm run package:install-smoke`
@@ -56,11 +63,13 @@
   - `npm publish --dry-run --access public`: passed as a dry-run after `bin.track` normalization
   - `npm run package:install-smoke`: passed
   - `npm whoami`: blocked with `ENEEDAUTH`
+  - `npm run package:publish-dry-run`: reports `publish-dry-run-blocked` until npm auth passes
 - control_surface_checks:
   - active slice points at `TRK-057`
   - next queued release slice is `TRK-058`
   - `TRK-058` remains gated behind release-owner confirmation
 - regression_gate:
+  - combined preflight command reports auth, pack dry-run, publish dry-run, install smoke, and final publish command
   - npm no longer reports a `bin[track]` auto-correction warning during publish dry-run
   - blocked npm auth is visible in Track state
 
@@ -90,5 +99,4 @@
   - package layout docs
   - public npm release roadmap
 - candidate_future_automation:
-  - scripted npm auth preflight summary
-  - publish dry-run report command that records auth, pack, publish dry-run, and install-smoke results together
+  - persisted publish dry-run report artifact for release-owner handoff

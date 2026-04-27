@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { access, readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
@@ -206,6 +207,65 @@ export interface PackageReleaseNotesDraftResult {
   version: string | null;
 }
 
+export interface PackageCommandRunnerResult {
+  error?: string;
+  exitCode: number | null;
+  stderr: string;
+  stdout: string;
+}
+
+export type PackageCommandRunner = (
+  repoRoot: string,
+  command: string,
+  args: string[]
+) => Promise<PackageCommandRunnerResult>;
+
+export interface PackageNpmPublishDryRunOptions extends PackageReleaseCandidateTagDryRunOptions {
+  runInstallSmoke?: boolean;
+  runner?: PackageCommandRunner;
+}
+
+export interface PackageNpmPublishDryRunCommandResult {
+  command: string;
+  exitCode: number | null;
+  id: "npm-auth" | "npm-pack-dry-run" | "npm-publish-dry-run" | "install-smoke";
+  ok: boolean;
+  stderr: string;
+  stdout: string;
+  summary: string;
+}
+
+export interface PackageNpmPublishDryRunIssue {
+  code:
+    | "install_smoke_failed"
+    | "manifest_autocorrected"
+    | "npm_auth_failed"
+    | "npm_pack_dry_run_failed"
+    | "npm_publish_dry_run_failed"
+    | "package_readiness_failed"
+    | "publish_guard_failed"
+    | "rc_tag_dry_run_failed"
+    | "release_notes_failed";
+  command?: string;
+  message: string;
+  severity: "error" | "warning";
+}
+
+export interface PackageNpmPublishDryRunResult {
+  commandResults: PackageNpmPublishDryRunCommandResult[];
+  finalPublishCommand: string | null;
+  issues: PackageNpmPublishDryRunIssue[];
+  ok: boolean;
+  packageName: string | null;
+  publishGuard: PackagePublishModeGuardResult;
+  readiness: PackageReadinessCheckResult;
+  releaseCandidate: PackageReleaseCandidateTagDryRunResult;
+  releaseNotes: PackageReleaseNotesDraftResult;
+  status: "publish-dry-run-blocked" | "publish-dry-run-ready";
+  summary: string;
+  version: string | null;
+}
+
 export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
   {
     name: "core",
@@ -291,6 +351,7 @@ const RELEASE_NOTES_CLI_COMMANDS = [
   "track package readiness",
   "track package rc-tag",
 ] as const;
+const MAX_COMMAND_OUTPUT_PREVIEW = 4000;
 const REQUIRED_READINESS_SCRIPTS = [
   { id: "build", name: "build", command: "npm run build", title: "Runtime build" },
   { id: "typecheck", name: "typecheck", command: "npm run typecheck", title: "Typecheck" },
@@ -767,6 +828,117 @@ export async function buildTrackReleaseNotesDraft(
   };
 }
 
+export async function buildTrackNpmPublishDryRun(
+  repoRoot: string,
+  options: PackageNpmPublishDryRunOptions = {}
+): Promise<PackageNpmPublishDryRunResult> {
+  const readiness = await checkTrackPublishReadiness(repoRoot);
+  const publishGuard = await checkTrackPublishModeGuard(repoRoot);
+  const releaseCandidate = await buildTrackReleaseCandidateTagDryRun(repoRoot, options);
+  const releaseNotes = await buildTrackReleaseNotesDraft(repoRoot, options);
+  const runner = options.runner ?? runPackageCommand;
+  const commandSpecs: Array<{
+    args: string[];
+    command: string;
+    id: PackageNpmPublishDryRunCommandResult["id"];
+  }> = [
+    { id: "npm-auth", command: "npm", args: ["whoami"] },
+    { id: "npm-pack-dry-run", command: "npm", args: ["pack", "--dry-run", "--json"] },
+    { id: "npm-publish-dry-run", command: "npm", args: ["publish", "--dry-run", "--access", "public"] },
+  ];
+
+  if (options.runInstallSmoke !== false) {
+    commandSpecs.push({ id: "install-smoke", command: "npm", args: ["run", "package:install-smoke"] });
+  }
+
+  const commandResults: PackageNpmPublishDryRunCommandResult[] = [];
+  for (const spec of commandSpecs) {
+    const result = await runner(repoRoot, spec.command, spec.args);
+    commandResults.push({
+      command: formatCommand(spec.command, spec.args),
+      exitCode: result.exitCode,
+      id: spec.id,
+      ok: result.exitCode === 0,
+      stderr: trimCommandOutput(result.stderr),
+      stdout: trimCommandOutput(result.stdout),
+      summary: summarizeNpmDryRunCommand(spec.id, result),
+    });
+  }
+
+  const issues: PackageNpmPublishDryRunIssue[] = [];
+  if (!readiness.ok) {
+    issues.push({
+      code: "package_readiness_failed",
+      message: "Package readiness must pass before public npm publish dry-run can be treated as ready.",
+      severity: "error",
+    });
+  }
+  if (publishGuard.status !== "publishable-ready") {
+    issues.push({
+      code: "publish_guard_failed",
+      message: `Publish guard must be publishable-ready, got ${publishGuard.status}.`,
+      severity: "error",
+    });
+  }
+  if (!releaseCandidate.ok) {
+    issues.push({
+      code: "rc_tag_dry_run_failed",
+      message: "RC tag dry-run must be ready before public npm publish execution is considered safe.",
+      severity: "error",
+    });
+  }
+  if (!releaseNotes.ok) {
+    issues.push({
+      code: "release_notes_failed",
+      message: "Release notes draft must be ready before public npm publish execution is considered safe.",
+      severity: "error",
+    });
+  }
+
+  for (const commandResult of commandResults) {
+    if (!commandResult.ok) {
+      issues.push({
+        code: commandIssueCode(commandResult.id),
+        command: commandResult.command,
+        message: commandResult.summary,
+        severity: "error",
+      });
+    }
+
+    if (
+      commandResult.id === "npm-publish-dry-run" &&
+      /auto-corrected|bin\[track\]/i.test(`${commandResult.stderr}\n${commandResult.stdout}`)
+    ) {
+      issues.push({
+        code: "manifest_autocorrected",
+        command: commandResult.command,
+        message: "npm publish dry-run reported manifest auto-correction; package.json should be normalized before release.",
+        severity: "error",
+      });
+    }
+  }
+
+  const ok = !issues.some((issue) => issue.severity === "error");
+  const finalPublishCommand = readiness.packageName ? "npm publish --access public" : null;
+
+  return {
+    commandResults,
+    finalPublishCommand,
+    issues,
+    ok,
+    packageName: readiness.packageName,
+    publishGuard,
+    readiness,
+    releaseCandidate,
+    releaseNotes,
+    status: ok ? "publish-dry-run-ready" : "publish-dry-run-blocked",
+    summary: ok
+      ? "Public npm publish dry-run lane is ready; final publish still requires release-owner confirmation."
+      : "Public npm publish dry-run lane is blocked until the reported preflight issues are resolved.",
+    version: readiness.version,
+  };
+}
+
 export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -935,6 +1107,54 @@ export function renderPackageReleaseNotesDraft(result: PackageReleaseNotesDraftR
   lines.push("");
   lines.push("This draft does not publish to npm, create a git tag, or push a tag.");
   lines.push("Final publish still requires release-owner npm authentication and explicit confirmation.");
+
+  return lines.join("\n");
+}
+
+export function renderPackageNpmPublishDryRun(result: PackageNpmPublishDryRunResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const readyCommands = result.commandResults.filter((command) => command.ok).length;
+  const lines = [
+    result.ok ? "PACKAGE NPM PUBLISH DRY-RUN READY" : "PACKAGE NPM PUBLISH DRY-RUN BLOCKED",
+    `PACKAGE  ${packageLabel}`,
+    `STATUS   ${result.status}`,
+    `SUMMARY  ${result.summary}`,
+    `COMMANDS ${readyCommands}/${result.commandResults.length} ready`,
+    `FINAL    ${result.finalPublishCommand ?? "missing"}`,
+    "",
+    "Preflight Commands:",
+  ];
+
+  for (const command of result.commandResults) {
+    lines.push(`- ${command.id.padEnd(20)} ${command.ok ? "ready" : "blocked"} ${command.command}`);
+    lines.push(`  ${command.summary}`);
+  }
+
+  lines.push("");
+  lines.push("Release Gates:");
+  lines.push(`- readiness           ${result.readiness.ok ? "ready" : "blocked"}`);
+  lines.push(`- publish guard       ${result.publishGuard.status}`);
+  lines.push(`- rc tag dry-run      ${result.releaseCandidate.status}`);
+  lines.push(`- release notes       ${result.releaseNotes.status}`);
+
+  if (result.finalPublishCommand) {
+    lines.push("");
+    lines.push("Final publish command:");
+    lines.push(`- ${result.finalPublishCommand}`);
+  }
+
+  if (result.issues.length) {
+    lines.push("");
+    lines.push("Publish dry-run issues:");
+    for (const issue of result.issues) {
+      const command = issue.command ? ` ${issue.command}` : "";
+      lines.push(`- [${issue.severity}] ${issue.code}:${command} ${issue.message}`);
+    }
+  }
+
+  lines.push("");
+  lines.push("No package was published by this command.");
 
   return lines.join("\n");
 }
@@ -1136,6 +1356,115 @@ function readScriptMap(source: Record<string, unknown>): Record<string, string> 
 
 function hasScript(scripts: Record<string, string>, name: string): boolean {
   return typeof scripts[name] === "string" && scripts[name].trim().length > 0;
+}
+
+async function runPackageCommand(
+  repoRoot: string,
+  command: string,
+  args: string[]
+): Promise<PackageCommandRunnerResult> {
+  return new Promise((resolve) => {
+    const child = spawn(command, args, {
+      cwd: repoRoot,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let settled = false;
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout?.setEncoding("utf8");
+    child.stderr?.setEncoding("utf8");
+    child.stdout?.on("data", (chunk: string) => {
+      stdout = appendCommandOutput(stdout, chunk);
+    });
+    child.stderr?.on("data", (chunk: string) => {
+      stderr = appendCommandOutput(stderr, chunk);
+    });
+    child.on("error", (error) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve({
+        error: error.message,
+        exitCode: null,
+        stderr,
+        stdout,
+      });
+    });
+    child.on("close", (exitCode) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve({
+        exitCode,
+        stderr,
+        stdout,
+      });
+    });
+  });
+}
+
+function appendCommandOutput(current: string, chunk: string): string {
+  if (current.length >= MAX_COMMAND_OUTPUT_PREVIEW) {
+    return current;
+  }
+  return `${current}${chunk}`.slice(0, MAX_COMMAND_OUTPUT_PREVIEW);
+}
+
+function trimCommandOutput(output: string): string {
+  return output.length > MAX_COMMAND_OUTPUT_PREVIEW ? `${output.slice(0, MAX_COMMAND_OUTPUT_PREVIEW)}...` : output;
+}
+
+function formatCommand(command: string, args: string[]): string {
+  return [command, ...args].join(" ");
+}
+
+function summarizeNpmDryRunCommand(
+  id: PackageNpmPublishDryRunCommandResult["id"],
+  result: PackageCommandRunnerResult
+): string {
+  if (result.exitCode === 0) {
+    if (id === "npm-auth") {
+      return `authenticated as ${firstOutputLine(result.stdout) ?? "unknown npm user"}`;
+    }
+    if (id === "npm-pack-dry-run") {
+      return "npm pack dry-run completed";
+    }
+    if (id === "npm-publish-dry-run") {
+      return "npm publish dry-run completed without publishing";
+    }
+    return "package install smoke completed";
+  }
+
+  return (
+    firstOutputLine(result.stderr) ??
+    firstOutputLine(result.stdout) ??
+    result.error ??
+    `command exited with ${result.exitCode === null ? "no exit code" : `code ${result.exitCode}`}`
+  );
+}
+
+function firstOutputLine(output: string): string | null {
+  const line = output
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .find((entry) => entry.length > 0);
+  return line ?? null;
+}
+
+function commandIssueCode(id: PackageNpmPublishDryRunCommandResult["id"]): PackageNpmPublishDryRunIssue["code"] {
+  if (id === "npm-auth") {
+    return "npm_auth_failed";
+  }
+  if (id === "npm-pack-dry-run") {
+    return "npm_pack_dry_run_failed";
+  }
+  if (id === "npm-publish-dry-run") {
+    return "npm_publish_dry_run_failed";
+  }
+  return "install_smoke_failed";
 }
 
 function summarizePackageHandoffStatus(readiness: PackageReadinessCheckResult): {

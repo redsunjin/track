@@ -13,8 +13,8 @@ Complete the public npm dry-run lane without publishing, and make the remaining 
 
 1. release owner runs `npm login` or `npm adduser` on the release machine
 2. verify `npm whoami`
-3. rerun `npm publish --dry-run --access public`
-4. rerun `npm run package:install-smoke`
+3. rerun `npm run package:publish-dry-run`
+4. confirm `npm publish --dry-run --access public` and `npm run package:install-smoke` are both ready inside the report
 5. confirm the final publish command remains `npm publish --access public`
 
 ## Current Result
@@ -23,6 +23,7 @@ Complete the public npm dry-run lane without publishing, and make the remaining 
 - `npm publish --dry-run --access public`: passed as a dry-run after normalizing `bin.track` to `dist/cli.js`
 - `npm run package:install-smoke`: passed
 - `npm whoami`: blocked with `ENEEDAUTH`
+- `track package publish-dry-run`: added to summarize npm auth, pack dry-run, publish dry-run, install smoke, and final publish command
 
 ## Constraints
 
@@ -37,6 +38,7 @@ Complete the public npm dry-run lane without publishing, and make the remaining 
 npm test
 npm run typecheck
 npm run check:harness
+npm run package:publish-dry-run
 npm pack --dry-run --json
 npm publish --dry-run --access public
 npm run package:install-smoke
