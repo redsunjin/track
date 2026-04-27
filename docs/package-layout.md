@@ -205,6 +205,27 @@ The draft includes:
 The command does not publish to npm, create a git tag, or push a tag.
 If readiness, publish guard, or RC tag dry-run is blocked, the draft renders `release-notes-blocked`.
 
+## npm Publish Dry Run
+
+Use the registry publish dry-run only after the package readiness, publish guard, RC tag dry-run, and release notes draft are green:
+
+```bash
+npm whoami
+npm pack --dry-run --json
+npm publish --dry-run --access public
+npm run package:install-smoke
+```
+
+The publish dry-run does not publish the package, but real publish execution still requires npm authentication.
+The final publish command remains:
+
+```bash
+npm publish --access public
+```
+
+Keep `bin.track` as `dist/cli.js`.
+Using `./dist/cli.js` works locally, but npm normalizes it during publish dry-run and reports an auto-correction warning.
+
 ## Extraction Rule
 
 When Track becomes multi-package, extraction should follow this order:

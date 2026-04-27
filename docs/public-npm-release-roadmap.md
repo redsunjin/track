@@ -101,9 +101,18 @@ Expected checks:
 - `npm publish --dry-run --access public`
 - package install smoke
 
+Current result:
+
+- `npm pack --dry-run --json`: passed
+- `npm publish --dry-run --access public`: passed as a dry-run
+- `npm run package:install-smoke`: passed
+- `npm whoami`: blocked with `ENEEDAUTH`
+- `bin.track`: normalized to `dist/cli.js` so npm does not auto-correct the manifest during publish dry-run
+
 Exit condition:
 
 - release owner can see the exact final publish command and all dry-runs are green
+- npm authentication must pass before this slice can be treated as release-ready
 
 ### TRK-058 Public Release Execution
 

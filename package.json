@@ -67,7 +67,7 @@
     "./vscode": "./vscode-extension/dist/extension.js"
   },
   "bin": {
-    "track": "./dist/cli.js"
+    "track": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

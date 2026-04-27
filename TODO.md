@@ -2,11 +2,10 @@
 
 ## Active
 
-- `TRK-056` Release Notes Draft Generator
+- `TRK-057` npm Publish Dry Run
 
 ## Queued
 
-- `TRK-057 npm Publish Dry Run`
 - `TRK-058 Public Release Execution`
 
 ## Parked

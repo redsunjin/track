@@ -214,11 +214,11 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-030-release-notes-draft-generator.md](./worksheets/HW-030-release-notes-draft-generator.md)
+- [HW-031-npm-publish-dry-run.md](./worksheets/HW-031-npm-publish-dry-run.md)
 
 Last completed worksheet:
 
-- [HW-029-publishable-rc-gate-tightening.md](./worksheets/HW-029-publishable-rc-gate-tightening.md)
+- [HW-030-release-notes-draft-generator.md](./worksheets/HW-030-release-notes-draft-generator.md)
 
 ## Adoption Rules
 

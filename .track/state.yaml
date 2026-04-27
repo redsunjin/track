@@ -9,11 +9,12 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 32
-  active_lap: 30
-  health: green
-  next_action: Select next active slice
-  blocked_reason: null
-  percent_complete: 100
+  active_lap: 31
+  health: red
+  next_action: Resolve blocker on Verify npm authentication preflight
+  blocked_reason: npm whoami failed with ENEEDAUTH; release owner must run npm
+    login or npm adduser before final publish
+  percent_complete: 97
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -461,15 +462,15 @@ laps:
         weight: 2
   - id: lap-31
     title: npm publish dry run
-    status: todo
+    status: blocked
     checkpoints:
       - id: cp-82
         title: npm auth preflight
-        status: todo
+        status: blocked
         weight: 1
       - id: cp-83
         title: Public publish dry-run
-        status: todo
+        status: done
         weight: 2
   - id: lap-32
     title: Public release execution
@@ -921,12 +922,12 @@ tasks:
   - id: task-087
     title: Verify npm authentication preflight
     checkpoint_id: cp-82
-    status: todo
+    status: blocked
     owner: release-owner
   - id: task-088
     title: Run public npm publish dry-run
     checkpoint_id: cp-83
-    status: todo
+    status: done
     owner: release-owner
   - id: task-089
     title: Approve public release execution
@@ -943,7 +944,13 @@ tasks:
     checkpoint_id: cp-86
     status: todo
     owner: codex
-flags: []
+flags:
+  - id: auto-block:task-087
+    level: red
+    title: Blocked Verify npm authentication preflight
+    detail: npm whoami failed with ENEEDAUTH; release owner must run npm login or
+      npm adduser before final publish
+    source: track:auto-block
 events:
   - id: evt-001
     type: project.created
@@ -1239,7 +1246,8 @@ events:
     type: roadmap.slice_selected
     actor: codex
     timestamp: 2026-04-21T17:00:00+09:00
-    summary: Selected TRK-040 Package Split / Publishable Layout as the next active slice
+    summary: Selected TRK-040 Package Split / Publishable Layout as the next active
+      slice
   - id: evt-2026-04-21T17:10:00+09:00
     type: task.completed
     actor: codex
@@ -1650,3 +1658,15 @@ events:
     actor: codex
     timestamp: 2026-04-27T00:56:00+09:00
     summary: Completed TRK-056 Release Notes Draft Generator
+  - id: evt-2026-04-27T14:56:01.855Z-t27ms7
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T14:56:01.855Z
+    summary: Completed Run public npm publish dry-run
+  - id: evt-2026-04-27T14:56:06.035Z-u9n7tx
+    type: task.blocked
+    actor: codex
+    timestamp: 2026-04-27T14:56:06.035Z
+    summary: "Blocked Verify npm authentication preflight: npm whoami failed with
+      ENEEDAUTH; release owner must run npm login or npm adduser before final
+      publish"
