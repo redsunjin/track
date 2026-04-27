@@ -186,6 +186,26 @@ export interface PackageReleaseCandidateTagDryRunResult {
   version: string | null;
 }
 
+export interface PackageReleaseNotesDraftResult {
+  cliCommands: string[];
+  importSubpaths: string[];
+  installCommand: string | null;
+  npxCommand: string | null;
+  ok: boolean;
+  packageName: string | null;
+  publishGuard: PackagePublishModeGuardResult;
+  readiness: PackageReadinessCheckResult;
+  recentSlices: Array<{
+    id: string;
+    title: string;
+  }>;
+  releaseCandidate: PackageReleaseCandidateTagDryRunResult;
+  status: "release-notes-blocked" | "release-notes-ready";
+  summary: string;
+  verificationCommands: string[];
+  version: string | null;
+}
+
 export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
   {
     name: "core",
@@ -252,6 +272,24 @@ const DEFAULT_HANDOFF_COMMANDS = [
   "npm run package:readiness",
   "npm run package:install-smoke",
   "npm pack --dry-run --json",
+] as const;
+const RELEASE_NOTES_VERIFICATION_COMMANDS = [
+  "npm test",
+  "npm run typecheck",
+  "npm run check:harness",
+  "npm run package:dry-run",
+  "npm run package:readiness",
+  "npm run package:publish-guard",
+  "npm run package:rc-tag",
+  "npm run package:install-smoke",
+  "npm pack --dry-run --json",
+] as const;
+const RELEASE_NOTES_CLI_COMMANDS = [
+  "track status",
+  "track map --color",
+  "track pitwall --openclaw",
+  "track package readiness",
+  "track package rc-tag",
 ] as const;
 const REQUIRED_READINESS_SCRIPTS = [
   { id: "build", name: "build", command: "npm run build", title: "Runtime build" },
@@ -695,6 +733,40 @@ export async function buildTrackReleaseCandidateTagDryRun(
   };
 }
 
+export async function buildTrackReleaseNotesDraft(
+  repoRoot: string,
+  options: PackageReleaseCandidateTagDryRunOptions = {}
+): Promise<PackageReleaseNotesDraftResult> {
+  const readiness = await checkTrackPublishReadiness(repoRoot);
+  const publishGuard = await checkTrackPublishModeGuard(repoRoot);
+  const releaseCandidate = await buildTrackReleaseCandidateTagDryRun(repoRoot, options);
+  const packageName = readiness.packageName;
+  const version = readiness.version;
+  const importSubpaths = [
+    ...new Set(readiness.dryRun.exportEntries.map((entry) => entry.subpath ?? ".").filter((value) => value.length > 0)),
+  ].sort((left, right) => left.localeCompare(right));
+  const ok = readiness.ok && publishGuard.status === "publishable-ready" && releaseCandidate.ok;
+
+  return {
+    cliCommands: [...RELEASE_NOTES_CLI_COMMANDS],
+    importSubpaths,
+    installCommand: packageName ? `npm install ${packageName}` : null,
+    npxCommand: packageName ? `npx ${packageName} status` : null,
+    ok,
+    packageName,
+    publishGuard,
+    readiness,
+    recentSlices: await readRecentReleaseSlices(repoRoot),
+    releaseCandidate,
+    status: ok ? "release-notes-ready" : "release-notes-blocked",
+    summary: ok
+      ? "Release notes draft is ready from package readiness, publish guard, RC tag dry-run, and recent release slices."
+      : "Release notes draft is blocked until package readiness, publish guard, and RC tag dry-run are green.",
+    verificationCommands: [...RELEASE_NOTES_VERIFICATION_COMMANDS],
+    version,
+  };
+}
+
 export function renderPackageDryRunCheck(result: PackageDryRunCheckResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -747,6 +819,18 @@ function describeReleaseCandidatePublishGuard(
   return `publish mode guard is ${status}; expected publishable-ready`;
 }
 
+async function readRecentReleaseSlices(repoRoot: string): Promise<Array<{ id: string; title: string }>> {
+  try {
+    const todo = await readFile(path.join(repoRoot, "TODO.md"), "utf8");
+    return [...todo.matchAll(/^### (TRK-\d+)\s+(.+)$/gm)]
+      .map((match) => ({ id: match[1], title: match[2].trim() }))
+      .filter((slice) => /^TRK-0(5[3-9]|6\d)$/.test(slice.id))
+      .slice(0, 6);
+  } catch {
+    return [];
+  }
+}
+
 export function renderPackageReleaseCandidateTagDryRun(result: PackageReleaseCandidateTagDryRunResult): string {
   const packageLabel =
     result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
@@ -782,6 +866,75 @@ export function renderPackageReleaseCandidateTagDryRun(result: PackageReleaseCan
       lines.push(`- [${issue.severity}] ${issue.code}: ${issue.message}`);
     }
   }
+
+  return lines.join("\n");
+}
+
+export function renderPackageReleaseNotesDraft(result: PackageReleaseNotesDraftResult): string {
+  const packageLabel =
+    result.packageName && result.version ? `${result.packageName}@${result.version}` : result.packageName ?? "unknown";
+  const lines = [
+    `# ${packageLabel} Release Notes Draft`,
+    "",
+    `Status: ${result.status}`,
+    "",
+    "## Summary",
+    "",
+    result.summary,
+    "",
+    "## Install",
+    "",
+    "```bash",
+    result.installCommand ?? "npm install <package>",
+    result.npxCommand ?? "npx <package> status",
+    "track status",
+    "```",
+    "",
+    "## CLI Quick Start",
+    "",
+  ];
+
+  for (const command of result.cliCommands) {
+    lines.push(`- \`${command}\``);
+  }
+
+  lines.push("");
+  lines.push("## Public Imports");
+  lines.push("");
+  for (const subpath of result.importSubpaths) {
+    const packagePath = subpath === "." ? result.packageName ?? "unknown" : `${result.packageName ?? "unknown"}${subpath.slice(1)}`;
+    lines.push(`- \`${packagePath}\``);
+  }
+
+  lines.push("");
+  lines.push("## Recent Release Slices");
+  lines.push("");
+  for (const slice of result.recentSlices) {
+    lines.push(`- ${slice.id} ${slice.title}`);
+  }
+
+  lines.push("");
+  lines.push("## Verification");
+  lines.push("");
+  for (const command of result.verificationCommands) {
+    lines.push(`- \`${command}\``);
+  }
+
+  lines.push("");
+  lines.push("## Release Candidate");
+  lines.push("");
+  lines.push(`- status: \`${result.releaseCandidate.status}\``);
+  lines.push(`- tag: \`${result.releaseCandidate.candidateTag ?? "missing"}\``);
+  lines.push(`- publish guard: \`${result.publishGuard.status}\``);
+  for (const command of result.releaseCandidate.commands) {
+    lines.push(`- dry-run command: \`${command}\``);
+  }
+
+  lines.push("");
+  lines.push("## Publish Note");
+  lines.push("");
+  lines.push("This draft does not publish to npm, create a git tag, or push a tag.");
+  lines.push("Final publish still requires release-owner npm authentication and explicit confirmation.");
 
   return lines.join("\n");
 }

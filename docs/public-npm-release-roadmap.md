@@ -81,9 +81,9 @@ Exit condition:
 
 Generate a release note draft from the locked package state and recent release slices.
 
-Expected changes:
+Completed changes:
 
-- add release notes draft command or documented generation path
+- add `track package release-notes` and `npm run package:release-notes`
 - include package name, version, install command, CLI usage, and verification summary
 
 Exit condition:

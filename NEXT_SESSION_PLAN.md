@@ -2,26 +2,26 @@
 
 ## Active Slice
 
-- id: `TRK-055`
-- title: `Publishable RC Gate Tightening`
+- id: `TRK-056`
+- title: `Release Notes Draft Generator`
 
 ## Goal
 
-Make `track package rc-tag` mean public-release readiness, not just private artifact readiness.
+Generate a pasteable public-release note from the current package state without manually reconstructing install commands, CLI usage, verification output, or recent release slices.
 
 ## First Steps
 
-1. require `publishable-ready` publish guard status for the default RC tag dry-run
-2. block private-root artifact RC tags unless explicitly requested
-3. add a clear `--allow-private-root` escape hatch for artifact-only RC tags
-4. cover both paths with regression tests and docs
+1. add a release notes draft builder from readiness, publish guard, and RC tag dry-run state
+2. wire `track package release-notes` and `track package notes-draft`
+3. add `npm run package:release-notes`
+4. document the command and add regression coverage
 
 ## Constraints
 
 - do not publish to npm
 - do not create or push git tags
-- keep default RC behavior aligned to public npm release readiness
-- keep private-root artifact behavior explicit and visibly non-publishable
+- keep the output as a draft, not a release execution command
+- keep blocked readiness visible in the rendered draft
 
 ## Verification
 
@@ -32,13 +32,14 @@ npm run check:harness
 npm run package:readiness
 npm run package:publish-guard
 npm run package:rc-tag
-node --import tsx ./src/cli.ts package rc-tag --allow-private-root
+npm run package:release-notes
+node --import tsx ./src/cli.ts package notes-draft --json
 git diff --check
 ```
 
 ## Exit Condition
 
-- default RC tag dry-run requires `publishable-ready`
-- private-root fixture is blocked by default
-- explicit private-root artifact override is tested
-- docs and harness state point at `TRK-055`
+- release notes draft includes package name, version, install command, CLI usage, and verification summary
+- RC tag dry-run status is included without creating a tag
+- blocked draft behavior is covered by tests
+- docs and harness state point at `TRK-056`

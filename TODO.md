@@ -2,17 +2,27 @@
 
 ## Active
 
-- `TRK-055` Publishable RC Gate Tightening
+- `TRK-056` Release Notes Draft Generator
 
 ## Queued
 
-- `TRK-056 Release Notes Draft Generator`
 - `TRK-057 npm Publish Dry Run`
 - `TRK-058 Public Release Execution`
 
 ## Parked
 
 ## Done
+
+### TRK-056 Release Notes Draft Generator
+
+- completed:
+  - `track package release-notes`
+  - `track package notes-draft` alias
+  - `npm run package:release-notes`
+  - Markdown draft with package name, version, install command, and `npx` command
+  - CLI quick-start, public imports, recent release slices, and verification summary
+  - RC tag dry-run status included without creating a tag
+  - blocked draft output when release readiness or RC tag readiness is blocked
 
 ### TRK-055 Publishable RC Gate Tightening
 

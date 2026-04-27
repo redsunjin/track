@@ -85,6 +85,7 @@
     "package:publish-guard": "node --import tsx ./src/cli.ts package publish-guard",
     "package:rc-tag": "node --import tsx ./src/cli.ts package rc-tag",
     "package:readiness": "node --import tsx ./src/cli.ts package readiness",
+    "package:release-notes": "node --import tsx ./src/cli.ts package release-notes",
     "status": "node --import tsx ./src/cli.ts status",
     "next": "node --import tsx ./src/cli.ts next",
     "map": "node --import tsx ./src/cli.ts map",

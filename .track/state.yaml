@@ -9,7 +9,7 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 32
-  active_lap: 29
+  active_lap: 30
   health: green
   next_action: Select next active slice
   blocked_reason: null
@@ -449,15 +449,15 @@ laps:
         weight: 2
   - id: lap-30
     title: Release notes draft generator
-    status: todo
+    status: done
     checkpoints:
       - id: cp-80
         title: Release notes draft source
-        status: todo
+        status: done
         weight: 2
       - id: cp-81
         title: Release notes CLI or script
-        status: todo
+        status: done
         weight: 2
   - id: lap-31
     title: npm publish dry run
@@ -911,12 +911,12 @@ tasks:
   - id: task-085
     title: Build release notes draft source
     checkpoint_id: cp-80
-    status: todo
+    status: done
     owner: codex
   - id: task-086
     title: Wire release notes draft command
     checkpoint_id: cp-81
-    status: todo
+    status: done
     owner: codex
   - id: task-087
     title: Verify npm authentication preflight
@@ -1630,3 +1630,23 @@ events:
     actor: codex
     timestamp: 2026-04-27T00:41:00+09:00
     summary: Completed TRK-055 Publishable RC Gate Tightening
+  - id: evt-2026-04-27T00:50:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-27T00:50:00+09:00
+    summary: Selected TRK-056 Release Notes Draft Generator as the next active slice
+  - id: evt-2026-04-27T00:53:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:53:00+09:00
+    summary: Completed Build release notes draft source
+  - id: evt-2026-04-27T00:55:00+09:00
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-27T00:55:00+09:00
+    summary: Completed Wire release notes draft command
+  - id: evt-2026-04-27T00:56:00+09:00
+    type: roadmap.slice_completed
+    actor: codex
+    timestamp: 2026-04-27T00:56:00+09:00
+    summary: Completed TRK-056 Release Notes Draft Generator

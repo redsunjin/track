@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   buildTrackPackageHandoff,
+  buildTrackReleaseNotesDraft,
   buildTrackReleaseCandidateTagDryRun,
   checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
@@ -19,6 +20,7 @@ import {
   renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
   renderPackageReleaseCandidateTagDryRun,
+  renderPackageReleaseNotesDraft,
 } from "../src/package-layout.js";
 
 test("package boundaries define the publishable Track package split", () => {
@@ -76,6 +78,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof layout.buildTrackPackageHandoff, "function");
   assert.equal(typeof layout.checkTrackPublishModeGuard, "function");
   assert.equal(typeof layout.buildTrackReleaseCandidateTagDryRun, "function");
+  assert.equal(typeof layout.buildTrackReleaseNotesDraft, "function");
   assert.equal(layout.TRACK_PACKAGE_BOUNDARIES.length, 6);
 });
 
@@ -216,6 +219,37 @@ test("release candidate tag dry-run blocks an existing candidate tag", async () 
   assert.ok(result.issues.some((issue) => issue.code === "tag_already_exists"));
   assert.match(renderPackageReleaseCandidateTagDryRun(result), /PACKAGE RC TAG DRY-RUN BLOCKED/);
   assert.match(renderPackageReleaseCandidateTagDryRun(result), /tag_already_exists/);
+});
+
+test("release notes draft summarizes package install, CLI, verification, and recent slices", async () => {
+  const result = await buildTrackReleaseNotesDraft(path.resolve("."), { existingTags: [] });
+  const rendered = renderPackageReleaseNotesDraft(result);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, "release-notes-ready");
+  assert.equal(result.packageName, "@redsunjin/track");
+  assert.equal(result.version, "0.1.0");
+  assert.equal(result.installCommand, "npm install @redsunjin/track");
+  assert.equal(result.npxCommand, "npx @redsunjin/track status");
+  assert.ok(result.cliCommands.includes("track package readiness"));
+  assert.ok(result.importSubpaths.includes("./core"));
+  assert.ok(result.verificationCommands.includes("npm run package:install-smoke"));
+  assert.ok(result.recentSlices.some((slice) => slice.id === "TRK-055"));
+  assert.equal(result.releaseCandidate.status, "tag-dry-run-ready");
+  assert.match(rendered, /# @redsunjin\/track@0\.1\.0 Release Notes Draft/);
+  assert.match(rendered, /npm install @redsunjin\/track/);
+  assert.match(rendered, /track package rc-tag/);
+  assert.match(rendered, /TRK-055 Publishable RC Gate Tightening/);
+  assert.match(rendered, /Final publish still requires release-owner npm authentication/);
+});
+
+test("release notes draft is blocked when RC tag readiness is blocked", async () => {
+  const result = await buildTrackReleaseNotesDraft(path.resolve("."), { existingTags: ["v0.1.0-rc.0"] });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.status, "release-notes-blocked");
+  assert.equal(result.releaseCandidate.status, "tag-dry-run-blocked");
+  assert.match(renderPackageReleaseNotesDraft(result), /release-notes-blocked/);
 });
 
 test("package coverage helper matches directories and exact files", () => {

@@ -28,6 +28,7 @@ import {
 import { captureOpenClawTelemetry, renderOpenClawCaptureSummary } from "./openclaw-live.js";
 import {
   buildTrackPackageHandoff,
+  buildTrackReleaseNotesDraft,
   buildTrackReleaseCandidateTagDryRun,
   checkTrackPublishModeGuard,
   checkTrackPackageDryRun,
@@ -40,6 +41,7 @@ import {
   renderPackagePublishModeGuard,
   renderPackageReadinessCheck,
   renderPackageReleaseCandidateTagDryRun,
+  renderPackageReleaseNotesDraft,
 } from "./package-layout.js";
 import type { PackagePublishModeTarget } from "./package-layout.js";
 import {
@@ -519,6 +521,22 @@ async function main(): Promise<void> {
         process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       } else {
         process.stdout.write(`${renderPackageReleaseCandidateTagDryRun(result)}\n`);
+      }
+      if (!result.ok) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
+    if (subcommand === "release-notes" || subcommand === "notes-draft") {
+      const result = await buildTrackReleaseNotesDraft(process.cwd(), {
+        candidateTag: packageCandidateTag,
+        rc: packageCandidateRc,
+      });
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        process.stdout.write(`${renderPackageReleaseNotesDraft(result)}\n`);
       }
       if (!result.ok) {
         process.exitCode = 1;

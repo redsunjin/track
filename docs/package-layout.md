@@ -75,6 +75,7 @@ npm run package:handoff
 npm run package:readiness
 npm run package:publish-guard
 npm run package:rc-tag
+npm run package:release-notes
 npm pack --dry-run --json
 ```
 
@@ -179,6 +180,30 @@ Use `--allow-private-root` only when intentionally preparing a non-publishable a
 
 The command prints the exact `git tag -a ...` and `git push origin ...` commands to run manually.
 It does not create a tag, push a tag, mutate `package.json`, or publish to npm.
+
+## Release Notes Draft
+
+Use the release notes draft when the package state is ready and the release owner needs a pasteable public-release note:
+
+```bash
+track package release-notes
+track package notes-draft
+track package release-notes --rc 1
+npm run package:release-notes
+```
+
+The draft includes:
+
+- package name and version
+- install and `npx` commands
+- CLI quick-start commands
+- public import subpaths
+- recent release slices from the release roadmap work
+- verification command summary
+- RC tag dry-run status and tag commands
+
+The command does not publish to npm, create a git tag, or push a tag.
+If readiness, publish guard, or RC tag dry-run is blocked, the draft renders `release-notes-blocked`.
 
 ## Extraction Rule
 

@@ -139,6 +139,7 @@ Current checks:
 - `npm run package:readiness`
 - `npm run package:publish-guard`
 - `npm run package:rc-tag`
+- `npm run package:release-notes`
 - `track package list`
 - `track package check`
 - `track package dry-run`
@@ -146,6 +147,7 @@ Current checks:
 - `track package readiness`
 - `track package publish-guard`
 - `track package rc-tag`
+- `track package release-notes`
 
 `package:build-check` runs the compiled CLI from `dist/cli.js` after build.
 The public package exports and `bin.track` now point at compiled release artifacts under `dist`.
@@ -154,6 +156,7 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:readiness` is the release gate: it verifies the required build/test/harness/package scripts exist and that the package dry-run is clean before a physical `npm pack --dry-run --json`.
 `package:publish-guard` verifies the current scoped public package manifest and reports `publishable-ready` when the package shape and publish configuration are ready.
 `package:rc-tag` prepares the release-candidate git tag commands as a dry-run only when the publish guard reports `publishable-ready`; it does not create or push a tag.
+`package:release-notes` generates a Markdown release-notes draft from package state, install commands, CLI usage, verification commands, and recent release slices.
 
 Public npm release target:
 
