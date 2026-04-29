@@ -11,9 +11,9 @@ track:
   total_laps: 36
   active_lap: 33
   health: green
-  next_action: Design Track init/bootstrap contract
+  next_action: Scaffold Track init templates
   blocked_reason: null
-  percent_complete: 90
+  percent_complete: 86
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -493,11 +493,11 @@ laps:
     checkpoints:
       - id: cp-87
         title: Init command contract
-        status: doing
+        status: done
         weight: 2
       - id: cp-88
         title: Minimal roadmap and state templates
-        status: todo
+        status: doing
         weight: 2
       - id: cp-89
         title: Init smoke and docs
@@ -1010,12 +1010,12 @@ tasks:
   - id: task-092
     title: Design Track init/bootstrap contract
     checkpoint_id: cp-87
-    status: doing
+    status: done
     owner: codex
   - id: task-093
     title: Scaffold Track init templates
     checkpoint_id: cp-88
-    status: todo
+    status: doing
     owner: codex
   - id: task-094
     title: Add init smoke and docs
@@ -1806,9 +1806,20 @@ events:
     type: roadmap.slice_parked
     actor: codex
     timestamp: 2026-04-29T17:00:00+09:00
-    summary: Parked TRK-058 Public Release Execution until user acceptance testing is complete
+    summary: Parked TRK-058 Public Release Execution until user acceptance testing
+      is complete
   - id: evt-2026-04-29T17:01:00+09:00
     type: roadmap.slice_selected
     actor: codex
     timestamp: 2026-04-29T17:01:00+09:00
     summary: Selected TRK-059 Track Init / Bootstrap Roadmap as the next active slice
+  - id: evt-2026-04-29T12:31:48.633Z-n0fh1g
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-29T12:31:48.633Z
+    summary: Completed Design Track init/bootstrap contract
+  - id: evt-2026-04-29T12:31:56.312Z-3hjtbg
+    type: task.started
+    actor: codex
+    timestamp: 2026-04-29T12:31:56.312Z
+    summary: Started Scaffold Track init templates

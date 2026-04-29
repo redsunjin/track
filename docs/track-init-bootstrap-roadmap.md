@@ -118,6 +118,157 @@ Track should cooperate with workflow systems by using adapters:
 
 The adapter output should be explicit data, not scraped terminal prose.
 
+## TRK-059 Strategy
+
+TRK-059 can use subagents for planning and later implementation, but only if each agent has a non-overlapping write surface.
+The main session should keep ownership of product decisions, `.track/*` state transitions, `src/cli.ts` integration, release parking, and final verification.
+
+Recommended split:
+
+- init worker: owns `src/init.ts`, optional `src/init-templates.ts`, and `tests/init.test.ts`
+- bootstrap worker: owns `src/bootstrap.ts`, optional `src/bootstrap-sources.ts` or `src/bootstrap/*`, and `tests/bootstrap.test.ts`
+- integration-doc worker: owns workflow integration docs and adapter examples only
+- QA worker: owns clean-project tarball/UAT scripts and reports only
+- main session: owns `src/cli.ts`, public exports, `.track/roadmap.yaml`, `.track/state.yaml`, `TODO.md`, `NEXT_SESSION_PLAN.md`, release decisions, and final merge
+
+Conflict rule:
+
+- only Track CLI/MCP should mutate `.track/*`
+- only `project-harness-runner` should mutate `.agent/*`, `AGENTS.md` managed sections, and harness scripts
+- shared integration should happen through explicit adapter payloads and tests, not through two tools editing the same state files
+
+## Locked Command Contract
+
+### `track init`
+
+First implementation target:
+
+```bash
+track init --dry-run
+track init --name "My Project" --template simple
+track init --force --name "My Project"
+```
+
+Contract:
+
+- creates `.track/roadmap.yaml` and `.track/state.yaml`
+- refuses overwrite by default if either file already exists
+- supports `--dry-run`, `--force`, `--name <project-name>`, and `--template <simple|sdd|tdd|harness>`
+- may support `--state-out` and `--roadmap-out` for consistency with `track import`
+- returns JSON as `{ roadmap, state, files, written, skipped, warnings }`
+- produces a text summary that points the user to `track status` and `track map`
+
+MVP scope should implement only the `simple` template first.
+The `sdd`, `tdd`, and `harness` templates can be thin variants after the safe write path is proven.
+
+### `track bootstrap`
+
+Bootstrap must be draft-first.
+It should not write `.track/*` unless the user explicitly asks for a write path.
+
+Expected usage:
+
+```bash
+track bootstrap --dry-run
+track bootstrap --from readme --dry-run
+track bootstrap --from package,git,harness --dry-run
+track bootstrap --write
+```
+
+Contract:
+
+- reads local signals as evidence, not as authoritative future plans
+- supports `--from <auto|readme|package|git|harness|agent>`
+- supports `--dry-run`, `--write`, `--force`, `--name`, `--json`, `--state-out`, and `--roadmap-out`
+- shows evidence, confidence, warnings, and projected roadmap/state
+- reuses the existing external-plan projection path where possible instead of inventing a second schema
+
+## `project-harness-runner` Role Separation
+
+`project-harness-runner` and Track should cooperate, but they should not become two competing project state systems.
+
+Role boundary:
+
+- `project-harness-runner` owns method selection, GSD/SDD/TDD/superpowers-lite operating material, `.agent/*`, prompt bundles, definition-of-done docs, and validation scripts such as `scripts/agent-harness.sh`
+- Track owns `.track/roadmap.yaml`, `.track/state.yaml`, `.track/events.ndjson`, current task state, blockers, owner, next action, Pitwall views, CLI, and MCP state mutation
+- harnesses verify implementation quality
+- Track verifies roadmap/state/control-plane consistency
+
+Preferred data exchange:
+
+```text
+project-harness-runner bootstrap/orchestrate
+  -> emits .agent/track-bootstrap.json or stdout adapter JSON
+
+track bootstrap --from harness --dry-run
+  -> reads adapter JSON and renders a reviewable Track draft
+
+track bootstrap --from harness --write
+  -> writes .track files only through Track's no-overwrite policy
+
+track status/map/pitwall
+  -> becomes the shared operating view for humans and agents
+```
+
+Initial adapter payload:
+
+```json
+{
+  "version": 1,
+  "source": "project-harness-runner",
+  "project": {
+    "id": "repo-name",
+    "name": "Repo Name",
+    "mode": "sprint"
+  },
+  "method": "gsd|sdd|tdd|superpowers-lite",
+  "goal": "MVP complete",
+  "validation": {
+    "preferred": "scripts/agent-harness.sh",
+    "checks": ["npm run check"],
+    "smokes": ["npm run smoke"]
+  },
+  "phases": [
+    {
+      "id": "harness-execution",
+      "title": "Harness execution",
+      "checkpoints": [
+        { "id": "define-next-slice", "title": "Define next implementation slice" },
+        { "id": "implement-slice", "title": "Implement slice" },
+        { "id": "validate-harness", "title": "Validate with harness" }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "run-agent-harness",
+      "title": "Run existing validation harness",
+      "checkpoint_id": "validate-harness",
+      "owner": "codex",
+      "status": "todo"
+    }
+  ],
+  "blockers": [],
+  "metadata": {
+    "orchestrate_only": true,
+    "harness_structure_changed": false
+  }
+}
+```
+
+Track should normalize this payload into the existing intermediate adapter schema, then project it into roadmap/state files.
+Markdown files under `.agent/` may be fallback evidence, but they should not be parsed as the source of truth.
+
+## Implementation Sequence
+
+Recommended sequence before public npm publish:
+
+1. TRK-059: lock this strategy, command contract, and role boundary.
+2. TRK-060a: implement `track init --dry-run` and `track init --template simple`.
+3. TRK-060b: implement `track bootstrap --dry-run` from README, package metadata, git context, and harness evidence.
+4. TRK-061: add the `project-harness-runner` adapter contract and optional payload emitter.
+5. TRK-062: run clean-project UAT from tarball install before npm publish approval.
+
 ## New Roadmap Slices
 
 ### TRK-059 Track Init / Bootstrap Roadmap
