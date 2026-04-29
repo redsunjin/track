@@ -942,3 +942,131 @@ roadmap:
             dependencies: 4
             coordination: 3
             risk: 3
+    - id: phase-33
+      title: Track init baseline
+      goal: Let a new project start using Track with a git-init-like command that creates roadmap and state files.
+      kind: build
+      checkpoints:
+        - id: cp-87
+          title: Init command contract
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+        - id: cp-88
+          title: Minimal roadmap and state templates
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-89
+          title: Init smoke and docs
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+    - id: phase-34
+      title: Bootstrap source adapters
+      goal: Generate reviewable Track drafts from local repo signals without pretending git history is a complete plan.
+      kind: integration
+      checkpoints:
+        - id: cp-90
+          title: Git README and package inference
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 3
+            dependencies: 3
+            coordination: 2
+            risk: 3
+        - id: cp-91
+          title: Skill and harness bootstrap bridge
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 3
+            dependencies: 3
+            coordination: 3
+            risk: 3
+        - id: cp-92
+          title: Bootstrap draft review and write flow
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 3
+            dependencies: 2
+            coordination: 2
+            risk: 3
+    - id: phase-35
+      title: Workflow framework integration
+      goal: Make Track cooperate with skill, harness, SDD, TDD, and multi-agent workflow systems while keeping Track state canonical.
+      kind: integration
+      checkpoints:
+        - id: cp-93
+          title: Orchestration contract adapter
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 3
+            dependencies: 3
+            coordination: 3
+            risk: 3
+        - id: cp-94
+          title: Skill and framework collaboration docs
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 2
+            risk: 2
+        - id: cp-95
+          title: Multi-agent handoff patterns
+          kind: integration
+          difficulty:
+            effort: 3
+            uncertainty: 3
+            dependencies: 3
+            coordination: 4
+            risk: 3
+    - id: phase-36
+      title: Pre-publish user acceptance
+      goal: Prove Track is usable from a clean project before public npm publishing.
+      kind: release
+      checkpoints:
+        - id: cp-96
+          title: Clean-project acceptance script
+          kind: build
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 3
+            coordination: 2
+            risk: 2
+        - id: cp-97
+          title: Fresh repo dogfood run
+          kind: release
+          difficulty:
+            effort: 2
+            uncertainty: 3
+            dependencies: 3
+            coordination: 3
+            risk: 3
+        - id: cp-98
+          title: Public publish go-no-go review
+          kind: release
+          difficulty:
+            effort: 1
+            uncertainty: 3
+            dependencies: 4
+            coordination: 4
+            risk: 4

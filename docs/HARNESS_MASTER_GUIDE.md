@@ -214,7 +214,7 @@ Use the worksheet template for any non-trivial slice:
 
 Current active worksheet:
 
-- [HW-032-public-release-execution.md](./worksheets/HW-032-public-release-execution.md)
+- [HW-033-track-init-bootstrap-roadmap.md](./worksheets/HW-033-track-init-bootstrap-roadmap.md)
 
 Last completed worksheet:
 

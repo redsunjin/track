@@ -8,12 +8,12 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 32
-  active_lap: 32
+  total_laps: 36
+  active_lap: 33
   health: green
-  next_action: Approve public release execution
+  next_action: Design Track init/bootstrap contract
   blocked_reason: null
-  percent_complete: 97
+  percent_complete: 90
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -487,6 +487,70 @@ laps:
         title: Post-publish clean install verification
         status: todo
         weight: 2
+  - id: lap-33
+    title: Track init baseline
+    status: doing
+    checkpoints:
+      - id: cp-87
+        title: Init command contract
+        status: doing
+        weight: 2
+      - id: cp-88
+        title: Minimal roadmap and state templates
+        status: todo
+        weight: 2
+      - id: cp-89
+        title: Init smoke and docs
+        status: todo
+        weight: 2
+  - id: lap-34
+    title: Bootstrap source adapters
+    status: todo
+    checkpoints:
+      - id: cp-90
+        title: Git README and package inference
+        status: todo
+        weight: 3
+      - id: cp-91
+        title: Skill and harness bootstrap bridge
+        status: todo
+        weight: 3
+      - id: cp-92
+        title: Bootstrap draft review and write flow
+        status: todo
+        weight: 2
+  - id: lap-35
+    title: Workflow framework integration
+    status: todo
+    checkpoints:
+      - id: cp-93
+        title: Orchestration contract adapter
+        status: todo
+        weight: 3
+      - id: cp-94
+        title: Skill and framework collaboration docs
+        status: todo
+        weight: 2
+      - id: cp-95
+        title: Multi-agent handoff patterns
+        status: todo
+        weight: 3
+  - id: lap-36
+    title: Pre-publish user acceptance
+    status: todo
+    checkpoints:
+      - id: cp-96
+        title: Clean-project acceptance script
+        status: todo
+        weight: 2
+      - id: cp-97
+        title: Fresh repo dogfood run
+        status: todo
+        weight: 2
+      - id: cp-98
+        title: Public publish go-no-go review
+        status: todo
+        weight: 1
 tasks:
   - id: task-001
     title: Scaffold core package
@@ -943,6 +1007,66 @@ tasks:
     checkpoint_id: cp-86
     status: todo
     owner: codex
+  - id: task-092
+    title: Design Track init/bootstrap contract
+    checkpoint_id: cp-87
+    status: doing
+    owner: codex
+  - id: task-093
+    title: Scaffold Track init templates
+    checkpoint_id: cp-88
+    status: todo
+    owner: codex
+  - id: task-094
+    title: Add init smoke and docs
+    checkpoint_id: cp-89
+    status: todo
+    owner: codex
+  - id: task-095
+    title: Add git README and package bootstrap inference
+    checkpoint_id: cp-90
+    status: todo
+    owner: codex
+  - id: task-096
+    title: Add skill and harness bootstrap bridge
+    checkpoint_id: cp-91
+    status: todo
+    owner: codex
+  - id: task-097
+    title: Add bootstrap draft review and write flow
+    checkpoint_id: cp-92
+    status: todo
+    owner: codex
+  - id: task-098
+    title: Define orchestration contract adapter
+    checkpoint_id: cp-93
+    status: todo
+    owner: codex
+  - id: task-099
+    title: Document skill and framework collaboration
+    checkpoint_id: cp-94
+    status: todo
+    owner: codex
+  - id: task-100
+    title: Add multi-agent handoff patterns
+    checkpoint_id: cp-95
+    status: todo
+    owner: codex
+  - id: task-101
+    title: Build clean-project UAT script
+    checkpoint_id: cp-96
+    status: todo
+    owner: codex
+  - id: task-102
+    title: Dogfood Track init in a fresh repo
+    checkpoint_id: cp-97
+    status: todo
+    owner: codex
+  - id: task-103
+    title: Run public publish go-no-go review
+    checkpoint_id: cp-98
+    status: todo
+    owner: release-owner
 flags: []
 events:
   - id: evt-001
@@ -1678,3 +1802,13 @@ events:
     actor: codex
     timestamp: 2026-04-28T01:21:00+09:00
     summary: Selected TRK-058 Public Release Execution as the next active slice
+  - id: evt-2026-04-29T17:00:00+09:00
+    type: roadmap.slice_parked
+    actor: codex
+    timestamp: 2026-04-29T17:00:00+09:00
+    summary: Parked TRK-058 Public Release Execution until user acceptance testing is complete
+  - id: evt-2026-04-29T17:01:00+09:00
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-04-29T17:01:00+09:00
+    summary: Selected TRK-059 Track Init / Bootstrap Roadmap as the next active slice

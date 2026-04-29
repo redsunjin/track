@@ -2,35 +2,34 @@
 
 ## Active Slice
 
-- id: `TRK-058`
-- title: `Public Release Execution`
+- id: `TRK-059`
+- title: `Track Init / Bootstrap Roadmap`
 
 ## Goal
 
-Execute the public npm release only after explicit release-owner approval, then verify the published package from a clean consumer path.
+Turn Track from a tool that only works in already-prepared repos into a project-progress framework that can initialize `.track/roadmap.yaml` and `.track/state.yaml`, then cooperate with skill, harness, SDD, TDD, and multi-agent workflows.
 
 ## First Steps
 
-1. get explicit release-owner approval for actual public npm publish
-2. verify `git status --short --branch`
-3. rerun `npm run package:publish-dry-run`
-4. create and push the release tag selected by the release owner
-5. run `npm publish --access public`
-6. verify registry metadata and clean consumer install
+1. lock the `track init` command contract and template outputs
+2. document how `track bootstrap` drafts roadmap/state from git, README, package metadata, and harness files
+3. define the integration boundary with `/Users/Agent/ps-workspace/skills/project-harness-runner`
+4. add roadmap phases for init, bootstrap, workflow integration, and pre-publish UAT
+5. keep public npm publish parked until clean-project UAT passes
 
 ## Current Result
 
-- `npm whoami`: passed as `redsunjin`
-- `npm run package:publish-dry-run`: passed with `publish-dry-run-ready`
-- final publish command: `npm publish --access public`
-- no package has been published yet
+- public npm publish is ready but intentionally parked
+- `TRK-059` through `TRK-062` now define the product direction before publish
+- `track init` is the next required capability
+- Track should act as the canonical roadmap/state layer, not replace git or method-specific harnesses
 
 ## Constraints
 
-- do not publish to npm without explicit final approval
-- do not create or push git tags without explicit final approval
-- do not change the package name away from `@redsunjin/track`
-- keep release verification output available for handoff
+- do not publish to npm during this slice
+- do not make git history the source of truth for future plans
+- keep `.track/roadmap.yaml` and `.track/state.yaml` as the canonical runtime files
+- skill and harness integrations should generate or update Track inputs, not create competing state models
 
 ## Verification
 
@@ -38,17 +37,14 @@ Execute the public npm release only after explicit release-owner approval, then 
 npm test
 npm run typecheck
 npm run check:harness
-npm run package:publish-dry-run
-npm whoami
-npm view @redsunjin/track version
-npm install @redsunjin/track
-npx @redsunjin/track status
+node --import tsx ./src/cli.ts status --no-color
+node --import tsx ./src/cli.ts map --no-color
 git diff --check
 ```
 
 ## Exit Condition
 
-- release tag is created and pushed
-- `@redsunjin/track` is published to npm
-- clean consumer install works
-- documented CLI entrypoint works from the published package
+- docs define `track init`, `track bootstrap`, and framework cooperation
+- `.track/roadmap.yaml` and `.track/state.yaml` include the new post-release-readiness phases
+- public npm publish remains parked until UAT
+- next implementation slice can start building `track init`

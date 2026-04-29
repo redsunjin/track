@@ -38,6 +38,23 @@ V1 is a plugin-first architecture:
 - source-level package boundaries for `track-core`, `track-runtime`, `track-mcp`, `track-cli`, `track-agents`, and `track-vscode`
 - compiled `dist` package exports and CLI bin for release-manifest readiness checks
 
+## Framework direction
+
+The next product step is to make Track useful in a project that does not already have `.track/` files.
+Track should become the canonical roadmap/state layer beside git:
+
+- `git` records code history
+- `track` records roadmap, current state, blockers, ownership, and next action
+- method-specific tools such as SDD, TDD, GSD, or project harnesses can feed Track, but should not replace Track state
+
+Planned commands:
+
+- `track init` creates `.track/roadmap.yaml` and `.track/state.yaml` from safe templates
+- `track bootstrap` drafts roadmap/state from local signals such as README, package metadata, git branch, and existing harness files
+- `track import` remains the adapter path for explicit external plans
+
+Reference: [docs/track-init-bootstrap-roadmap.md](docs/track-init-bootstrap-roadmap.md)
+
 ## Security defaults
 
 Track now ships with conservative defaults intended for open-source and local-agent use:
@@ -196,6 +213,7 @@ The terminal map now renders a wrapped retro course board with sector markers an
 - MCP contract: [docs/MCP_CONTRACT.md](docs/MCP_CONTRACT.md)
 - Package layout: [docs/package-layout.md](docs/package-layout.md)
 - Public npm release roadmap: [docs/public-npm-release-roadmap.md](docs/public-npm-release-roadmap.md)
+- Track init/bootstrap roadmap: [docs/track-init-bootstrap-roadmap.md](docs/track-init-bootstrap-roadmap.md)
 - Security operations guide: [docs/SECURITY_OPERATIONS_GUIDE.md](docs/SECURITY_OPERATIONS_GUIDE.md)
 - External adapters: [docs/external-adapters.md](docs/external-adapters.md)
 - Agent operating packs: [docs/agent-operating-packs.md](docs/agent-operating-packs.md)

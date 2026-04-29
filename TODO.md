@@ -2,11 +2,17 @@
 
 ## Active
 
-- `TRK-058` Public Release Execution
+- `TRK-059` Track Init / Bootstrap Roadmap
 
 ## Queued
 
+- `TRK-060 Bootstrap Source Adapters`
+- `TRK-061 Workflow Framework Integration`
+- `TRK-062 Pre-Publish User Acceptance`
+
 ## Parked
+
+- `TRK-058 Public Release Execution` - parked until Track is dogfooded from a clean project and release owner approves actual npm publish
 
 ## Done
 

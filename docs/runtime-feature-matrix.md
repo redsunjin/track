@@ -20,6 +20,23 @@ It answers two questions:
 
 ## Real-environment requirements
 
+### 0. Project initialization and bootstrap
+
+Must have:
+
+- `track init`
+- safe `.track/roadmap.yaml` template creation
+- safe `.track/state.yaml` template creation
+- no overwrite by default
+- dry-run preview of generated files
+- `track bootstrap` draft mode from README, package metadata, git branch, and existing harness files
+
+Why:
+
+- a project without `.track/` files cannot use Track meaningfully
+- git history can suggest context, but it cannot be the source of truth for future work
+- the first user experience should not require hand-authoring YAML
+
 ### 1. Canonical state and durability
 
 Must have:

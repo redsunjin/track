@@ -131,9 +131,10 @@ Expected steps:
 
 Current gate:
 
-- `TRK-058` is active
+- `TRK-058` is parked until clean-project UAT is complete
 - final publish command is `npm publish --access public`
 - actual tag creation and npm publish still require explicit release-owner approval
+- `TRK-059` through `TRK-062` cover init/bootstrap, workflow integration, and pre-publish user acceptance before publishing
 
 Exit condition:
 
