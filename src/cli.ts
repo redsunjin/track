@@ -13,6 +13,7 @@ import {
 } from "./agent-packs.js";
 import type { TrackMutationCommand } from "./actions.js";
 import { expandCommandAliases } from "./aliases.js";
+import { bootstrapTrack, summarizeTrackBootstrap } from "./bootstrap.js";
 import { renderBuddy } from "./buddy.js";
 import { buildMonitorBotPushEvents, renderMonitorBotPushBatch } from "./bot-bridge.js";
 import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
@@ -99,6 +100,8 @@ async function main(): Promise<void> {
   const sound = resolveTrackSoundOptions(args, process.env, { json });
   const projectName = readFlag(args, "--name");
   const initTemplate = readFlag(args, "--template");
+  const bootstrapFrom = readFlag(args, "--from");
+  const bootstrapWrite = args.includes("--write");
 
   if (command === "mcp") {
     await runStdioServer({
@@ -183,6 +186,27 @@ async function main(): Promise<void> {
     }
 
     process.stdout.write(`${renderTrackInitPlan(result)}\n`);
+    playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
+    return;
+  }
+
+  if (command === "bootstrap") {
+    if (bootstrapWrite) {
+      throw new Error("`track bootstrap --write` is not available yet. Use `track bootstrap --dry-run` to review the draft.");
+    }
+
+    const result = await bootstrapTrack({
+      cwd: process.cwd(),
+      from: bootstrapFrom,
+      projectName,
+    });
+
+    if (json) {
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      return;
+    }
+
+    process.stdout.write(`${summarizeTrackBootstrap(result)}\n`);
     playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
     return;
   }

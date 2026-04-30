@@ -11,15 +11,16 @@ Implement `track bootstrap` as a draft-first path that can inspect a local repo 
 
 ## First Steps
 
-1. define the bootstrap evidence model for README, package metadata, git context, and harness files
-2. add source readers that produce explicit evidence and warnings
-3. project the evidence into the existing intermediate roadmap schema
-4. render a reviewable `track bootstrap --dry-run` draft
-5. keep write behavior blocked behind explicit `--write` and no-overwrite defaults
+1. add the harness and skill evidence bridge for existing `.agent/` files and harness scripts
+2. keep source readers producing explicit evidence and warnings
+3. extend the bootstrap draft without treating harness prose as source of truth
+4. prepare review/write flow behind explicit `--write`
+5. keep public npm publish parked until clean-project UAT passes
 
 ## Current Result
 
 - `track init` now has a simple MVP with safe no-overwrite behavior
+- `track bootstrap --dry-run` now drafts from README, package metadata, and git context
 - CLI sound cues are available only when explicitly enabled
 - public markdown no longer exposes local workspace paths
 - Team Race Mode is documented as a future roadmap concept, not a runtime feature
@@ -47,7 +48,7 @@ git diff --check
 
 ## Exit Condition
 
-- `track bootstrap --dry-run` can produce a reviewable draft from README/package/git evidence
+- harness and skill evidence can join the existing README/package/git bootstrap draft
 - bootstrap output clearly separates evidence from inferred roadmap/state
 - no `.track/*` files are overwritten without explicit write and force controls
 - next slice can add harness/skill bridge inputs

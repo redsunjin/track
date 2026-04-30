@@ -7,6 +7,7 @@ export { JiraRoadmapAdapter } from "../adapters/jira-adapter.js";
 export { LinearRoadmapAdapter } from "../adapters/linear-adapter.js";
 export { NotionRoadmapAdapter } from "../adapters/notion-adapter.js";
 export { createRoadmapAdapter, listRoadmapAdapterKinds, normalizeRoadmapAdapterKind, resolveRoadmapAdapterSourcePath } from "../adapters/registry.js";
+export { bootstrapTrack, resolveBootstrapSources, summarizeTrackBootstrap } from "../bootstrap.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "../external-plan.js";
 export {
   assertTrackInitPlanWritable,
@@ -40,6 +41,15 @@ export { loadTrackRoadmap, resolveRoadmapPath } from "../roadmap.js";
 export { appendTrackEventLog, loadTrackState, loadTrackStateFromPath, resolveEventLogPath, resolveStatePath, saveTrackState, withTrackStateLock } from "../state.js";
 export type { ApplyTrackMutationOptions, ApplyTrackMutationResult, TrackMutationCommand } from "../actions.js";
 export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "../adapter-schema.js";
+export type {
+  TrackBootstrapCommandResult,
+  TrackBootstrapCommandRunner,
+  TrackBootstrapEvidence,
+  TrackBootstrapOptions,
+  TrackBootstrapRequestedSource,
+  TrackBootstrapResult,
+  TrackBootstrapSourceKind,
+} from "../bootstrap.js";
 export type {
   ProjectTrackInitOptions,
   TrackInitFileAction,

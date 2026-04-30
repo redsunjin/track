@@ -11,9 +11,9 @@ track:
   total_laps: 36
   active_lap: 34
   health: green
-  next_action: Add git README and package bootstrap inference
+  next_action: Add skill and harness bootstrap bridge
   blocked_reason: null
-  percent_complete: 88
+  percent_complete: 90
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -509,11 +509,11 @@ laps:
     checkpoints:
       - id: cp-90
         title: Git README and package inference
-        status: doing
+        status: done
         weight: 3
       - id: cp-91
         title: Skill and harness bootstrap bridge
-        status: todo
+        status: doing
         weight: 3
       - id: cp-92
         title: Bootstrap draft review and write flow
@@ -1025,12 +1025,12 @@ tasks:
   - id: task-095
     title: Add git README and package bootstrap inference
     checkpoint_id: cp-90
-    status: doing
+    status: done
     owner: codex
   - id: task-096
     title: Add skill and harness bootstrap bridge
     checkpoint_id: cp-91
-    status: todo
+    status: doing
     owner: codex
   - id: task-097
     title: Add bootstrap draft review and write flow
@@ -1838,3 +1838,13 @@ events:
     actor: codex
     timestamp: 2026-04-30T11:45:54.152Z
     summary: Started Add git README and package bootstrap inference
+  - id: evt-2026-04-30T12:22:40.524Z-p4bkme
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-30T12:22:40.524Z
+    summary: Completed Add git README and package bootstrap inference
+  - id: evt-2026-04-30T12:22:47.024Z-7tudx0
+    type: task.started
+    actor: codex
+    timestamp: 2026-04-30T12:22:47.024Z
+    summary: Started Add skill and harness bootstrap bridge

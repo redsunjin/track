@@ -14,8 +14,8 @@
   - README evidence reader
   - package metadata reader
   - git context reader
+  - `track bootstrap --dry-run` draft renderer
   - bootstrap evidence and warning model
-  - draft-first `track bootstrap --dry-run` projection plan
   - no-overwrite write policy design
 - out:
   - npm public publish

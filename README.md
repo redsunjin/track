@@ -55,6 +55,12 @@ Planned commands:
 
 Reference: [docs/track-init-bootstrap-roadmap.md](docs/track-init-bootstrap-roadmap.md)
 
+Current bootstrap usage:
+
+- `track bootstrap --dry-run`
+- `track bootstrap --from readme,package,git --dry-run`
+- `track bootstrap --from package --json`
+
 ## CLI sound cues
 
 Track can play optional retro terminal sound cues for status changes.
