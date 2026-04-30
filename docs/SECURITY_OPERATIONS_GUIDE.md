@@ -127,3 +127,14 @@ For open-source distribution, the right model is:
 - let each downstream team decide how much write automation they want
 
 That means `Track` should behave safely out of the box, while still letting advanced users opt into more automation for their own environment.
+
+## Public package hygiene
+
+Before publishing or packaging `Track`, verify public markdown does not expose machine-local workspace roots, user names, private repository paths, or live operational logs.
+
+Recommended documentation patterns:
+
+- use repo-relative links for files inside this repository
+- use `/path/to/workspace` or `<workspace-root>` in examples that need an external workspace
+- describe local comparison repos by name or placeholder path, not by absolute filesystem path
+- keep live `.track/events.ndjson` and generated traces out of package-ready docs

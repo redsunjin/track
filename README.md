@@ -55,6 +55,20 @@ Planned commands:
 
 Reference: [docs/track-init-bootstrap-roadmap.md](docs/track-init-bootstrap-roadmap.md)
 
+## CLI sound cues
+
+Track can play optional retro terminal sound cues for status changes.
+Sound is off by default and is disabled for JSON output.
+
+Current usage:
+
+- `track status --sound`
+- `track next --sound --sound-theme retro`
+- `track watch --sound`
+- `TRACK_SOUND=1 track status`
+
+Reference: [docs/cli-sound-design.md](docs/cli-sound-design.md)
+
 ## Security defaults
 
 Track now ships with conservative defaults intended for open-source and local-agent use:

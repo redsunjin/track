@@ -1,29 +1,29 @@
 # Track Local Repo Survey
 
 Date: 2026-04-05
-Purpose: identify reusable patterns in local `ps-workspace` repos for the new `track` shared library.
+Purpose: identify reusable patterns from local workspace repos for the new `track` shared library.
 
 ## Summary
 
 The strongest local precedent is not one repo, but a combination:
 
-- `ctrl_` provides the real-time control surface model
-- `FirstStep` provides the room/task/timeline operating model
-- `agent-control-plane` provides append-only event and state-transition discipline
-- `Vibe_Planner` provides durable roadmap and dashboard document patterns
-- `maestro` provides the operator-side docked panel and approval-console mindset
-- `asset-growth` provides the clearest MCP vs skill vs harness boundary
+- a local control-surface prototype provides the real-time status model
+- a local room/task prototype provides the room, task, and timeline operating model
+- a local agent control-plane prototype provides append-only event and state-transition discipline
+- a local roadmap dashboard prototype provides durable roadmap and dashboard document patterns
+- a local operator-console prototype provides the docked panel and approval-console mindset
+- a local MCP/skill boundary prototype provides the clearest MCP vs skill vs harness boundary
 
 `Track` should reuse those patterns rather than invent a new planning system from scratch.
 
 ## Repo findings
 
-### `ctrl_`
+### Local control-surface prototype
 
 Relevant files:
 
-- [spec.md](/Users/Agent/ps-workspace/ctrl_/spec.md)
-- [web_dashboard_plan.md](/Users/Agent/ps-workspace/ctrl_/web_dashboard_plan.md)
+- product specification
+- web dashboard plan
 
 Reusable ideas:
 
@@ -38,11 +38,11 @@ Carry into `Track`:
 - let CLI, VS Code, and wallboard all consume the same state contract
 - include operational health alongside progress
 
-### `FirstStep`
+### Local room/task prototype
 
 Relevant files:
 
-- [README.md](/Users/Agent/ps-workspace/FirstStep/README.md)
+- project README
 
 Reusable ideas:
 
@@ -55,11 +55,11 @@ Carry into `Track`:
 - a roadmap lane should always expose current owner, blockers, latest signal, and next action
 - the track metaphor should not hide the underlying task room and timeline
 
-### `agent-control-plane`
+### Local agent control-plane prototype
 
 Relevant files:
 
-- [docs/event-schema.md](/Users/Agent/ps-workspace/agent-control-plane/docs/event-schema.md)
+- event schema documentation
 
 Reusable ideas:
 
@@ -72,11 +72,11 @@ Carry into `Track`:
 - `Track` should store state as projections over events, not only editable documents
 - pit-stop, blocked, approval-needed, and handoff states should be first-class
 
-### `Vibe_Planner`
+### Local roadmap dashboard prototype
 
 Relevant files:
 
-- [docs/PROJECT_DASHBOARD.md](/Users/Agent/ps-workspace/Vibe_Planner_works/Vibe_Planner/docs/PROJECT_DASHBOARD.md)
+- project dashboard documentation
 
 Reusable ideas:
 
@@ -88,12 +88,12 @@ Carry into `Track`:
 - support both live dashboards and durable markdown snapshots
 - keep risk and next-action sections mandatory
 
-### `maestro`
+### Local operator-console prototype
 
 Relevant files:
 
-- [WORK_CONSOLE_PRODUCT_PLAN.md](/Users/Agent/ps-workspace/maestro/docs/version-upgrades/vu-001-openclaw-work-orchestration/WORK_CONSOLE_PRODUCT_PLAN.md)
-- [WORK_CONSOLE_UI_PLAN.md](/Users/Agent/ps-workspace/maestro/docs/version-upgrades/vu-001-openclaw-work-orchestration/WORK_CONSOLE_UI_PLAN.md)
+- work console product plan
+- work console UI plan
 
 Reusable ideas:
 
@@ -106,13 +106,13 @@ Carry into `Track`:
 - the VS Code panel can feel like a work console, not a kanban clone
 - the buddy/avatar should expose state, not become decorative noise
 
-### `asset-growth`
+### Local MCP/skill boundary prototype
 
 Relevant files:
 
-- [docs/mcp-vs-skill-boundaries-review.md](/Users/Agent/ps-workspace/asset-growth/docs/mcp-vs-skill-boundaries-review.md)
-- [docs/local-dashboard.md](/Users/Agent/ps-workspace/asset-growth/docs/local-dashboard.md)
-- [README.md](/Users/Agent/ps-workspace/asset-growth/README.md)
+- MCP vs skill boundary review
+- local dashboard documentation
+- project README
 
 Reusable ideas:
 
@@ -133,12 +133,12 @@ Carry into `Track`:
 
 `Track` should combine:
 
-1. `ctrl_` event and surface model
-2. `FirstStep` room and task semantics
-3. `agent-control-plane` transition discipline
-4. `Vibe_Planner` dashboard reporting discipline
-5. `maestro` docked operator console UX
-6. `asset-growth` layer boundaries between MCP, skill, and harness
+1. control-surface event and display model
+2. room and task semantics
+3. agent control-plane transition discipline
+4. roadmap dashboard reporting discipline
+5. docked operator console UX
+6. layer boundaries between MCP, skill, and harness
 
 ## Immediate build recommendation
 

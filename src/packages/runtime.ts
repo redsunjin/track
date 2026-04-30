@@ -9,6 +9,14 @@ export { NotionRoadmapAdapter } from "../adapters/notion-adapter.js";
 export { createRoadmapAdapter, listRoadmapAdapterKinds, normalizeRoadmapAdapterKind, resolveRoadmapAdapterSourcePath } from "../adapters/registry.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "../external-plan.js";
 export {
+  assertTrackInitPlanWritable,
+  initTrack,
+  planTrackInit,
+  projectTrackInit,
+  renderTrackInitPlan,
+} from "../init.js";
+export { listTrackInitTemplates, projectSimpleTrackInit, resolveTrackInitTemplate } from "../init-templates.js";
+export {
   buildOpenClawSnapshotFromToolData,
   isOpenClawWorkerSession,
   normalizeProcessEntry,
@@ -32,6 +40,21 @@ export { loadTrackRoadmap, resolveRoadmapPath } from "../roadmap.js";
 export { appendTrackEventLog, loadTrackState, loadTrackStateFromPath, resolveEventLogPath, resolveStatePath, saveTrackState, withTrackStateLock } from "../state.js";
 export type { ApplyTrackMutationOptions, ApplyTrackMutationResult, TrackMutationCommand } from "../actions.js";
 export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "../adapter-schema.js";
+export type {
+  ProjectTrackInitOptions,
+  TrackInitFileAction,
+  TrackInitFileKind,
+  TrackInitFilePlan,
+  TrackInitOptions,
+  TrackInitPlan,
+  TrackInitResult,
+} from "../init.js";
+export type {
+  TrackInitProjection,
+  TrackInitTemplateDefinition,
+  TrackInitTemplateInput,
+  TrackInitTemplateName,
+} from "../init-templates.js";
 export type {
   BuildOpenClawSnapshotFromToolDataInput,
   OpenClawProcessListEntry,

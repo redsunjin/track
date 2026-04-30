@@ -1,4 +1,8 @@
 export function expandCommandAliases(args: string[]): string[] {
+  if (args[0] === "watch") {
+    return ["status", "--watch", ...args.slice(1)];
+  }
+
   if (!args.length || args[0] !== "lab") {
     return args;
   }

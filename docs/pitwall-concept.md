@@ -40,9 +40,9 @@ Each repo exposes Track state locally.
 
 Examples:
 
-- `/Users/Agent/ps-workspace/track/.track/state.yaml`
-- `/Users/Agent/ps-workspace/FirstStep/.track/state.yaml`
-- `/Users/Agent/ps-workspace/asset-growth/.track/state.yaml`
+- `<workspace-root>/track/.track/state.yaml`
+- `<workspace-root>/project-a/.track/state.yaml`
+- `<workspace-root>/project-b/.track/state.yaml`
 
 ### 2. Aggregation layer
 
@@ -77,8 +77,8 @@ Primary shape:
 
 Suggested commands:
 
-- `track pitwall --root /Users/Agent/ps-workspace`
-- `track pitwall --root /Users/Agent/ps-workspace --json`
+- `track pitwall --root /path/to/workspace`
+- `track pitwall --root /path/to/workspace --json`
 
 The JSON path exists so MCP or agents can consume the same aggregated snapshot.
 

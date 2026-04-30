@@ -66,8 +66,10 @@ test("package subpath exports resolve the release package entrypoints", async ()
   const layout = await import("@redsunjin/track/package-layout");
 
   assert.equal(typeof root.summarizeTrack, "function");
+  assert.equal(typeof root.initTrack, "function");
   assert.equal(typeof core.summarizeTrack, "function");
   assert.equal(typeof runtime.loadTrackState, "function");
+  assert.equal(typeof runtime.initTrack, "function");
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
   assert.equal(typeof botBridge.renderMonitorBotSummary, "function");

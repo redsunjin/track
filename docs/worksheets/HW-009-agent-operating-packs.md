@@ -46,7 +46,7 @@
   - `npm run check:harness`
   - `npm run status -- --no-color`
   - `npm run companion -- --no-color`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace --owners --no-color`
+  - `npm run pitwall -- --root /path/to/workspace --owners --no-color`
 - control_surface_checks:
   - Claude Code, Codex, and Gemini CLI packs point at the same shared Track command/MCP vocabulary
   - pack docs stay thin and do not redefine Track runtime semantics

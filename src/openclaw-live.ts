@@ -9,6 +9,7 @@ import {
   type OpenClawSessionListEntry,
 } from "./openclaw-adapter.js";
 import { type OpenClawMonitorSnapshot, type OpenClawWorkerSession } from "./openclaw-monitor.js";
+import { resolveWorkspacePath } from "./security.js";
 
 export interface CaptureOpenClawTelemetryOptions {
   generatedAt?: Date | string;
@@ -33,7 +34,7 @@ const DEFAULT_OPENCLAW_OUTPUT = path.join(".track", "openclaw-monitor.json");
 export async function captureOpenClawTelemetry(
   options: CaptureOpenClawTelemetryOptions
 ): Promise<CaptureOpenClawTelemetryResult> {
-  const sourcePaths = resolveOpenClawCaptureSources(options);
+  const sourcePaths = await resolveOpenClawCaptureSources(options);
   if (!sourcePaths.length) {
     throw new Error("OpenClaw capture requires --source, --sessions, or --processes.");
   }
@@ -42,7 +43,7 @@ export async function captureOpenClawTelemetry(
   }
 
   const snapshot = await buildSnapshotFromCaptureSources(options);
-  const outputPath = resolveCapturePath(options.workspaceRoot, options.outputFile ?? DEFAULT_OPENCLAW_OUTPUT);
+  const outputPath = await resolveCapturePath(options.workspaceRoot, options.outputFile ?? DEFAULT_OPENCLAW_OUTPUT);
   const shouldWrite = options.write ?? true;
 
   if (shouldWrite) {
@@ -70,16 +71,16 @@ export function renderOpenClawCaptureSummary(result: CaptureOpenClawTelemetryRes
 
 async function buildSnapshotFromCaptureSources(options: CaptureOpenClawTelemetryOptions): Promise<OpenClawMonitorSnapshot> {
   if (options.sourceFile) {
-    const sourcePath = resolveCapturePath(options.workspaceRoot, options.sourceFile);
+    const sourcePath = await resolveCapturePath(options.workspaceRoot, options.sourceFile);
     const raw = await readJson(sourcePath);
     return parseCombinedOpenClawSource(raw, options);
   }
 
   const sessions = options.sessionsFile
-    ? await readArrayFile<OpenClawSessionListEntry>(resolveCapturePath(options.workspaceRoot, options.sessionsFile), "sessions")
+    ? await readArrayFile<OpenClawSessionListEntry>(await resolveCapturePath(options.workspaceRoot, options.sessionsFile), "sessions")
     : [];
   const processes = options.processesFile
-    ? await readArrayFile<OpenClawProcessListEntry>(resolveCapturePath(options.workspaceRoot, options.processesFile), "processes")
+    ? await readArrayFile<OpenClawProcessListEntry>(await resolveCapturePath(options.workspaceRoot, options.processesFile), "processes")
     : [];
 
   return buildOpenClawSnapshotFromToolData({
@@ -135,14 +136,16 @@ async function readJson(filePath: string): Promise<unknown> {
   return JSON.parse(await readFile(filePath, "utf8")) as unknown;
 }
 
-function resolveOpenClawCaptureSources(options: CaptureOpenClawTelemetryOptions): string[] {
-  return [options.sourceFile, options.sessionsFile, options.processesFile]
+async function resolveOpenClawCaptureSources(options: CaptureOpenClawTelemetryOptions): Promise<string[]> {
+  return Promise.all(
+    [options.sourceFile, options.sessionsFile, options.processesFile]
     .filter((value): value is string => typeof value === "string" && value.length > 0)
-    .map((value) => resolveCapturePath(options.workspaceRoot, value));
+      .map((value) => resolveCapturePath(options.workspaceRoot, value))
+  );
 }
 
-function resolveCapturePath(workspaceRoot: string, value: string): string {
-  return path.resolve(workspaceRoot, value);
+function resolveCapturePath(workspaceRoot: string, value: string): Promise<string> {
+  return resolveWorkspacePath(workspaceRoot, value, "OpenClaw capture path");
 }
 
 async function writeSnapshotAtomically(outputPath: string, snapshot: OpenClawMonitorSnapshot): Promise<void> {

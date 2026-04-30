@@ -42,7 +42,7 @@
 - runtime_checks:
   - `npm run status -- --no-color`
   - `npm run lab -- --no-color`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace --owners --no-color`
+  - `npm run pitwall -- --root /path/to/workspace --owners --no-color`
   - `npm run vscode:build`
   - `npm run vscode:check`
 - control_surface_checks:

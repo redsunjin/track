@@ -24,6 +24,14 @@ export { createRoadmapAdapter, listRoadmapAdapterKinds, normalizeRoadmapAdapterK
 export { renderBuddy } from "./buddy.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 export { generateTrackMap, renderTrackMap } from "./generator.js";
+export {
+  assertTrackInitPlanWritable,
+  initTrack,
+  planTrackInit,
+  projectTrackInit,
+  renderTrackInitPlan,
+} from "./init.js";
+export { listTrackInitTemplates, projectSimpleTrackInit, resolveTrackInitTemplate } from "./init-templates.js";
 export { MCPError, READ_TOOLS, TOOLS, TrackMCPServer, WRITE_TOOLS, runStdioServer } from "./mcp.js";
 export {
   buildTrackPackageHandoff,
@@ -113,6 +121,14 @@ export {
 export { buildPitwallMonitorView, listPitwallMonitorAlerts } from "./pitwall-monitor.js";
 export { buildOpenClawMonitorSnapshot, deriveOpenClawWorkerStatus, toOpenClawWorkerSession } from "./openclaw-monitor.js";
 export { renderNext, renderStatus } from "./render.js";
+export {
+  playTrackSound,
+  renderBellCue,
+  resolveDarwinRetroSoundFile,
+  resolveTrackSoundOptions,
+  soundCueFromEvent,
+  soundCueFromSummary,
+} from "./sound.js";
 export { sanitizeInlineText } from "./security.js";
 export { summarizeTrack } from "./summary.js";
 export type {
@@ -132,6 +148,21 @@ export type {
 } from "./types.js";
 export type { IntermediateCheckpoint, IntermediatePhase, IntermediateRoadmapSchema, IntermediateTask } from "./adapter-schema.js";
 export type {
+  ProjectTrackInitOptions,
+  TrackInitFileAction,
+  TrackInitFileKind,
+  TrackInitFilePlan,
+  TrackInitOptions,
+  TrackInitPlan,
+  TrackInitResult,
+} from "./init.js";
+export type {
+  TrackInitProjection,
+  TrackInitTemplateDefinition,
+  TrackInitTemplateInput,
+  TrackInitTemplateName,
+} from "./init-templates.js";
+export type {
   MonitorBotCommand,
   MonitorBotPushEvent,
   MonitorBotPushKind,
@@ -147,6 +178,7 @@ export type {
 export type { OpenClawPitwallFilter, OpenClawPitwallLoadOptions, OpenClawPitwallResult } from "./openclaw-pitwall.js";
 export type { CaptureOpenClawTelemetryOptions, CaptureOpenClawTelemetryResult } from "./openclaw-live.js";
 export type { PitwallMonitorAlert, PitwallMonitorView } from "./pitwall-monitor.js";
+export type { TrackSoundCue, TrackSoundMode, TrackSoundOptions, TrackSoundPlaybackResult, TrackSoundTheme } from "./sound.js";
 export type {
   OpenClawMonitorSnapshot,
   OpenClawRuntimeKind,

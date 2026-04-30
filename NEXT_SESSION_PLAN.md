@@ -2,34 +2,36 @@
 
 ## Active Slice
 
-- id: `TRK-059`
-- title: `Track Init / Bootstrap Roadmap`
+- id: `TRK-060`
+- title: `Bootstrap Source Adapters`
 
 ## Goal
 
-Turn Track from a tool that only works in already-prepared repos into a project-progress framework that can initialize `.track/roadmap.yaml` and `.track/state.yaml`, then cooperate with skill, harness, SDD, TDD, and multi-agent workflows.
+Implement `track bootstrap` as a draft-first path that can inspect a local repo and propose `.track/roadmap.yaml` plus `.track/state.yaml` without treating git history as the source of truth.
 
 ## First Steps
 
-1. lock the `track init` command contract and template outputs
-2. document how `track bootstrap` drafts roadmap/state from git, README, package metadata, and harness files
-3. define the integration boundary with `/Users/Agent/ps-workspace/skills/project-harness-runner`
-4. add roadmap phases for init, bootstrap, workflow integration, and pre-publish UAT
-5. keep public npm publish parked until clean-project UAT passes
+1. define the bootstrap evidence model for README, package metadata, git context, and harness files
+2. add source readers that produce explicit evidence and warnings
+3. project the evidence into the existing intermediate roadmap schema
+4. render a reviewable `track bootstrap --dry-run` draft
+5. keep write behavior blocked behind explicit `--write` and no-overwrite defaults
 
 ## Current Result
 
-- public npm publish is ready but intentionally parked
-- `TRK-059` through `TRK-062` now define the product direction before publish
-- `track init` is the next required capability
-- Track should act as the canonical roadmap/state layer, not replace git or method-specific harnesses
+- `track init` now has a simple MVP with safe no-overwrite behavior
+- CLI sound cues are available only when explicitly enabled
+- public markdown no longer exposes local workspace paths
+- Team Race Mode is documented as a future roadmap concept, not a runtime feature
+- public npm publish remains parked until clean-project UAT
 
 ## Constraints
 
 - do not publish to npm during this slice
 - do not make git history the source of truth for future plans
 - keep `.track/roadmap.yaml` and `.track/state.yaml` as the canonical runtime files
-- skill and harness integrations should generate or update Track inputs, not create competing state models
+- bootstrap should show evidence, confidence, and warnings before writing
+- skill and harness integrations should provide explicit adapter input, not competing state files
 
 ## Verification
 
@@ -37,6 +39,7 @@ Turn Track from a tool that only works in already-prepared repos into a project-
 npm test
 npm run typecheck
 npm run check:harness
+npm run package:dry-run
 node --import tsx ./src/cli.ts status --no-color
 node --import tsx ./src/cli.ts map --no-color
 git diff --check
@@ -44,7 +47,7 @@ git diff --check
 
 ## Exit Condition
 
-- docs define `track init`, `track bootstrap`, and framework cooperation
-- `.track/roadmap.yaml` and `.track/state.yaml` include the new post-release-readiness phases
-- public npm publish remains parked until UAT
-- next implementation slice can start building `track init`
+- `track bootstrap --dry-run` can produce a reviewable draft from README/package/git evidence
+- bootstrap output clearly separates evidence from inferred roadmap/state
+- no `.track/*` files are overwritten without explicit write and force controls
+- next slice can add harness/skill bridge inputs

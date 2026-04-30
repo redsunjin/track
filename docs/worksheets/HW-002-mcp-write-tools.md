@@ -40,9 +40,9 @@
 - static_checks:
   - `npm test`
 - runtime_checks:
-  - `npm run mcp:smoke -- --root /Users/Agent/ps-workspace`
+  - `npm run mcp:smoke -- --root /path/to/workspace`
   - `npm run status`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace`
+  - `npm run pitwall -- --root /path/to/workspace`
 - control_surface_checks:
   - MCP write tools produce the same state transitions as CLI mutations
 - regression_gate:

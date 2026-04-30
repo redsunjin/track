@@ -42,7 +42,7 @@
 - runtime_checks:
   - `node --import tsx ./src/cli.ts import --source examples/external-plan.example.yaml --dry-run --json`
   - `npm run status -- --no-color`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace --owners --no-color`
+  - `npm run pitwall -- --root /path/to/workspace --owners --no-color`
 - control_surface_checks:
   - imported state produces the same summary vocabulary as native Track state
 - regression_gate:

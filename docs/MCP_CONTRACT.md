@@ -6,7 +6,7 @@ This document defines the current MCP surface for `Track`.
 
 Current runtime entrypoints:
 
-- `npm run mcp:smoke -- --root /Users/Agent/ps-workspace`
+- `npm run mcp:smoke -- --root /path/to/workspace`
 - `track mcp`
 - `track mcp --allow-write`
 

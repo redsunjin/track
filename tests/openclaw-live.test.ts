@@ -116,3 +116,23 @@ test("OpenClaw capture requires a single source mode", async () => {
     /either --source or --sessions\/--processes/
   );
 });
+
+test("OpenClaw capture rejects source and output paths outside the workspace root", async () => {
+  const workspaceRoot = await mkdtemp(path.join(tmpdir(), "track-openclaw-capture-safe-"));
+  const outsideRoot = await mkdtemp(path.join(tmpdir(), "track-openclaw-outside-"));
+  const outsideSource = path.join(outsideRoot, "raw-openclaw.json");
+  const insideSource = path.join(workspaceRoot, "raw-openclaw.json");
+  const payload = JSON.stringify({ processes: [], sessions: [] });
+
+  await writeFile(outsideSource, payload);
+  await writeFile(insideSource, payload);
+
+  await assert.rejects(
+    () => captureOpenClawTelemetry({ sourceFile: outsideSource, workspaceRoot, write: false }),
+    /OpenClaw capture path must stay inside/
+  );
+  await assert.rejects(
+    () => captureOpenClawTelemetry({ outputFile: path.join(outsideRoot, "output.json"), sourceFile: insideSource, workspaceRoot }),
+    /OpenClaw capture path must stay inside/
+  );
+});

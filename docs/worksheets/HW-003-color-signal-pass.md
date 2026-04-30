@@ -44,7 +44,7 @@
   - `npm run status`
   - `npm run companion`
   - `npm run map`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace`
+  - `npm run pitwall -- --root /path/to/workspace`
 - control_surface_checks:
   - red, yellow, and active states remain obvious at a glance
   - plain-text output is still readable when ANSI is stripped

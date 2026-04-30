@@ -79,6 +79,7 @@ Must have:
 
 - `--watch` mode for `status`, `map`, `companion`, and `pitwall`
 - `--color` and `--no-color` control for terminal signal rendering
+- optional `--sound` cues for human-facing terminal status changes
 - change detection on `.track/state.yaml` and `.track/events.ndjson`
 - minimal redraw logic for terminal mode
 

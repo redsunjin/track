@@ -2,11 +2,10 @@
 
 ## Active
 
-- `TRK-059` Track Init / Bootstrap Roadmap
+- `TRK-060` Bootstrap Source Adapters
 
 ## Queued
 
-- `TRK-060 Bootstrap Source Adapters`
 - `TRK-061 Workflow Framework Integration`
 - `TRK-062 Pre-Publish User Acceptance`
 
@@ -15,6 +14,18 @@
 - `TRK-058 Public Release Execution` - parked until Track is dogfooded from a clean project and release owner approves actual npm publish
 
 ## Done
+
+### TRK-059 Track Init / Bootstrap Roadmap
+
+- completed:
+  - `track init` and `track bootstrap` product direction documented
+  - subagent split and implementation strategy recorded
+  - `project-harness-runner` role boundary documented
+  - CLI sound MVP implemented with opt-in retro cues
+  - `track init` core and CLI MVP implemented
+  - public markdown local-path exposure cleaned up
+  - Team Race Mode captured as roadmap-only design
+  - public npm publish remains parked until clean-project UAT
 
 ### TRK-057 npm Publish Dry Run
 

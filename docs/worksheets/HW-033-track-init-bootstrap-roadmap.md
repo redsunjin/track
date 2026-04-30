@@ -14,7 +14,7 @@
   - `track init` product contract
   - `track bootstrap` product contract
   - workflow framework integration plan
-  - `/Users/Agent/ps-workspace/skills/project-harness-runner` compatibility review
+  - `<skills-workspace>/project-harness-runner` compatibility review
   - roadmap/state extension for TRK-059 through TRK-062
   - public publish parking decision
 - out:
@@ -67,7 +67,7 @@
   - making git history the source of truth for future roadmap
 - escalation_conditions:
   - release owner asks to resume public publish
-  - implementation needs to write into `/Users/Agent/ps-workspace/skills`
+  - implementation needs to write into a local skills workspace
 - rollback_or_recovery_path:
   - keep release readiness artifacts intact
   - revert only the roadmap extension docs/state if the product direction changes

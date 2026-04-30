@@ -2,7 +2,7 @@ import process from "node:process";
 
 export async function runWatchLoop(
   render: () => Promise<string>,
-  options?: { intervalMs?: number }
+  options?: { intervalMs?: number; onChange?: (output: string) => Promise<void> | void }
 ): Promise<void> {
   const intervalMs = Math.max(250, options?.intervalMs ?? 1000);
   let lastOutput = "";
@@ -21,6 +21,7 @@ export async function runWatchLoop(
       if (output !== lastOutput) {
         process.stdout.write(clearScreen());
         process.stdout.write(`${output}\n`);
+        await options?.onChange?.(output);
         lastOutput = output;
       }
     } catch (error: unknown) {

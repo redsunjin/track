@@ -6,6 +6,7 @@ import { expandCommandAliases } from "../src/aliases.js";
 test("expandCommandAliases maps lab to status by default", () => {
   assert.deepEqual(expandCommandAliases(["lab"]), ["status"]);
   assert.deepEqual(expandCommandAliases(["lab", "status", "--color"]), ["status", "--color"]);
+  assert.deepEqual(expandCommandAliases(["watch", "--sound"]), ["status", "--watch", "--sound"]);
 });
 
 test("expandCommandAliases maps lab subcommands to existing surfaces", () => {

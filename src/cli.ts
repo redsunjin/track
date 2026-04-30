@@ -19,6 +19,7 @@ import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
 import { buildTrackControlSnapshot } from "./control.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
+import { initTrack, renderTrackInitPlan } from "./init.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
 import {
   loadOpenClawPitwallResult,
@@ -59,6 +60,7 @@ import { renderNext, renderStatus } from "./render.js";
 import { loadTrackRoadmap } from "./roadmap.js";
 import { loadTrackState } from "./state.js";
 import { summarizeTrack } from "./summary.js";
+import { playTrackSound, resolveTrackSoundOptions, soundCueFromEvent, soundCueFromSummary } from "./sound.js";
 import { runWatchLoop } from "./watch.js";
 
 async function main(): Promise<void> {
@@ -74,6 +76,7 @@ async function main(): Promise<void> {
   const color = readColorPreference(args);
   const allowWrite = args.includes("--allow-write");
   const dryRun = args.includes("--dry-run");
+  const force = args.includes("--force");
   const json = args.includes("--json");
   const preserveProgress = !args.includes("--reset-progress");
   const adapterKind = readFlag(args, "--adapter");
@@ -93,6 +96,9 @@ async function main(): Promise<void> {
   const openClawMode = args.includes("--openclaw");
   const includeMainSessions = args.includes("--include-main");
   const includeCompleted = args.includes("--include-completed");
+  const sound = resolveTrackSoundOptions(args, process.env, { json });
+  const projectName = readFlag(args, "--name");
+  const initTemplate = readFlag(args, "--template");
 
   if (command === "mcp") {
     await runStdioServer({
@@ -157,6 +163,27 @@ async function main(): Promise<void> {
         2
       )}\n`
     );
+    return;
+  }
+
+  if (command === "init") {
+    const result = await initTrack({
+      cwd: process.cwd(),
+      dryRun,
+      force,
+      projectName,
+      roadmapFile: roadmapOutFile,
+      stateFile: stateOutFile,
+      template: initTemplate,
+    });
+
+    if (json) {
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      return;
+    }
+
+    process.stdout.write(`${renderTrackInitPlan(result)}\n`);
+    playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
     return;
   }
 
@@ -334,12 +361,24 @@ async function main(): Promise<void> {
   if (command === "map") {
     if (watch) {
       ensureWatchable(json);
-      await runWatchLoop(async () => {
-        const roadmap = await loadTrackRoadmap(process.cwd(), roadmapFile);
-        const state = await loadTrackState(process.cwd(), file).catch(() => undefined);
-        const segments = generateTrackMap(roadmap, state);
-        return renderTrackMap(roadmap.project.name, segments, { color });
-      }, { intervalMs });
+      let liveSummary = undefined as ReturnType<typeof summarizeTrack> | undefined;
+      await runWatchLoop(
+        async () => {
+          const roadmap = await loadTrackRoadmap(process.cwd(), roadmapFile);
+          const state = await loadTrackState(process.cwd(), file).catch(() => undefined);
+          liveSummary = state ? summarizeTrack(state) : undefined;
+          const segments = generateTrackMap(roadmap, state);
+          return renderTrackMap(roadmap.project.name, segments, { color });
+        },
+        {
+          intervalMs,
+          onChange: () => {
+            if (liveSummary) {
+              playTrackSound(soundCueFromSummary(liveSummary), sound);
+            }
+          },
+        }
+      );
       return;
     }
     const roadmap = await loadTrackRoadmap(process.cwd(), roadmapFile);
@@ -350,6 +389,9 @@ async function main(): Promise<void> {
       return;
     }
     process.stdout.write(`${renderTrackMap(roadmap.project.name, segments, { color })}\n`);
+    if (state) {
+      playTrackSound(soundCueFromSummary(summarizeTrack(state)), sound);
+    }
     return;
   }
 
@@ -371,8 +413,10 @@ async function main(): Promise<void> {
       return;
     }
 
+    const importedSummary = summarizeTrack(result.state);
     process.stdout.write(`${summarizeExternalPlanImport(result)}\n`);
-    process.stdout.write(`${renderStatus(summarizeTrack(result.state), { color })}\n`);
+    process.stdout.write(`${renderStatus(importedSummary, { color })}\n`);
+    playTrackSound(soundCueFromSummary(importedSummary), sound);
     return;
   }
 
@@ -590,6 +634,7 @@ async function main(): Promise<void> {
     for (const action of snapshot.nextActions.slice(0, 3)) {
       process.stdout.write(`ACTION   ${action.title}\n`);
     }
+    playTrackSound(soundCueFromSummary(snapshot.summary), sound);
     return;
   }
 
@@ -613,6 +658,7 @@ async function main(): Promise<void> {
 
     process.stdout.write(`${result.event.summary}\n`);
     process.stdout.write(`${renderStatus(result.summary, { color })}\n`);
+    playTrackSound(soundCueFromEvent(result.event, result.summary), sound);
     return;
   }
 
@@ -622,12 +668,21 @@ async function main(): Promise<void> {
   if (command === "buddy" || command === "companion") {
     if (watch) {
       ensureWatchable(json);
-      await runWatchLoop(async () => {
-        const liveState = await loadTrackState(process.cwd(), file);
-        const liveSummary = summarizeTrack(liveState);
-        const roadmap = await loadTrackRoadmap(process.cwd(), roadmapFile).catch(() => undefined);
-        return renderBuddy(liveSummary, roadmap, liveState, { color });
-      }, { intervalMs });
+      let liveSummary = summary;
+      await runWatchLoop(
+        async () => {
+          const liveState = await loadTrackState(process.cwd(), file);
+          liveSummary = summarizeTrack(liveState);
+          const roadmap = await loadTrackRoadmap(process.cwd(), roadmapFile).catch(() => undefined);
+          return renderBuddy(liveSummary, roadmap, liveState, { color });
+        },
+        {
+          intervalMs,
+          onChange: () => {
+            playTrackSound(soundCueFromSummary(liveSummary), sound);
+          },
+        }
+      );
       return;
     }
     const roadmap = await loadTrackRoadmap(process.cwd(), roadmapFile).catch(() => undefined);
@@ -636,19 +691,29 @@ async function main(): Promise<void> {
       return;
     }
     process.stdout.write(`${renderBuddy(summary, roadmap, state, { color })}\n`);
+    playTrackSound(soundCueFromSummary(summary), sound);
     return;
   }
 
   if (watch) {
     ensureWatchable(json);
     ensureReadableCommand(command);
-      await runWatchLoop(async () => {
+    let liveSummary = summary;
+    await runWatchLoop(
+      async () => {
         const liveState = await loadTrackState(process.cwd(), file);
-        const liveSummary = summarizeTrack(liveState);
+        liveSummary = summarizeTrack(liveState);
         return command === "next" ? renderNext(liveSummary, { color }) : renderStatus(liveSummary, { color });
-      }, { intervalMs });
-      return;
-    }
+      },
+      {
+        intervalMs,
+        onChange: () => {
+          playTrackSound(soundCueFromSummary(liveSummary), sound);
+        },
+      }
+    );
+    return;
+  }
 
   if (json) {
     process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
@@ -658,9 +723,11 @@ async function main(): Promise<void> {
   switch (command) {
     case "status":
       process.stdout.write(`${renderStatus(summary, { color })}\n`);
+      playTrackSound(soundCueFromSummary(summary), sound);
       return;
     case "next":
       process.stdout.write(`${renderNext(summary, { color })}\n`);
+      playTrackSound(soundCueFromSummary(summary), sound);
       return;
     default:
       throw new Error(`Unknown Track command: ${command}`);

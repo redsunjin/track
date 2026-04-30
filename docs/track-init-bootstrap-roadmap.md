@@ -76,9 +76,9 @@ track bootstrap --from git --dry-run
 track bootstrap --write
 ```
 
-## Relationship With `/Users/Agent/ps-workspace/skills`
+## Relationship With a Local Skills Workspace
 
-The local skills workspace already contains `project-harness-runner`.
+The local skills workspace can contain `project-harness-runner`.
 That skill generates or updates project harness material for GSD, SDD, TDD, and superpowers-lite workflows.
 
 Good integration shape:

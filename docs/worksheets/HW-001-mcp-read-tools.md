@@ -43,7 +43,7 @@
 - runtime_checks:
   - `npm run status`
   - `npm run map`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace`
+  - `npm run pitwall -- --root /path/to/workspace`
 - control_surface_checks:
   - MCP read tools return structured output matching current CLI state
 - regression_gate:

@@ -9,11 +9,11 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 36
-  active_lap: 33
+  active_lap: 34
   health: green
-  next_action: Scaffold Track init templates
+  next_action: Add git README and package bootstrap inference
   blocked_reason: null
-  percent_complete: 86
+  percent_complete: 88
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -489,7 +489,7 @@ laps:
         weight: 2
   - id: lap-33
     title: Track init baseline
-    status: doing
+    status: done
     checkpoints:
       - id: cp-87
         title: Init command contract
@@ -497,19 +497,19 @@ laps:
         weight: 2
       - id: cp-88
         title: Minimal roadmap and state templates
-        status: doing
+        status: done
         weight: 2
       - id: cp-89
         title: Init smoke and docs
-        status: todo
+        status: done
         weight: 2
   - id: lap-34
     title: Bootstrap source adapters
-    status: todo
+    status: doing
     checkpoints:
       - id: cp-90
         title: Git README and package inference
-        status: todo
+        status: doing
         weight: 3
       - id: cp-91
         title: Skill and harness bootstrap bridge
@@ -1015,17 +1015,17 @@ tasks:
   - id: task-093
     title: Scaffold Track init templates
     checkpoint_id: cp-88
-    status: doing
+    status: done
     owner: codex
   - id: task-094
     title: Add init smoke and docs
     checkpoint_id: cp-89
-    status: todo
+    status: done
     owner: codex
   - id: task-095
     title: Add git README and package bootstrap inference
     checkpoint_id: cp-90
-    status: todo
+    status: doing
     owner: codex
   - id: task-096
     title: Add skill and harness bootstrap bridge
@@ -1823,3 +1823,18 @@ events:
     actor: codex
     timestamp: 2026-04-29T12:31:56.312Z
     summary: Started Scaffold Track init templates
+  - id: evt-2026-04-30T11:45:45.767Z-bblajh
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-30T11:45:45.767Z
+    summary: Completed Scaffold Track init templates
+  - id: evt-2026-04-30T11:45:50.981Z-err87h
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-30T11:45:50.981Z
+    summary: Completed Add init smoke and docs
+  - id: evt-2026-04-30T11:45:54.152Z-vuq5hs
+    type: task.started
+    actor: codex
+    timestamp: 2026-04-30T11:45:54.152Z
+    summary: Started Add git README and package bootstrap inference

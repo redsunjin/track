@@ -48,7 +48,7 @@
   - `npm run check:harness`
   - `npm run status -- --no-color`
   - `npm run companion -- --no-color`
-  - `npm run pitwall -- --root /Users/Agent/ps-workspace --no-color`
+  - `npm run pitwall -- --root /path/to/workspace --no-color`
 - control_surface_checks:
   - flag, checkpoint, owner, and next action stay the dominant signals
   - retro dashboard cues do not weaken plain-text readability or shared vocabulary

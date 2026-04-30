@@ -15,18 +15,18 @@ The goal is not only to write code, but to keep `Track` aligned across:
 
 Read these first:
 
-1. [README.md](/Users/Agent/ps-workspace/track/README.md)
-2. [TODO.md](/Users/Agent/ps-workspace/track/TODO.md)
-3. [NEXT_SESSION_PLAN.md](/Users/Agent/ps-workspace/track/NEXT_SESSION_PLAN.md)
-4. [HARNESS_MASTER_GUIDE.md](/Users/Agent/ps-workspace/track/docs/HARNESS_MASTER_GUIDE.md)
+1. [README.md](README.md)
+2. [TODO.md](TODO.md)
+3. [NEXT_SESSION_PLAN.md](NEXT_SESSION_PLAN.md)
+4. [HARNESS_MASTER_GUIDE.md](docs/HARNESS_MASTER_GUIDE.md)
 
 Then use supporting docs as needed:
 
-- [plugin-architecture.md](/Users/Agent/ps-workspace/track/docs/plugin-architecture.md)
-- [runtime-feature-matrix.md](/Users/Agent/ps-workspace/track/docs/runtime-feature-matrix.md)
-- [pitwall-concept.md](/Users/Agent/ps-workspace/track/docs/pitwall-concept.md)
-- [track-generator-method.md](/Users/Agent/ps-workspace/track/docs/track-generator-method.md)
-- [visual-direction.md](/Users/Agent/ps-workspace/track/docs/visual-direction.md)
+- [plugin-architecture.md](docs/plugin-architecture.md)
+- [runtime-feature-matrix.md](docs/runtime-feature-matrix.md)
+- [pitwall-concept.md](docs/pitwall-concept.md)
+- [track-generator-method.md](docs/track-generator-method.md)
+- [visual-direction.md](docs/visual-direction.md)
 
 ## Active Loop Rule
 
@@ -62,12 +62,12 @@ npm test
 Useful runtime checks:
 
 ```bash
-npm run mcp:smoke -- --root /Users/Agent/ps-workspace
+npm run mcp:smoke -- --root /path/to/workspace
 npm run status
 npm run map
 npm run companion
-npm run pitwall -- --root /Users/Agent/ps-workspace
-node --import tsx ./src/cli.ts pitwall --root /Users/Agent/ps-workspace --detail track
+npm run pitwall -- --root /path/to/workspace
+node --import tsx ./src/cli.ts pitwall --root /path/to/workspace --detail track
 ```
 
 ## Guardrails

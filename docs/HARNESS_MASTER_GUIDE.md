@@ -86,8 +86,8 @@ Current evaluator set:
 - `npm run map`
 - `npm run companion`
 - `npm run import -- --source examples/external-plan.example.yaml --dry-run --json`
-- `npm run pitwall -- --root /Users/Agent/ps-workspace`
-- `node --import tsx ./src/cli.ts pitwall --root /Users/Agent/ps-workspace --detail track`
+- `npm run pitwall -- --root /path/to/workspace`
+- `node --import tsx ./src/cli.ts pitwall --root /path/to/workspace --detail track`
 
 Rule:
 
