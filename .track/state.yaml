@@ -11,9 +11,9 @@ track:
   total_laps: 36
   active_lap: 34
   health: green
-  next_action: Add skill and harness bootstrap bridge
+  next_action: Add bootstrap draft review and write flow
   blocked_reason: null
-  percent_complete: 90
+  percent_complete: 91
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -513,11 +513,11 @@ laps:
         weight: 3
       - id: cp-91
         title: Skill and harness bootstrap bridge
-        status: doing
+        status: done
         weight: 3
       - id: cp-92
         title: Bootstrap draft review and write flow
-        status: todo
+        status: doing
         weight: 2
   - id: lap-35
     title: Workflow framework integration
@@ -1030,12 +1030,12 @@ tasks:
   - id: task-096
     title: Add skill and harness bootstrap bridge
     checkpoint_id: cp-91
-    status: doing
+    status: done
     owner: codex
   - id: task-097
     title: Add bootstrap draft review and write flow
     checkpoint_id: cp-92
-    status: todo
+    status: doing
     owner: codex
   - id: task-098
     title: Define orchestration contract adapter
@@ -1848,3 +1848,13 @@ events:
     actor: codex
     timestamp: 2026-04-30T12:22:47.024Z
     summary: Started Add skill and harness bootstrap bridge
+  - id: evt-2026-04-30T14:07:02.326Z-fet4mi
+    type: task.completed
+    actor: codex
+    timestamp: 2026-04-30T14:07:02.326Z
+    summary: Completed Add skill and harness bootstrap bridge
+  - id: evt-2026-04-30T14:07:06.322Z-fs1gp8
+    type: task.started
+    actor: codex
+    timestamp: 2026-04-30T14:07:06.322Z
+    summary: Started Add bootstrap draft review and write flow

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -21,8 +21,9 @@ const gitRunner: TrackBootstrapCommandRunner = {
 };
 
 test("resolveBootstrapSources expands auto and validates explicit sources", () => {
-  assert.deepEqual(resolveBootstrapSources(undefined), ["readme", "package", "git", "plan"]);
+  assert.deepEqual(resolveBootstrapSources(undefined), ["readme", "package", "git", "plan", "harness", "agent"]);
   assert.deepEqual(resolveBootstrapSources("package,readme,package,plan"), ["package", "readme", "plan"]);
+  assert.deepEqual(resolveBootstrapSources("harness,skill,agent"), ["harness", "agent"]);
   assert.throws(() => resolveBootstrapSources("jira"), /--from/);
 });
 
@@ -55,7 +56,7 @@ test("bootstrapTrack projects README package and git evidence into a draft", asy
     "utf8"
   );
 
-  const result = await bootstrapTrack({ commandRunner: gitRunner, cwd: tempDir });
+  const result = await bootstrapTrack({ commandRunner: gitRunner, cwd: tempDir, from: "readme,package,git,plan" });
 
   assert.equal(result.state.project.name, "Bootstrap App");
   assert.equal(result.state.project.id, "bootstrap-app");
@@ -124,6 +125,90 @@ test("bootstrapTrack treats planning headings in README as plan evidence", async
     [
       ["readme", true],
       ["plan", false],
+    ]
+  );
+  assert.equal(result.warnings.length, 0);
+});
+
+test("bootstrapTrack projects an explicit harness adapter payload into a draft", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-harness-"));
+  await mkdir(path.join(tempDir, ".agent"), { recursive: true });
+  await writeFile(
+    path.join(tempDir, ".agent", "track-bootstrap.json"),
+    JSON.stringify(
+      {
+        version: 1,
+        source: "project-harness-runner",
+        project: {
+          id: "harness-app",
+          name: "Harness App",
+          mode: "sprint",
+        },
+        method: "gsd",
+        goal: "MVP complete",
+        validation: {
+          preferred: "scripts/agent-harness.sh",
+          checks: ["npm run check"],
+          smokes: ["npm run smoke"],
+        },
+        phases: [
+          {
+            id: "harness-execution",
+            title: "Harness execution",
+            checkpoints: [
+              { id: "define-next-slice", title: "Define next implementation slice" },
+              { id: "validate-harness", title: "Validate with harness" },
+            ],
+          },
+        ],
+        tasks: [
+          {
+            id: "run-agent-harness",
+            title: "Run existing validation harness",
+            checkpoint_id: "validate-harness",
+            owner: "codex",
+            status: "doing",
+          },
+        ],
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  const result = await bootstrapTrack({ cwd: tempDir, from: "harness" });
+
+  assert.equal(result.state.project.name, "Harness App");
+  assert.equal(result.state.project.mode, "sprint");
+  assert.equal(result.state.track.topology, "harness");
+  assert.equal(result.state.tasks?.[0]?.title, "Run existing validation harness");
+  assert.equal(result.builder.needed, false);
+  assert.deepEqual(
+    result.evidence.map((entry) => [entry.kind, entry.present]),
+    [["harness", true]]
+  );
+  assert.match(result.evidence[0]?.detail ?? "", /adapter payload/);
+  assert.equal(result.warnings.length, 0);
+});
+
+test("bootstrapTrack treats harness files and agent files as planning evidence", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-agent-"));
+  await mkdir(path.join(tempDir, "scripts"), { recursive: true });
+  await mkdir(path.join(tempDir, ".agent"), { recursive: true });
+  await writeFile(path.join(tempDir, "scripts", "agent-harness.sh"), "#!/usr/bin/env bash\nnpm test\n", "utf8");
+  await writeFile(path.join(tempDir, ".agent", "orchestration-contract.md"), "# Orchestration Contract\n", "utf8");
+
+  const result = await bootstrapTrack({ cwd: tempDir, from: "harness,agent" });
+
+  assert.equal(result.builder.needed, false);
+  assert.equal(result.roadmap.roadmap.phases[0]?.checkpoints?.some((checkpoint) => checkpoint.id === "cp-bootstrap-harness"), true);
+  assert.equal(result.roadmap.roadmap.phases[0]?.checkpoints?.some((checkpoint) => checkpoint.id === "cp-bootstrap-agent"), true);
+  assert.deepEqual(
+    result.evidence.map((entry) => [entry.kind, entry.present]),
+    [
+      ["harness", true],
+      ["agent", true],
     ]
   );
   assert.equal(result.warnings.length, 0);

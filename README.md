@@ -50,7 +50,7 @@ Track should become the canonical roadmap/state layer beside git:
 Planned commands:
 
 - `track init` creates `.track/roadmap.yaml` and `.track/state.yaml` from safe templates
-- `track bootstrap` drafts roadmap/state from local signals such as README, package metadata, git branch, plan files, and existing harness files
+- `track bootstrap` drafts roadmap/state from local signals such as README, package metadata, git branch, plan files, harness payloads, and agent workflow files
 - `track import` remains the adapter path for explicit external plans
 
 Track Builder is the missing-plan UX inside init/bootstrap.
@@ -67,7 +67,9 @@ Reference: [docs/track-init-bootstrap-roadmap.md](docs/track-init-bootstrap-road
 Current bootstrap usage:
 
 - `track bootstrap --dry-run`
-- `track bootstrap --from readme,package,git,plan --dry-run`
+- `track bootstrap --from readme,package,git,plan,harness,agent --dry-run`
+- `track bootstrap --from harness --dry-run`
+- `track bootstrap --from skill --json`
 - `track bootstrap --from package --json`
 
 ## CLI sound cues

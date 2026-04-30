@@ -83,7 +83,8 @@ Bootstrap should start as draft-first:
 track bootstrap --dry-run
 track bootstrap --from readme --dry-run
 track bootstrap --from git --dry-run
-track bootstrap --from readme,package,git,plan --dry-run
+track bootstrap --from readme,package,git,plan,harness,agent --dry-run
+track bootstrap --from harness --dry-run
 track bootstrap --write
 ```
 
@@ -182,18 +183,20 @@ Expected usage:
 ```bash
 track bootstrap --dry-run
 track bootstrap --from readme --dry-run
-track bootstrap --from readme,package,git,plan --dry-run
+track bootstrap --from readme,package,git,plan,harness,agent --dry-run
 track bootstrap --from package,git,harness --dry-run
+track bootstrap --from skill --json
 track bootstrap --write
 ```
 
 Contract:
 
 - reads local signals as evidence, not as authoritative future plans
-- supports `--from <auto|readme|package|git|plan|harness|agent>`
+- supports `--from <auto|readme|package|git|plan|harness|agent|skill>`
 - supports `--dry-run`, `--write`, `--force`, `--name`, `--json`, `--state-out`, and `--roadmap-out`
 - shows evidence, confidence, warnings, and projected roadmap/state
 - shows Track Builder guidance when planning evidence is missing
+- reads `.agent/track-bootstrap.json` as explicit adapter data when present
 - reuses the existing external-plan projection path where possible instead of inventing a second schema
 
 ## `project-harness-runner` Role Separation
@@ -306,6 +309,7 @@ Candidate scope:
 - ROADMAP/TODO/PLAN/spec detector
 - Track Builder missing-plan guidance
 - existing harness and `.agent/` file detector
+- `.agent/track-bootstrap.json` adapter payload reader
 - draft renderer
 - write path with no-overwrite default
 

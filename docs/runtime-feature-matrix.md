@@ -29,8 +29,9 @@ Must have:
 - safe `.track/state.yaml` template creation
 - no overwrite by default
 - dry-run preview of generated files
-- `track bootstrap` draft mode from README, package metadata, git branch, plan files, and existing harness files
+- `track bootstrap` draft mode from README, package metadata, git branch, plan files, harness payloads, and agent workflow files
 - Track Builder guidance when no roadmap, TODO, spec, or harness evidence exists
+- explicit `.agent/track-bootstrap.json` payloads for project-harness-runner style workflows
 
 Why:
 
