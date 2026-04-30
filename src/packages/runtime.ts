@@ -8,6 +8,7 @@ export { LinearRoadmapAdapter } from "../adapters/linear-adapter.js";
 export { NotionRoadmapAdapter } from "../adapters/notion-adapter.js";
 export { createRoadmapAdapter, listRoadmapAdapterKinds, normalizeRoadmapAdapterKind, resolveRoadmapAdapterSourcePath } from "../adapters/registry.js";
 export { bootstrapTrack, resolveBootstrapSources, summarizeTrackBootstrap } from "../bootstrap.js";
+export { buildTrackBuilderGuidance, hasTrackPlanningHeading, renderTrackBuilderGuidance, TRACK_BUILDER_METHODS } from "../builder.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "../external-plan.js";
 export {
   assertTrackInitPlanWritable,
@@ -50,6 +51,12 @@ export type {
   TrackBootstrapResult,
   TrackBootstrapSourceKind,
 } from "../bootstrap.js";
+export type {
+  BuildTrackBuilderGuidanceInput,
+  TrackBuilderGuidance,
+  TrackBuilderMethod,
+  TrackBuilderMethodKind,
+} from "../builder.js";
 export type {
   ProjectTrackInitOptions,
   TrackInitFileAction,

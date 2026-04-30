@@ -14,6 +14,8 @@
   - README evidence reader
   - package metadata reader
   - git context reader
+  - plan-file evidence reader
+  - Track Builder missing-plan guidance
   - `track bootstrap --dry-run` draft renderer
   - bootstrap evidence and warning model
   - no-overwrite write policy design
@@ -25,6 +27,7 @@
 - assumptions:
   - bootstrap should propose, not silently decide
   - a weak signal should become a warning rather than a fake plan
+  - no planning signal should produce method guidance, not roadmap confidence
   - write behavior should stay explicit after the draft is reviewable
 
 ## 3. Record System
@@ -58,6 +61,7 @@
 - regression_gate:
   - bootstrap does not overwrite `.track/*` by default
   - bootstrap separates evidence from inferred roadmap/state
+  - bootstrap guides GSD/SDD/TDD/harness choices when planning evidence is missing
   - local absolute paths stay out of public markdown
 
 ## 5. Guardrails
@@ -81,6 +85,7 @@
   - TODO/NEXT pointing at TRK-060 while state remains on TRK-059
   - bootstrap docs promising write behavior before no-overwrite tests exist
   - adapter evidence schema diverging from external-plan import schema
+  - Track Builder guidance becoming a second state model instead of a planning UX
 - required_doc_updates:
   - README
   - docs/track-init-bootstrap-roadmap.md
@@ -89,3 +94,4 @@
   - `track bootstrap --dry-run`
   - clean-repo bootstrap fixture
   - harness bridge fixture
+  - Track Builder method template fixture

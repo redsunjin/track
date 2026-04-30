@@ -29,13 +29,15 @@ Must have:
 - safe `.track/state.yaml` template creation
 - no overwrite by default
 - dry-run preview of generated files
-- `track bootstrap` draft mode from README, package metadata, git branch, and existing harness files
+- `track bootstrap` draft mode from README, package metadata, git branch, plan files, and existing harness files
+- Track Builder guidance when no roadmap, TODO, spec, or harness evidence exists
 
 Why:
 
 - a project without `.track/` files cannot use Track meaningfully
 - git history can suggest context, but it cannot be the source of truth for future work
 - the first user experience should not require hand-authoring YAML
+- missing-plan projects need a guided planning method instead of fake roadmap confidence
 
 ### 1. Canonical state and durability
 

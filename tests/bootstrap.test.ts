@@ -21,8 +21,8 @@ const gitRunner: TrackBootstrapCommandRunner = {
 };
 
 test("resolveBootstrapSources expands auto and validates explicit sources", () => {
-  assert.deepEqual(resolveBootstrapSources(undefined), ["readme", "package", "git"]);
-  assert.deepEqual(resolveBootstrapSources("package,readme,package"), ["package", "readme"]);
+  assert.deepEqual(resolveBootstrapSources(undefined), ["readme", "package", "git", "plan"]);
+  assert.deepEqual(resolveBootstrapSources("package,readme,package,plan"), ["package", "readme", "plan"]);
   assert.throws(() => resolveBootstrapSources("jira"), /--from/);
 });
 
@@ -31,6 +31,11 @@ test("bootstrapTrack projects README package and git evidence into a draft", asy
   await writeFile(
     path.join(tempDir, "README.md"),
     ["# Bootstrap App", "", "## Goals", "", "Ship the first slice."].join("\n"),
+    "utf8"
+  );
+  await writeFile(
+    path.join(tempDir, "ROADMAP.md"),
+    ["# Bootstrap App Roadmap", "", "## First slice", "", "Ship the first slice."].join("\n"),
     "utf8"
   );
   await writeFile(
@@ -57,12 +62,14 @@ test("bootstrapTrack projects README package and git evidence into a draft", asy
   assert.equal(result.roadmap.roadmap.phases.length, 1);
   assert.equal(result.roadmap.roadmap.phases[0]?.checkpoints?.length, 3);
   assert.equal(result.state.tasks?.[0]?.status, "doing");
+  assert.equal(result.builder.needed, false);
   assert.deepEqual(
     result.evidence.map((entry) => [entry.kind, entry.present]),
     [
       ["readme", true],
       ["package", true],
       ["git", true],
+      ["plan", true],
     ]
   );
   assert.equal(result.warnings.length, 0);
@@ -78,18 +85,21 @@ test("bootstrapTrack can draft from a missing-source repo with warnings", async 
     },
   };
 
-  const result = await bootstrapTrack({ commandRunner: missingGitRunner, cwd: tempDir, from: "readme,package,git" });
+  const result = await bootstrapTrack({ commandRunner: missingGitRunner, cwd: tempDir, from: "readme,package,git,plan" });
 
   assert.equal(result.state.project.name.startsWith("Track Bootstrap Missing"), true);
   assert.deepEqual(
     result.evidence.map((entry) => entry.present),
-    [false, false, false]
+    [false, false, false, false]
   );
   assert.deepEqual(result.warnings, [
     "README evidence not found.",
     "package.json evidence not found.",
     "git evidence not available.",
+    "planning evidence not found.",
   ]);
+  assert.equal(result.builder.needed, true);
+  assert.match(summarizeTrackBootstrap(result), /TRACK BUILDER/);
 });
 
 test("bootstrapTrack title-cases package names when README is not selected", async () => {
@@ -100,4 +110,21 @@ test("bootstrapTrack title-cases package names when README is not selected", asy
 
   assert.equal(result.state.project.name, "Package Only");
   assert.equal(result.state.project.id, "package-only");
+});
+
+test("bootstrapTrack treats planning headings in README as plan evidence", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-readme-plan-"));
+  await writeFile(path.join(tempDir, "README.md"), ["# Readme Plan", "", "## Roadmap", "", "First slice."].join("\n"), "utf8");
+
+  const result = await bootstrapTrack({ commandRunner: gitRunner, cwd: tempDir, from: "readme,plan" });
+
+  assert.equal(result.builder.needed, false);
+  assert.deepEqual(
+    result.evidence.map((entry) => [entry.kind, entry.present]),
+    [
+      ["readme", true],
+      ["plan", false],
+    ]
+  );
+  assert.equal(result.warnings.length, 0);
 });

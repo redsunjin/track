@@ -36,6 +36,8 @@ test("planTrackInit supports dry-run style file planning without writing files",
   assert.equal(plan.files.state.action, "create");
   assert.equal(plan.writes.length, 2);
   assert.match(renderTrackInitPlan(plan), /TRACK INIT DRY RUN/);
+  assert.match(renderTrackInitPlan(plan), /TRACK BUILDER/);
+  assert.match(renderTrackInitPlan(plan), /GSD/);
   await assert.rejects(() => readFile(path.join(tempDir, ".track", "roadmap.yaml"), "utf8"));
   await assert.rejects(() => readFile(path.join(tempDir, ".track", "state.yaml"), "utf8"));
 });

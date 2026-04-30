@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 
+import { buildTrackBuilderGuidance, renderTrackBuilderGuidance } from "./builder.js";
 import { saveTrackRoadmap } from "./roadmap.js";
 import { sanitizeInlineText, resolveTrackFilePath } from "./security.js";
 import { saveTrackState } from "./state.js";
@@ -137,6 +138,9 @@ export function renderTrackInitPlan(plan: TrackInitPlan | TrackInitResult): stri
   } else if (wasWritten) {
     lines.push("Next: track status");
     lines.push("Next: track map");
+  } else if (plan.dryRun) {
+    lines.push("");
+    lines.push(...renderTrackBuilderGuidance(buildTrackBuilderGuidance({ context: "init", hasPlanEvidence: false })));
   }
 
   return lines.join("\n");

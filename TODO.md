@@ -4,6 +4,9 @@
 
 - `TRK-060` Bootstrap Source Adapters
 
+Current TRK-060 result: README/package/git/plan bootstrap draft is implemented, and plan-file detection plus Track Builder missing-plan guidance is in progress.
+Next TRK-060 focus: harness/skill adapter payload bridge and explicit review/write flow.
+
 ## Queued
 
 - `TRK-061 Workflow Framework Integration`

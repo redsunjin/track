@@ -27,6 +27,16 @@ track map
 
 and get a usable starting point.
 
+The harder case is a project that has code but no usable plan.
+In that case Track should not silently invent a roadmap.
+It should act as a Track Builder:
+
+- search for explicit planning evidence first
+- show a reviewable draft when evidence exists
+- warn when no roadmap, TODO, spec, or harness evidence exists
+- guide the user toward GSD, SDD, TDD, or harness-based planning before writing `.track/*`
+- keep generated Track files behind the same no-overwrite policy as `track init`
+
 ## Command Direction
 
 ### `track init`
@@ -59,9 +69,9 @@ Candidate inputs:
 - README
 - package metadata
 - git branch name and current status
+- ROADMAP, TODO, PLAN, and spec files
 - existing `.agent/` orchestration files
 - existing harness scripts
-- existing plans or TODO files
 
 Important rule:
 
@@ -73,6 +83,7 @@ Bootstrap should start as draft-first:
 track bootstrap --dry-run
 track bootstrap --from readme --dry-run
 track bootstrap --from git --dry-run
+track bootstrap --from readme,package,git,plan --dry-run
 track bootstrap --write
 ```
 
@@ -171,6 +182,7 @@ Expected usage:
 ```bash
 track bootstrap --dry-run
 track bootstrap --from readme --dry-run
+track bootstrap --from readme,package,git,plan --dry-run
 track bootstrap --from package,git,harness --dry-run
 track bootstrap --write
 ```
@@ -178,9 +190,10 @@ track bootstrap --write
 Contract:
 
 - reads local signals as evidence, not as authoritative future plans
-- supports `--from <auto|readme|package|git|harness|agent>`
+- supports `--from <auto|readme|package|git|plan|harness|agent>`
 - supports `--dry-run`, `--write`, `--force`, `--name`, `--json`, `--state-out`, and `--roadmap-out`
 - shows evidence, confidence, warnings, and projected roadmap/state
+- shows Track Builder guidance when planning evidence is missing
 - reuses the existing external-plan projection path where possible instead of inventing a second schema
 
 ## `project-harness-runner` Role Separation
@@ -265,9 +278,10 @@ Recommended sequence before public npm publish:
 
 1. TRK-059: lock this strategy, command contract, and role boundary.
 2. TRK-060a: implement `track init --dry-run` and `track init --template simple`.
-3. TRK-060b: implement `track bootstrap --dry-run` from README, package metadata, git context, and harness evidence.
-4. TRK-061: add the `project-harness-runner` adapter contract and optional payload emitter.
-5. TRK-062: run clean-project UAT from tarball install before npm publish approval.
+3. TRK-060b: implement `track bootstrap --dry-run` from README, package metadata, git context, plan files, and Track Builder guidance.
+4. TRK-060c: add harness and skill adapter payload evidence without parsing workflow prose as source of truth.
+5. TRK-061: add the `project-harness-runner` adapter contract and optional payload emitter.
+6. TRK-062: run clean-project UAT from tarball install before npm publish approval.
 
 ## New Roadmap Slices
 
@@ -289,6 +303,8 @@ Candidate scope:
 
 - README/package metadata reader
 - git context reader
+- ROADMAP/TODO/PLAN/spec detector
+- Track Builder missing-plan guidance
 - existing harness and `.agent/` file detector
 - draft renderer
 - write path with no-overwrite default

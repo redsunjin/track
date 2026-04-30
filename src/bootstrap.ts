@@ -4,12 +4,18 @@ import path from "node:path";
 
 import { intermediateToExternalPlan } from "./adapters/bridge.js";
 import type { IntermediateRoadmapSchema } from "./adapter-schema.js";
+import {
+  buildTrackBuilderGuidance,
+  hasTrackPlanningHeading,
+  renderTrackBuilderGuidance,
+  type TrackBuilderGuidance,
+} from "./builder.js";
 import { projectExternalPlan } from "./external-plan.js";
 import { sanitizeInlineText } from "./security.js";
 import { summarizeTrack } from "./summary.js";
 import type { ProjectExternalPlanResult } from "./types.js";
 
-export type TrackBootstrapSourceKind = "readme" | "package" | "git";
+export type TrackBootstrapSourceKind = "readme" | "package" | "git" | "plan";
 export type TrackBootstrapRequestedSource = TrackBootstrapSourceKind | "auto";
 
 export interface TrackBootstrapEvidence {
@@ -28,6 +34,7 @@ export interface TrackBootstrapOptions {
 }
 
 export interface TrackBootstrapResult extends ProjectExternalPlanResult {
+  builder: TrackBuilderGuidance;
   cwd: string;
   evidence: TrackBootstrapEvidence[];
   schema: IntermediateRoadmapSchema;
@@ -64,16 +71,23 @@ interface GitSignal {
   present: boolean;
 }
 
+interface PlanSignal {
+  file: string;
+  headings: string[];
+  title: string | null;
+}
+
 export async function bootstrapTrack(options: TrackBootstrapOptions): Promise<TrackBootstrapResult> {
   const cwd = path.resolve(options.cwd);
   const sources = resolveBootstrapSources(options.from);
   const warnings: string[] = [];
   const evidence: TrackBootstrapEvidence[] = [];
 
-  const [readme, packageJson, git] = await Promise.all([
+  const [readme, packageJson, git, plan] = await Promise.all([
     sources.includes("readme") ? readReadmeSignal(cwd) : Promise.resolve(null),
     sources.includes("package") ? readPackageSignal(cwd) : Promise.resolve(null),
     sources.includes("git") ? readGitSignal(cwd, options.commandRunner ?? defaultCommandRunner) : Promise.resolve(null),
+    sources.includes("plan") ? readPlanSignal(cwd) : Promise.resolve(null),
   ]);
 
   if (sources.includes("readme")) {
@@ -94,11 +108,25 @@ export async function bootstrapTrack(options: TrackBootstrapOptions): Promise<Tr
       warnings.push("git evidence not available.");
     }
   }
+  if (sources.includes("plan")) {
+    evidence.push(planEvidence(plan));
+  }
+
+  const hasPlanEvidence = Boolean(plan) || hasTrackPlanningHeading(readme?.headings ?? []);
+  if (sources.includes("plan") && !hasPlanEvidence) {
+    warnings.push("planning evidence not found.");
+  }
+  const builder = buildTrackBuilderGuidance({
+    context: "bootstrap",
+    evidenceLabels: collectPlanningEvidenceLabels(readme, plan),
+    hasPlanEvidence,
+  });
 
   const schema = buildBootstrapSchema({
     cwd,
     git,
     packageJson,
+    plan,
     projectName: options.projectName,
     readme,
     sources,
@@ -107,6 +135,7 @@ export async function bootstrapTrack(options: TrackBootstrapOptions): Promise<Tr
 
   return {
     ...projected,
+    builder,
     cwd,
     evidence,
     schema,
@@ -121,11 +150,12 @@ export function resolveBootstrapSources(raw: string | undefined): TrackBootstrap
     .map((entry) => entry.trim().toLowerCase())
     .filter((entry) => entry.length > 0);
 
-  const expanded = requested.length === 0 || requested.includes("auto") ? ["readme", "package", "git"] : requested;
+  const expanded =
+    requested.length === 0 || requested.includes("auto") ? ["readme", "package", "git", "plan"] : requested;
   const normalized: TrackBootstrapSourceKind[] = [];
   for (const source of expanded) {
-    if (source !== "readme" && source !== "package" && source !== "git") {
-      throw new Error("`--from` must contain auto, readme, package, or git.");
+    if (source !== "readme" && source !== "package" && source !== "git" && source !== "plan") {
+      throw new Error("`--from` must contain auto, readme, package, git, or plan.");
     }
     if (!normalized.includes(source)) {
       normalized.push(source);
@@ -158,6 +188,12 @@ export function summarizeTrackBootstrap(result: TrackBootstrapResult): string {
     }
   }
 
+  const builderGuidance = renderTrackBuilderGuidance(result.builder);
+  if (builderGuidance.length) {
+    lines.push("");
+    lines.push(...builderGuidance);
+  }
+
   lines.push("");
   lines.push("This is a draft. Review the evidence before writing .track files.");
   return lines.join("\n");
@@ -167,6 +203,7 @@ function buildBootstrapSchema(input: {
   cwd: string;
   git: GitSignal | null;
   packageJson: PackageSignal | null;
+  plan: PlanSignal | null;
   projectName: string | undefined;
   readme: ReadmeSignal | null;
   sources: TrackBootstrapSourceKind[];
@@ -176,12 +213,20 @@ function buildBootstrapSchema(input: {
   const title = input.readme?.title ?? projectName;
   const hasPackage = Boolean(input.packageJson);
   const hasGit = Boolean(input.git?.present);
+  const hasPlanEvidence = Boolean(input.plan) || hasTrackPlanningHeading(input.readme?.headings ?? []);
+  const firstCheckpointTitle = hasPlanEvidence ? `Review ${title} plan evidence` : "Create the first Track plan";
+  const firstCheckpointGoal = hasPlanEvidence
+    ? "Review local planning evidence and confirm the first Track plan."
+    : "Choose GSD, SDD, TDD, or a harness workflow before writing Track state.";
+  const firstTaskTitle = hasPlanEvidence
+    ? "Review bootstrap evidence and confirm the first Track slice"
+    : "Choose a Track Builder method and define the first slice";
 
   const checkpoints = [
     {
       id: "cp-bootstrap-purpose",
-      title: input.readme ? `Confirm ${title} direction` : "Confirm project direction",
-      goal: "Review local project documentation and confirm the first Track plan.",
+      title: firstCheckpointTitle,
+      goal: firstCheckpointGoal,
       kind: "build",
       status: "doing" as const,
       weight: 1,
@@ -227,7 +272,7 @@ function buildBootstrapSchema(input: {
     tasks: [
       {
         id: "task-bootstrap-review",
-        title: "Review bootstrap evidence and confirm the first Track slice",
+        title: firstTaskTitle,
         checkpoint_id: "cp-bootstrap-purpose",
         phase_id: "phase-bootstrap-discovery",
         status: "doing",
@@ -251,10 +296,7 @@ async function readReadmeSignal(cwd: string): Promise<ReadmeSignal | null> {
     const filePath = path.join(cwd, candidate);
     try {
       const raw = await readFile(filePath, "utf8");
-      const headings = Array.from(raw.matchAll(/^#{1,3}\s+(.+)$/gm))
-        .map((match) => sanitizeInlineText(match[1], ""))
-        .filter(Boolean)
-        .slice(0, 6);
+      const headings = parseMarkdownHeadings(raw);
       return {
         file: candidate,
         headings,
@@ -284,6 +326,40 @@ async function readPackageSignal(cwd: string): Promise<PackageSignal | null> {
   } catch {
     return null;
   }
+}
+
+async function readPlanSignal(cwd: string): Promise<PlanSignal | null> {
+  const candidates = [
+    "ROADMAP.md",
+    "roadmap.md",
+    "TODO.md",
+    "PLAN.md",
+    "plans.md",
+    "docs/roadmap.md",
+    "docs/plan.md",
+    "docs/todo.md",
+    "docs/spec.md",
+    "docs/specification.md",
+    "docs/definition-of-done.md",
+    ".agent/orchestration-contract.md",
+    ".agent/status.md",
+  ];
+
+  for (const candidate of candidates) {
+    const filePath = path.join(cwd, candidate);
+    try {
+      const raw = await readFile(filePath, "utf8");
+      const headings = parseMarkdownHeadings(raw);
+      return {
+        file: candidate,
+        headings,
+        title: headings[0] ?? null,
+      };
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 async function readGitSignal(cwd: string, runner: TrackBootstrapCommandRunner): Promise<GitSignal | null> {
@@ -316,6 +392,27 @@ function readmeEvidence(signal: ReadmeSignal | null): TrackBootstrapEvidence {
   return {
     kind: "readme",
     label: "README",
+    present: true,
+    file: signal.file,
+    detail,
+  };
+}
+
+function planEvidence(signal: PlanSignal | null): TrackBootstrapEvidence {
+  if (!signal) {
+    return {
+      kind: "plan",
+      label: "Plan",
+      present: false,
+      detail: "no ROADMAP, TODO, PLAN, spec, or harness file found",
+    };
+  }
+  const detail = signal.title
+    ? `found title "${signal.title}" with ${signal.headings.length} heading(s)`
+    : `found ${signal.file} without a markdown heading`;
+  return {
+    kind: "plan",
+    label: "Plan",
     present: true,
     file: signal.file,
     detail,
@@ -356,6 +453,24 @@ function gitEvidence(signal: GitSignal | null): TrackBootstrapEvidence {
     present: true,
     detail: `branch ${signal.branch ?? "unknown"}; ${signal.dirtyCount} dirty file(s)`,
   };
+}
+
+function collectPlanningEvidenceLabels(readme: ReadmeSignal | null, plan: PlanSignal | null): string[] {
+  const labels: string[] = [];
+  if (plan) {
+    labels.push(plan.file);
+  }
+  if (readme && hasTrackPlanningHeading(readme.headings)) {
+    labels.push(`${readme.file} headings`);
+  }
+  return labels;
+}
+
+function parseMarkdownHeadings(raw: string): string[] {
+  return Array.from(raw.matchAll(/^#{1,3}\s+(.+)$/gm))
+    .map((match) => sanitizeInlineText(match[1], ""))
+    .filter(Boolean)
+    .slice(0, 6);
 }
 
 function resolveBootstrapProjectName(

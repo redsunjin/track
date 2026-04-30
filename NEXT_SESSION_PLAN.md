@@ -12,15 +12,16 @@ Implement `track bootstrap` as a draft-first path that can inspect a local repo 
 ## First Steps
 
 1. add the harness and skill evidence bridge for existing `.agent/` files and harness scripts
-2. keep source readers producing explicit evidence and warnings
-3. extend the bootstrap draft without treating harness prose as source of truth
-4. prepare review/write flow behind explicit `--write`
+2. convert Track Builder guidance into explicit method templates or adapter payloads
+3. prepare review/write flow behind explicit `--write`
+4. keep source readers producing explicit evidence and warnings
 5. keep public npm publish parked until clean-project UAT passes
 
 ## Current Result
 
 - `track init` now has a simple MVP with safe no-overwrite behavior
-- `track bootstrap --dry-run` now drafts from README, package metadata, and git context
+- `track bootstrap --dry-run` now drafts from README, package metadata, git context, and plan files
+- Track Builder guidance now appears when no roadmap, TODO, spec, or harness evidence exists
 - CLI sound cues are available only when explicitly enabled
 - public markdown no longer exposes local workspace paths
 - Team Race Mode is documented as a future roadmap concept, not a runtime feature
@@ -32,6 +33,7 @@ Implement `track bootstrap` as a draft-first path that can inspect a local repo 
 - do not make git history the source of truth for future plans
 - keep `.track/roadmap.yaml` and `.track/state.yaml` as the canonical runtime files
 - bootstrap should show evidence, confidence, and warnings before writing
+- missing-plan projects should be guided to GSD, SDD, TDD, or harness planning instead of fake roadmap confidence
 - skill and harness integrations should provide explicit adapter input, not competing state files
 
 ## Verification
@@ -48,7 +50,8 @@ git diff --check
 
 ## Exit Condition
 
-- harness and skill evidence can join the existing README/package/git bootstrap draft
+- harness and skill evidence can join the existing README/package/git/plan bootstrap draft
 - bootstrap output clearly separates evidence from inferred roadmap/state
+- Track Builder produces method guidance when no plan evidence is found
 - no `.track/*` files are overwritten without explicit write and force controls
 - next slice can add harness/skill bridge inputs
