@@ -31,6 +31,8 @@
   - [TODO.md](../../TODO.md)
   - [NEXT_SESSION_PLAN.md](../../NEXT_SESSION_PLAN.md)
   - [docs/track-init-bootstrap-roadmap.md](../track-init-bootstrap-roadmap.md)
+  - [docs/workflow-framework-collaboration.md](../workflow-framework-collaboration.md)
+  - [docs/multi-agent-handoff-patterns.md](../multi-agent-handoff-patterns.md)
 - execution_doc:
   - this worksheet
 - state_files_touched:
@@ -44,6 +46,7 @@
   - `git diff --check`
 - runtime_checks:
   - `npm test`
+  - `node --import tsx --test tests/orchestration-contract.test.ts tests/bootstrap.test.ts`
   - `npm run package:dry-run`
   - `node --import tsx ./src/cli.ts status --no-color`
   - `node --import tsx ./src/cli.ts map --no-color`
@@ -85,3 +88,12 @@
   - orchestration contract fixture
   - project-harness-runner payload fixture
   - clean-project UAT with bootstrap write
+
+## 7. Implementation Notes
+
+- `src/orchestration-contract.ts` owns the explicit `.agent/track-bootstrap.json` to intermediate schema adapter.
+- `src/bootstrap.ts` treats `.agent/track-bootstrap.json` as structured contract input and keeps `.agent` markdown as fallback evidence only.
+- `examples/track-bootstrap.example.json` is the canonical project-harness-runner payload fixture.
+- `tests/orchestration-contract.test.ts` covers fixture projection, default plan generation, validation command de-dupe, and invalid root rejection.
+- `docs/workflow-framework-collaboration.md` records the ownership boundary for project-harness-runner, SDD, TDD, GSD, harnesses, and skill workspaces.
+- `docs/multi-agent-handoff-patterns.md` records the handoff packet, owner transitions, parallel work split, and Pitwall/OpenClaw monitor boundary.

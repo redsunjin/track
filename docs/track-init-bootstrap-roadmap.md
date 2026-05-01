@@ -118,6 +118,8 @@ track status/map/pitwall
   -> gives humans and agents one shared operating view
 ```
 
+Detailed collaboration rules are kept in [workflow-framework-collaboration.md](workflow-framework-collaboration.md).
+
 ## Framework Boundary
 
 Track should cooperate with workflow systems by using adapters:
@@ -274,7 +276,8 @@ Initial adapter payload:
 }
 ```
 
-Track should normalize this payload into the existing intermediate adapter schema, then project it into roadmap/state files.
+The checked fixture for this payload is `examples/track-bootstrap.example.json`.
+Track normalizes this payload through `trackOrchestrationContractToIntermediateSchema`, then projects it into roadmap/state files.
 Markdown files under `.agent/` may be fallback evidence, but they should not be parsed as the source of truth.
 
 ## Implementation Sequence
@@ -325,6 +328,11 @@ Candidate scope:
 - orchestration status import
 - prompts or pack guidance for Codex, Claude Code, Gemini CLI
 - multi-agent handoff patterns
+
+Current docs:
+
+- [workflow-framework-collaboration.md](workflow-framework-collaboration.md)
+- [multi-agent-handoff-patterns.md](multi-agent-handoff-patterns.md)
 
 ### TRK-062 Pre-Publish User Acceptance
 

@@ -11,6 +11,7 @@
     "src",
     "agents",
     "docs",
+    "examples",
     "vscode-extension",
     "README.md",
     "AGENTS.md"
@@ -93,6 +94,7 @@
     "pitwall": "node --import tsx ./src/cli.ts pitwall",
     "test": "npm run build && node --import tsx --test tests/**/*.test.ts",
     "typecheck": "tsc --noEmit",
+    "uat:clean-project": "node scripts/clean-project-uat.mjs",
     "vscode:build": "tsc -p vscode-extension/tsconfig.json",
     "vscode:check": "tsc -p vscode-extension/tsconfig.json --noEmit"
   },

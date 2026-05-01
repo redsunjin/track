@@ -17,6 +17,11 @@ export {
   writeTrackBootstrap,
 } from "../bootstrap.js";
 export { buildTrackBuilderGuidance, hasTrackPlanningHeading, renderTrackBuilderGuidance, TRACK_BUILDER_METHODS } from "../builder.js";
+export {
+  collectOrchestrationValidationCommands,
+  TRACK_ORCHESTRATION_CONTRACT_FILE,
+  trackOrchestrationContractToIntermediateSchema,
+} from "../orchestration-contract.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "../external-plan.js";
 export {
   assertTrackInitPlanWritable,
@@ -65,6 +70,10 @@ export type {
   TrackBootstrapWritePlan,
   TrackBootstrapWriteResult,
 } from "../bootstrap.js";
+export type {
+  TrackOrchestrationContractOptions,
+  TrackOrchestrationContractPayload,
+} from "../orchestration-contract.js";
 export type {
   BuildTrackBuilderGuidanceInput,
   TrackBuilderGuidance,

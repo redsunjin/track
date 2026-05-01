@@ -39,5 +39,6 @@ test("package scripts expose a build artifact verification path", async () => {
   assert.equal(manifest.scripts?.["package:readiness"], "node --import tsx ./src/cli.ts package readiness");
   assert.equal(manifest.scripts?.["package:release-notes"], "node --import tsx ./src/cli.ts package release-notes");
   assert.equal(manifest.scripts?.test, "npm run build && node --import tsx --test tests/**/*.test.ts");
+  assert.equal(manifest.scripts?.["uat:clean-project"], "node scripts/clean-project-uat.mjs");
   assert.ok(manifest.files?.includes("dist"));
 });

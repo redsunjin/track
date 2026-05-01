@@ -9,11 +9,11 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 36
-  active_lap: 35
+  active_lap: 36
   health: green
-  next_action: Define orchestration contract adapter
+  next_action: Run public publish go-no-go review
   blocked_reason: null
-  percent_complete: 92
+  percent_complete: 97
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -521,35 +521,35 @@ laps:
         weight: 2
   - id: lap-35
     title: Workflow framework integration
-    status: doing
+    status: done
     checkpoints:
       - id: cp-93
         title: Orchestration contract adapter
-        status: doing
+        status: done
         weight: 3
       - id: cp-94
         title: Skill and framework collaboration docs
-        status: todo
+        status: done
         weight: 2
       - id: cp-95
         title: Multi-agent handoff patterns
-        status: todo
+        status: done
         weight: 3
   - id: lap-36
     title: Pre-publish user acceptance
-    status: todo
+    status: doing
     checkpoints:
       - id: cp-96
         title: Clean-project acceptance script
-        status: todo
+        status: done
         weight: 2
       - id: cp-97
         title: Fresh repo dogfood run
-        status: todo
+        status: done
         weight: 2
       - id: cp-98
         title: Public publish go-no-go review
-        status: todo
+        status: doing
         weight: 1
 tasks:
   - id: task-001
@@ -1040,32 +1040,32 @@ tasks:
   - id: task-098
     title: Define orchestration contract adapter
     checkpoint_id: cp-93
-    status: doing
+    status: done
     owner: codex
   - id: task-099
     title: Document skill and framework collaboration
     checkpoint_id: cp-94
-    status: todo
+    status: done
     owner: codex
   - id: task-100
     title: Add multi-agent handoff patterns
     checkpoint_id: cp-95
-    status: todo
+    status: done
     owner: codex
   - id: task-101
     title: Build clean-project UAT script
     checkpoint_id: cp-96
-    status: todo
+    status: done
     owner: codex
   - id: task-102
     title: Dogfood Track init in a fresh repo
     checkpoint_id: cp-97
-    status: todo
+    status: done
     owner: codex
   - id: task-103
     title: Run public publish go-no-go review
     checkpoint_id: cp-98
-    status: todo
+    status: doing
     owner: release-owner
 flags: []
 events:
@@ -1868,3 +1868,53 @@ events:
     actor: codex
     timestamp: 2026-05-01T02:16:29.995Z
     summary: Started Define orchestration contract adapter
+  - id: evt-2026-05-01T05:48:19.006Z-s0mqnc
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-01T05:48:19.006Z
+    summary: Completed Define orchestration contract adapter
+  - id: evt-2026-05-01T05:48:22.603Z-3bypcn
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-01T05:48:22.603Z
+    summary: Started Document skill and framework collaboration
+  - id: evt-2026-05-01T05:49:39.102Z-hss8tr
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-01T05:49:39.102Z
+    summary: Completed Document skill and framework collaboration
+  - id: evt-2026-05-01T05:49:43.602Z-gzm9li
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-01T05:49:43.602Z
+    summary: Started Add multi-agent handoff patterns
+  - id: evt-2026-05-01T05:51:01.084Z-vr0ip0
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-01T05:51:01.084Z
+    summary: Completed Add multi-agent handoff patterns
+  - id: evt-2026-05-01T05:51:04.393Z-87u5bt
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-01T05:51:04.393Z
+    summary: Started Build clean-project UAT script
+  - id: evt-2026-05-01T05:54:06.858Z-2rz57a
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-01T05:54:06.858Z
+    summary: Completed Build clean-project UAT script
+  - id: evt-2026-05-01T05:54:12.808Z-jfgq5g
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-01T05:54:12.808Z
+    summary: Started Dogfood Track init in a fresh repo
+  - id: evt-2026-05-01T05:55:09.459Z-srinpz
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-01T05:55:09.459Z
+    summary: Completed Dogfood Track init in a fresh repo
+  - id: evt-2026-05-01T05:55:14.461Z-4luk51
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-01T05:55:14.461Z
+    summary: Started Run public publish go-no-go review

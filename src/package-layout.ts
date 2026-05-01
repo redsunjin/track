@@ -288,6 +288,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
       "src/external-plan.ts",
       "src/builder.ts",
       "src/bootstrap.ts",
+      "src/orchestration-contract.ts",
       "src/init.ts",
       "src/init-templates.ts",
       "src/adapters",

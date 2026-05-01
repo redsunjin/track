@@ -76,6 +76,7 @@ npm run package:readiness
 npm run package:publish-guard
 npm run package:rc-tag
 npm run package:release-notes
+npm run uat:clean-project
 npm pack --dry-run --json
 ```
 
@@ -83,6 +84,7 @@ This verifies that every declared boundary has an entrypoint and that the owned 
 The dry-run check also verifies that `package.json.files` covers `dist`, boundary entrypoints, exported subpaths, CLI bin target, and package layout docs before any physical npm packing step.
 Export and bin targets must exist, so run the build scripts before invoking `node dist/cli.js package dry-run` directly.
 The install smoke creates a temporary tarball and consumer project, installs Track from that tarball, imports public subpaths, and runs the installed `track` bin.
+The clean-project UAT script goes one step further: it installs the tarball into a throwaway project and verifies installed CLI usage for `track init`, `track status`, `track map`, `track bootstrap`, harness bootstrap, and init overwrite protection.
 
 Track's root package is now scoped and publishable in the manifest.
 `package dry-run` is still only a distribution-readiness check; it does not publish, tag, or authenticate with npm.

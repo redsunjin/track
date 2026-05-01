@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "source": "project-harness-runner",
+  "project": {
+    "id": "repo-name",
+    "name": "Repo Name",
+    "mode": "sprint"
+  },
+  "method": "gsd",
+  "goal": "MVP complete",
+  "validation": {
+    "preferred": "scripts/agent-harness.sh",
+    "checks": ["npm run check"],
+    "smokes": ["npm run smoke"]
+  },
+  "phases": [
+    {
+      "id": "harness-execution",
+      "title": "Harness execution",
+      "goal": "Run a bounded implementation slice through the project harness.",
+      "checkpoints": [
+        {
+          "id": "define-next-slice",
+          "title": "Define next implementation slice",
+          "status": "doing"
+        },
+        {
+          "id": "implement-slice",
+          "title": "Implement slice",
+          "status": "todo"
+        },
+        {
+          "id": "validate-harness",
+          "title": "Validate with harness",
+          "status": "todo"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "run-agent-harness",
+      "title": "Run existing validation harness",
+      "checkpoint_id": "validate-harness",
+      "owner": "codex",
+      "status": "todo"
+    }
+  ],
+  "blockers": [],
+  "metadata": {
+    "orchestrate_only": true,
+    "harness_structure_changed": false
+  }
+}

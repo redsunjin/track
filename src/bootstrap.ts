@@ -11,11 +11,17 @@ import {
   type TrackBuilderGuidance,
 } from "./builder.js";
 import { projectExternalPlan } from "./external-plan.js";
+import {
+  collectOrchestrationValidationCommands,
+  TRACK_ORCHESTRATION_CONTRACT_FILE,
+  trackOrchestrationContractToIntermediateSchema,
+  type TrackOrchestrationContractPayload,
+} from "./orchestration-contract.js";
 import { saveTrackRoadmap } from "./roadmap.js";
 import { resolveTrackFilePath, sanitizeInlineText } from "./security.js";
 import { saveTrackState } from "./state.js";
 import { summarizeTrack } from "./summary.js";
-import type { ProjectExternalPlanResult, TrackStatus } from "./types.js";
+import type { ProjectExternalPlanResult } from "./types.js";
 
 export type TrackBootstrapSourceKind = "readme" | "package" | "git" | "plan" | "harness" | "agent";
 export type TrackBootstrapRequestedSource = TrackBootstrapSourceKind | "auto" | "skill";
@@ -115,7 +121,7 @@ interface HarnessSignal {
   files: string[];
   goal: string | null;
   method: string | null;
-  payload: Record<string, unknown> | null;
+  payload: TrackOrchestrationContractPayload | null;
   payloadError: string | null;
   payloadFile: string | null;
   present: boolean;
@@ -193,13 +199,14 @@ export async function bootstrapTrack(options: TrackBootstrapOptions): Promise<Tr
 
   const schema =
     harness?.payload && !harness.payloadError
-      ? buildHarnessPayloadSchema({
+      ? trackOrchestrationContractToIntermediateSchema(harness.payload, {
           cwd,
-          harness,
-          packageJson,
+          fallbackPackageName: packageJson?.name,
+          fallbackProjectName: readme?.title,
           projectName: options.projectName,
-          readme,
+          sourceName: harness.source,
           sources,
+          validationCommands: harness.validationCommands,
         })
       : buildBootstrapSchema({
           agent,
@@ -490,162 +497,6 @@ function buildBootstrapSchema(input: {
   };
 }
 
-function buildHarnessPayloadSchema(input: {
-  cwd: string;
-  harness: HarnessSignal;
-  packageJson: PackageSignal | null;
-  projectName: string | undefined;
-  readme: ReadmeSignal | null;
-  sources: TrackBootstrapSourceKind[];
-}): IntermediateRoadmapSchema {
-  const payload = input.harness.payload ?? {};
-  const project = asRecord(payload.project) ?? {};
-  const method = optionalText(payload.method) ?? input.harness.method ?? "harness";
-  const projectName = sanitizeInlineText(
-    input.projectName ?? optionalText(project.name) ?? input.readme?.title ?? input.packageJson?.name,
-    titleCaseWords(path.basename(input.cwd))
-  );
-  const projectId = slugify(optionalText(project.id) ?? input.packageJson?.name ?? projectName);
-  const goal = optionalText(payload.goal) ?? input.harness.goal ?? "Execute the project harness plan.";
-  const rawPhases = records(payload.phases);
-  const phases = rawPhases.length
-    ? rawPhases.map((phase, index) => mapHarnessPayloadPhase(phase, index))
-    : [defaultHarnessPhase(goal, input.harness.validationCommands)];
-  const firstCheckpointId = phases[0]?.checkpoints?.[0]?.id ?? "define-next-slice";
-  const firstPhaseId = findPhaseIdForCheckpoint(phases, firstCheckpointId) ?? phases[0]?.id ?? "harness-execution";
-  const tasks = records(payload.tasks).map((task, index) => mapHarnessPayloadTask(task, index, phases, firstCheckpointId));
-
-  return {
-    version: positiveInteger(payload.version) ?? 1,
-    project: {
-      id: projectId,
-      name: projectName,
-      mode: optionalText(project.mode) ?? method,
-    },
-    phases,
-    tasks: tasks.length
-      ? tasks
-      : [
-          {
-            id: "run-agent-harness",
-            title: input.harness.validationCommands.length
-              ? `Run ${input.harness.validationCommands[0]}`
-              : "Run existing validation harness",
-            checkpoint_id: firstCheckpointId,
-            phase_id: firstPhaseId,
-            owner: null,
-            status: "doing",
-          },
-        ],
-    metadata: {
-      kind: "track-bootstrap-harness",
-      method,
-      name: input.harness.source ?? "project harness",
-      plan_id: `${projectId}-harness-plan`,
-      plan_title: `${projectName} harness bootstrap draft`,
-      sources: input.sources,
-      topology: "harness",
-      validation_commands: input.harness.validationCommands,
-    },
-  };
-}
-
-function defaultHarnessPhase(goal: string, validationCommands: string[]): IntermediateRoadmapSchema["phases"][number] {
-  const validationGoal = validationCommands.length
-    ? `Run validation gates: ${validationCommands.slice(0, 4).join(", ")}.`
-    : "Run the strongest available harness validation.";
-  return {
-    id: "harness-execution",
-    title: "Harness execution",
-    goal,
-    kind: "integration",
-    checkpoints: [
-      {
-        id: "define-next-slice",
-        title: "Define next implementation slice",
-        goal: "Choose the next bounded slice from the harness goal and done criteria.",
-        kind: "build",
-        status: "doing",
-        weight: 1,
-      },
-      {
-        id: "implement-slice",
-        title: "Implement slice",
-        goal: "Make the selected slice real in the codebase.",
-        kind: "build",
-        status: "todo",
-        weight: 1,
-      },
-      {
-        id: "validate-harness",
-        title: "Validate with harness",
-        goal: validationGoal,
-        kind: "release",
-        status: "todo",
-        weight: 1,
-      },
-    ],
-  };
-}
-
-function mapHarnessPayloadPhase(raw: Record<string, unknown>, index: number): IntermediateRoadmapSchema["phases"][number] {
-  const id = sanitizeInlineText(optionalText(raw.id), `harness-phase-${index + 1}`);
-  const rawCheckpoints = records(raw.checkpoints);
-  return {
-    id,
-    title: sanitizeInlineText(optionalText(raw.title), `Harness phase ${index + 1}`),
-    goal: optionalText(raw.goal) ?? undefined,
-    kind: optionalText(raw.kind) ?? "integration",
-    checkpoints: rawCheckpoints.length
-      ? rawCheckpoints.map((checkpoint, checkpointIndex) => mapHarnessPayloadCheckpoint(checkpoint, checkpointIndex))
-      : [
-          {
-            id: `${id}-checkpoint`,
-            title: "Execute harness checkpoint",
-            goal: "Run the harness-defined work and validation loop.",
-            kind: "integration",
-            status: index === 0 ? "doing" : "todo",
-            weight: 1,
-          },
-        ],
-  };
-}
-
-function mapHarnessPayloadCheckpoint(
-  raw: Record<string, unknown>,
-  index: number
-): NonNullable<IntermediateRoadmapSchema["phases"][number]["checkpoints"]>[number] {
-  return {
-    id: sanitizeInlineText(optionalText(raw.id), `harness-checkpoint-${index + 1}`),
-    title: sanitizeInlineText(optionalText(raw.title), `Harness checkpoint ${index + 1}`),
-    goal: optionalText(raw.goal) ?? undefined,
-    kind: optionalText(raw.kind) ?? "integration",
-    status: coerceStatus(raw.status),
-    weight: positiveInteger(raw.weight) ?? 1,
-  };
-}
-
-function mapHarnessPayloadTask(
-  raw: Record<string, unknown>,
-  index: number,
-  phases: IntermediateRoadmapSchema["phases"],
-  fallbackCheckpointId: string
-): NonNullable<IntermediateRoadmapSchema["tasks"]>[number] {
-  const checkpointId = sanitizeInlineText(optionalText(raw.checkpoint_id), fallbackCheckpointId);
-  return {
-    id: sanitizeInlineText(optionalText(raw.id), `harness-task-${index + 1}`),
-    title: sanitizeInlineText(optionalText(raw.title), `Harness task ${index + 1}`),
-    checkpoint_id: checkpointId,
-    phase_id: optionalText(raw.phase_id) ?? findPhaseIdForCheckpoint(phases, checkpointId),
-    owner: optionalText(raw.owner),
-    status: coerceStatus(raw.status) ?? (index === 0 ? "doing" : "todo"),
-  };
-}
-
-function findPhaseIdForCheckpoint(phases: IntermediateRoadmapSchema["phases"], checkpointId: string): string | undefined {
-  return phases.find((phase) => (phase.checkpoints ?? []).some((checkpoint) => checkpoint.id === checkpointId))?.id;
-}
-
 async function readReadmeSignal(cwd: string): Promise<ReadmeSignal | null> {
   const candidates = ["README.md", "readme.md", "README"];
   for (const candidate of candidates) {
@@ -718,7 +569,7 @@ async function readPlanSignal(cwd: string): Promise<PlanSignal | null> {
 
 async function readHarnessSignal(cwd: string): Promise<HarnessSignal | null> {
   const candidates = [
-    ".agent/track-bootstrap.json",
+    TRACK_ORCHESTRATION_CONTRACT_FILE,
     "scripts/agent-harness.sh",
     "scripts/check.sh",
     "scripts/smoke.sh",
@@ -726,9 +577,9 @@ async function readHarnessSignal(cwd: string): Promise<HarnessSignal | null> {
     "docs/methodology.md",
   ];
   const files = await collectExistingFiles(cwd, candidates);
-  let payload: Record<string, unknown> | null = null;
+  let payload: TrackOrchestrationContractPayload | null = null;
   let payloadError: string | null = null;
-  const payloadFile = files.includes(".agent/track-bootstrap.json") ? ".agent/track-bootstrap.json" : null;
+  const payloadFile = files.includes(TRACK_ORCHESTRATION_CONTRACT_FILE) ? TRACK_ORCHESTRATION_CONTRACT_FILE : null;
 
   if (payloadFile) {
     try {
@@ -983,51 +834,21 @@ async function pathExists(filePath: string): Promise<boolean> {
 }
 
 function collectValidationCommands(payload: Record<string, unknown> | null, files: string[]): string[] {
-  const commands = new Set<string>();
-  const validation = payload ? asRecord(payload.validation) : null;
-  const preferred = validation ? optionalText(validation.preferred) : null;
-  if (preferred) {
-    commands.add(preferred);
-  }
-  for (const entry of strings(validation?.checks)) {
-    commands.add(entry);
-  }
-  for (const entry of strings(validation?.smokes)) {
-    commands.add(entry);
-  }
+  const fallbackCommands: string[] = [];
   for (const file of ["scripts/agent-harness.sh", "scripts/check.sh", "scripts/smoke.sh"]) {
     if (files.includes(file)) {
-      commands.add(file);
+      fallbackCommands.push(file);
     }
   }
-  return [...commands];
+  return collectOrchestrationValidationCommands(payload, fallbackCommands);
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
 }
 
-function records(value: unknown): Record<string, unknown>[] {
-  return Array.isArray(value) ? value.map(asRecord).filter((entry): entry is Record<string, unknown> => Boolean(entry)) : [];
-}
-
-function strings(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value.map(optionalText).filter((entry): entry is string => Boolean(entry));
-}
-
 function optionalText(value: unknown): string | null {
   return typeof value === "string" ? sanitizeInlineText(value, "") || null : null;
-}
-
-function positiveInteger(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : undefined;
-}
-
-function coerceStatus(value: unknown): TrackStatus | undefined {
-  return value === "todo" || value === "doing" || value === "blocked" || value === "done" ? value : undefined;
 }
 
 function parseMarkdownHeadings(raw: string): string[] {

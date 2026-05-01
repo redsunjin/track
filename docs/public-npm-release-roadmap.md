@@ -29,6 +29,7 @@ Public release is not complete until all of these are true:
 - `track` bin still works after tarball install
 - `track package publish-guard --target publishable` passes
 - `track package rc-tag` only reports ready for publishable release state
+- clean-project tarball UAT passes for `track init`, `track status`, `track map`, and bootstrap
 - npm authentication is available on the release machine
 - `npm publish --dry-run --access public` passes
 - the release owner explicitly runs the final publish command
@@ -131,7 +132,8 @@ Expected steps:
 
 Current gate:
 
-- `TRK-058` is parked until clean-project UAT is complete
+- `TRK-058` is parked until clean-project UAT and release-owner go/no-go are complete
+- clean-project UAT report: [pre-publish-user-acceptance-report.md](./pre-publish-user-acceptance-report.md)
 - final publish command is `npm publish --access public`
 - actual tag creation and npm publish still require explicit release-owner approval
 - `TRK-059` through `TRK-062` cover init/bootstrap, workflow integration, and pre-publish user acceptance before publishing

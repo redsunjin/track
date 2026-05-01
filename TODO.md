@@ -2,19 +2,30 @@
 
 ## Active
 
-- `TRK-061` Workflow Framework Integration
+- `TRK-062` Pre-Publish User Acceptance
 
-Current TRK-061 focus: define the orchestration contract adapter that lets workflow frameworks feed Track through explicit data instead of competing state files.
+Current TRK-062 focus: release-owner go/no-go review. Clean-project UAT has passed; actual npm publish remains parked until explicit approval.
 
 ## Queued
 
-- `TRK-062 Pre-Publish User Acceptance`
+- none
 
 ## Parked
 
 - `TRK-058 Public Release Execution` - parked until Track is dogfooded from a clean project and release owner approves actual npm publish
 
 ## Done
+
+### TRK-061 Workflow Framework Integration
+
+- completed:
+  - orchestration contract adapter extracted to `src/orchestration-contract.ts`
+  - root and runtime exports expose `trackOrchestrationContractToIntermediateSchema`
+  - `track bootstrap --from harness` delegates explicit payload projection through the adapter
+  - `examples/track-bootstrap.example.json` added as the project-harness-runner payload fixture
+  - framework collaboration ownership boundary documented
+  - multi-agent handoff packet and parallel work rules documented
+  - public npm publish remained parked through this slice
 
 ### TRK-060 Bootstrap Source Adapters
 

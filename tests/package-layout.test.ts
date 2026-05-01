@@ -70,12 +70,14 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof root.bootstrapTrack, "function");
   assert.equal(typeof (root as Record<string, unknown>).writeTrackBootstrap, "function");
   assert.equal(typeof (root as Record<string, unknown>).buildTrackBuilderGuidance, "function");
+  assert.equal(typeof (root as Record<string, unknown>).trackOrchestrationContractToIntermediateSchema, "function");
   assert.equal(typeof core.summarizeTrack, "function");
   assert.equal(typeof runtime.loadTrackState, "function");
   assert.equal(typeof runtime.initTrack, "function");
   assert.equal(typeof runtime.bootstrapTrack, "function");
   assert.equal(typeof (runtime as Record<string, unknown>).writeTrackBootstrap, "function");
   assert.equal(typeof (runtime as Record<string, unknown>).buildTrackBuilderGuidance, "function");
+  assert.equal(typeof (runtime as Record<string, unknown>).trackOrchestrationContractToIntermediateSchema, "function");
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
   assert.equal(typeof botBridge.renderMonitorBotSummary, "function");

@@ -63,6 +63,9 @@ Instead it should guide the user toward one of these planning modes:
 - Harness for `.agent` contracts, definition-of-done docs, and repeatable checks
 
 Reference: [docs/track-init-bootstrap-roadmap.md](docs/track-init-bootstrap-roadmap.md)
+Framework collaboration guide: [docs/workflow-framework-collaboration.md](docs/workflow-framework-collaboration.md)
+Multi-agent handoff guide: [docs/multi-agent-handoff-patterns.md](docs/multi-agent-handoff-patterns.md)
+Pre-publish UAT report: [docs/pre-publish-user-acceptance-report.md](docs/pre-publish-user-acceptance-report.md)
 
 Current bootstrap usage:
 
@@ -75,6 +78,9 @@ Current bootstrap usage:
 - `track bootstrap --write --force`
 
 `track bootstrap --write` refuses to overwrite existing `.track/roadmap.yaml` or `.track/state.yaml` unless `--force` is provided.
+
+Workflow frameworks should exchange explicit data with Track through `.agent/track-bootstrap.json`.
+The runtime adapter is exported as `trackOrchestrationContractToIntermediateSchema`, and a reference payload lives at [examples/track-bootstrap.example.json](examples/track-bootstrap.example.json).
 
 ## CLI sound cues
 
@@ -193,6 +199,7 @@ Current checks:
 - `npm run package:publish-dry-run`
 - `npm run package:rc-tag`
 - `npm run package:release-notes`
+- `npm run uat:clean-project`
 - `track package list`
 - `track package check`
 - `track package dry-run`
@@ -212,6 +219,7 @@ The public package exports and `bin.track` now point at compiled release artifac
 `package:publish-dry-run` runs the public npm preflight lane and reports npm auth, pack dry-run, publish dry-run, install smoke, and the final publish command without publishing.
 `package:rc-tag` prepares the release-candidate git tag commands as a dry-run only when the publish guard reports `publishable-ready`; it does not create or push a tag.
 `package:release-notes` generates a Markdown release-notes draft from package state, install commands, CLI usage, verification commands, and recent release slices.
+`uat:clean-project` packs Track, installs it into a temporary clean consumer project, then verifies the installed `track` CLI through `init`, `status`, `map`, bootstrap draft, harness bootstrap, and init no-overwrite behavior.
 
 Public npm release target:
 
