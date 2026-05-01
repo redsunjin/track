@@ -197,6 +197,8 @@ Contract:
 - shows evidence, confidence, warnings, and projected roadmap/state
 - shows Track Builder guidance when planning evidence is missing
 - reads `.agent/track-bootstrap.json` as explicit adapter data when present
+- writes `.track/roadmap.yaml` and `.track/state.yaml` only through an explicit `--write` path
+- refuses overwrite by default and requires `--force` for existing Track files
 - reuses the existing external-plan projection path where possible instead of inventing a second schema
 
 ## `project-harness-runner` Role Separation

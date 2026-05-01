@@ -11,12 +11,16 @@ import {
   type TrackBuilderGuidance,
 } from "./builder.js";
 import { projectExternalPlan } from "./external-plan.js";
-import { sanitizeInlineText } from "./security.js";
+import { saveTrackRoadmap } from "./roadmap.js";
+import { resolveTrackFilePath, sanitizeInlineText } from "./security.js";
+import { saveTrackState } from "./state.js";
 import { summarizeTrack } from "./summary.js";
 import type { ProjectExternalPlanResult, TrackStatus } from "./types.js";
 
 export type TrackBootstrapSourceKind = "readme" | "package" | "git" | "plan" | "harness" | "agent";
 export type TrackBootstrapRequestedSource = TrackBootstrapSourceKind | "auto" | "skill";
+export type TrackBootstrapFileKind = "roadmap" | "state";
+export type TrackBootstrapFileAction = "create" | "overwrite" | "skip";
 
 export interface TrackBootstrapEvidence {
   detail: string;
@@ -33,6 +37,13 @@ export interface TrackBootstrapOptions {
   projectName?: string;
 }
 
+export interface TrackBootstrapWriteOptions extends TrackBootstrapOptions {
+  dryRun?: boolean;
+  force?: boolean;
+  roadmapFile?: string;
+  stateFile?: string;
+}
+
 export interface TrackBootstrapResult extends ProjectExternalPlanResult {
   builder: TrackBuilderGuidance;
   cwd: string;
@@ -40,6 +51,29 @@ export interface TrackBootstrapResult extends ProjectExternalPlanResult {
   schema: IntermediateRoadmapSchema;
   sources: TrackBootstrapSourceKind[];
   warnings: string[];
+}
+
+export interface TrackBootstrapFilePlan {
+  action: TrackBootstrapFileAction;
+  exists: boolean;
+  kind: TrackBootstrapFileKind;
+  path: string;
+}
+
+export interface TrackBootstrapWritePlan extends TrackBootstrapResult {
+  conflicts: TrackBootstrapFilePlan[];
+  dryRun: boolean;
+  files: {
+    roadmap: TrackBootstrapFilePlan;
+    state: TrackBootstrapFilePlan;
+  };
+  force: boolean;
+  ok: boolean;
+  writes: TrackBootstrapFilePlan[];
+}
+
+export interface TrackBootstrapWriteResult extends TrackBootstrapWritePlan {
+  written: TrackBootstrapFilePlan[];
 }
 
 export interface TrackBootstrapCommandRunner {
@@ -191,6 +225,57 @@ export async function bootstrapTrack(options: TrackBootstrapOptions): Promise<Tr
   };
 }
 
+export async function planTrackBootstrapWrite(options: TrackBootstrapWriteOptions): Promise<TrackBootstrapWritePlan> {
+  const cwd = path.resolve(options.cwd);
+  const draft = await bootstrapTrack({ ...options, cwd });
+  const [roadmapPath, statePath] = await Promise.all([
+    resolveBootstrapOutputPath(cwd, options.roadmapFile, "roadmap"),
+    resolveBootstrapOutputPath(cwd, options.stateFile, "state"),
+  ]);
+  const [roadmapExists, stateExists] = await Promise.all([pathExists(roadmapPath), pathExists(statePath)]);
+  const force = options.force ?? false;
+  const dryRun = options.dryRun ?? false;
+  const roadmap = buildFilePlan("roadmap", roadmapPath, roadmapExists, force);
+  const state = buildFilePlan("state", statePath, stateExists, force);
+  const files = { roadmap, state };
+  const writes = [roadmap, state].filter((file) => file.action === "create" || file.action === "overwrite");
+  const conflicts = [roadmap, state].filter((file) => file.action === "skip");
+
+  return {
+    ...draft,
+    conflicts,
+    dryRun,
+    files,
+    force,
+    ok: conflicts.length === 0,
+    writes,
+  };
+}
+
+export async function writeTrackBootstrap(options: TrackBootstrapWriteOptions): Promise<TrackBootstrapWriteResult> {
+  const plan = await planTrackBootstrapWrite(options);
+
+  if (plan.dryRun) {
+    return { ...plan, written: [] };
+  }
+
+  assertTrackBootstrapWritePlanWritable(plan);
+
+  await saveTrackRoadmap(plan.files.roadmap.path, plan.roadmap);
+  await saveTrackState(plan.files.state.path, plan.state);
+
+  return { ...plan, written: plan.writes };
+}
+
+export function assertTrackBootstrapWritePlanWritable(plan: TrackBootstrapWritePlan): void {
+  if (plan.ok) {
+    return;
+  }
+
+  const files = plan.conflicts.map((file) => path.relative(plan.cwd, file.path)).join(", ");
+  throw new Error(`Track bootstrap would overwrite existing file(s): ${files}. Re-run with --force to overwrite.`);
+}
+
 export function resolveBootstrapSources(raw: string | undefined): TrackBootstrapSourceKind[] {
   const requested = (raw ?? "auto")
     .split(",")
@@ -252,6 +337,37 @@ export function summarizeTrackBootstrap(result: TrackBootstrapResult): string {
 
   lines.push("");
   lines.push("This is a draft. Review the evidence before writing .track files.");
+  return lines.join("\n");
+}
+
+export function renderTrackBootstrapWritePlan(plan: TrackBootstrapWritePlan | TrackBootstrapWriteResult): string {
+  const wasWritten = "written" in plan && plan.written.length > 0;
+  const presentEvidenceCount = plan.evidence.filter((entry) => entry.present).length;
+  const status = !plan.ok
+    ? "TRACK BOOTSTRAP WRITE BLOCKED"
+    : wasWritten
+      ? "TRACK BOOTSTRAP WRITTEN"
+      : plan.dryRun
+        ? "TRACK BOOTSTRAP WRITE DRY RUN"
+        : "TRACK BOOTSTRAP WRITE PLAN";
+  const lines = [
+    status,
+    `Project: ${plan.state.project.name}`,
+    `Sources: ${plan.sources.join(", ")}`,
+    `Roadmap: ${renderFileAction(plan.files.roadmap, plan.cwd)}`,
+    `State: ${renderFileAction(plan.files.state, plan.cwd)}`,
+    `Evidence: ${presentEvidenceCount}/${plan.evidence.length} present, ${plan.warnings.length} warning(s)`,
+  ];
+
+  if (!plan.ok) {
+    lines.push("Use --force to overwrite existing Track files.");
+  } else if (wasWritten) {
+    lines.push("Next: track status");
+    lines.push("Next: track map");
+  } else if (plan.dryRun) {
+    lines.push("Next: rerun with --write to create Track files.");
+  }
+
   return lines.join("\n");
 }
 
@@ -814,6 +930,37 @@ function collectPlanningEvidenceLabels(
     labels.push(`${readme.file} headings`);
   }
   return labels;
+}
+
+function buildFilePlan(
+  kind: TrackBootstrapFileKind,
+  filePath: string,
+  exists: boolean,
+  force: boolean
+): TrackBootstrapFilePlan {
+  return {
+    action: exists ? (force ? "overwrite" : "skip") : "create",
+    exists,
+    kind,
+    path: filePath,
+  };
+}
+
+async function resolveBootstrapOutputPath(
+  cwd: string,
+  explicitFile: string | undefined,
+  kind: TrackBootstrapFileKind
+): Promise<string> {
+  if (explicitFile) {
+    return resolveTrackFilePath(cwd, explicitFile, `Track bootstrap ${kind} output`);
+  }
+
+  return path.resolve(cwd, ".track", kind === "roadmap" ? "roadmap.yaml" : "state.yaml");
+}
+
+function renderFileAction(file: TrackBootstrapFilePlan, cwd: string): string {
+  const relativePath = path.relative(cwd, file.path);
+  return `${file.action} ${relativePath}${file.exists ? " (exists)" : ""}`;
 }
 
 async function collectExistingFiles(cwd: string, candidates: string[]): Promise<string[]> {

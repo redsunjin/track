@@ -13,7 +13,7 @@ import {
 } from "./agent-packs.js";
 import type { TrackMutationCommand } from "./actions.js";
 import { expandCommandAliases } from "./aliases.js";
-import { bootstrapTrack, summarizeTrackBootstrap } from "./bootstrap.js";
+import { bootstrapTrack, renderTrackBootstrapWritePlan, summarizeTrackBootstrap, writeTrackBootstrap } from "./bootstrap.js";
 import { renderBuddy } from "./buddy.js";
 import { buildMonitorBotPushEvents, renderMonitorBotPushBatch } from "./bot-bridge.js";
 import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
@@ -192,7 +192,24 @@ async function main(): Promise<void> {
 
   if (command === "bootstrap") {
     if (bootstrapWrite) {
-      throw new Error("`track bootstrap --write` is not available yet. Use `track bootstrap --dry-run` to review the draft.");
+      const result = await writeTrackBootstrap({
+        cwd: process.cwd(),
+        dryRun,
+        force,
+        from: bootstrapFrom,
+        projectName,
+        roadmapFile: roadmapOutFile,
+        stateFile: stateOutFile,
+      });
+
+      if (json) {
+        process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+        return;
+      }
+
+      process.stdout.write(`${renderTrackBootstrapWritePlan(result)}\n`);
+      playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
+      return;
     }
 
     const result = await bootstrapTrack({

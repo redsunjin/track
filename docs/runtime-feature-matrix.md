@@ -32,6 +32,7 @@ Must have:
 - `track bootstrap` draft mode from README, package metadata, git branch, plan files, harness payloads, and agent workflow files
 - Track Builder guidance when no roadmap, TODO, spec, or harness evidence exists
 - explicit `.agent/track-bootstrap.json` payloads for project-harness-runner style workflows
+- explicit `track bootstrap --write` with no-overwrite default and `--force` replacement
 
 Why:
 

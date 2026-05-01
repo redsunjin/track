@@ -2,18 +2,18 @@
 
 ## Active Slice
 
-- id: `TRK-060`
-- title: `Bootstrap Source Adapters`
+- id: `TRK-061`
+- title: `Workflow Framework Integration`
 
 ## Goal
 
-Implement `track bootstrap` as a draft-first path that can inspect a local repo and propose `.track/roadmap.yaml` plus `.track/state.yaml` without treating git history as the source of truth.
+Make Track cooperate with skill, harness, SDD, TDD, and multi-agent workflow systems while keeping Track state canonical.
 
 ## First Steps
 
-1. prepare review/write flow behind explicit `--write`
-2. keep source readers producing explicit evidence and warnings
-3. convert Track Builder guidance into explicit method templates after write safety is proven
+1. define the orchestration contract adapter shape for `.agent/track-bootstrap.json`
+2. document how project-harness-runner should emit explicit Track adapter payloads
+3. add fixtures or tests for orchestration status import if the contract changes
 4. keep public npm publish parked until clean-project UAT passes
 
 ## Current Result
@@ -23,6 +23,9 @@ Implement `track bootstrap` as a draft-first path that can inspect a local repo 
 - Track Builder guidance now appears when no roadmap, TODO, spec, or harness evidence exists
 - `track bootstrap --from harness` reads `.agent/track-bootstrap.json` adapter payloads
 - `track bootstrap --from agent` detects `AGENTS.md` and `.agent` workflow files as operating evidence
+- `track bootstrap --write` now writes roadmap/state files through no-overwrite safety checks
+- `track bootstrap --write --force` is required to replace existing Track files
+- active work moved from TRK-060 to TRK-061
 - CLI sound cues are available only when explicitly enabled
 - public markdown no longer exposes local workspace paths
 - Team Race Mode is documented as a future roadmap concept, not a runtime feature
@@ -31,10 +34,8 @@ Implement `track bootstrap` as a draft-first path that can inspect a local repo 
 ## Constraints
 
 - do not publish to npm during this slice
-- do not make git history the source of truth for future plans
+- do not make git history, harness prose, or agent logs the source of truth for future plans
 - keep `.track/roadmap.yaml` and `.track/state.yaml` as the canonical runtime files
-- bootstrap should show evidence, confidence, and warnings before writing
-- missing-plan projects should be guided to GSD, SDD, TDD, or harness planning instead of fake roadmap confidence
 - skill and harness integrations should provide explicit adapter input, not competing state files
 - `.agent/track-bootstrap.json` is explicit adapter data; markdown under `.agent/` is evidence only
 
@@ -52,9 +53,7 @@ git diff --check
 
 ## Exit Condition
 
-- harness and skill evidence can join the existing README/package/git/plan bootstrap draft
-- explicit harness adapter payloads can drive the projected roadmap/state draft
-- bootstrap output clearly separates evidence from inferred roadmap/state
-- Track Builder produces method guidance when no plan evidence is found
-- no `.track/*` files are overwritten without explicit write and force controls
-- next slice can add `--write` review/no-overwrite behavior
+- orchestration adapter contract is documented and testable
+- Track remains the only writer of `.track/*`
+- project-harness-runner integration has a clear payload boundary
+- next slice can move toward clean-project UAT or method templates

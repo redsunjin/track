@@ -1,11 +1,20 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { bootstrapTrack, resolveBootstrapSources, summarizeTrackBootstrap } from "../src/bootstrap.js";
+import {
+  bootstrapTrack,
+  planTrackBootstrapWrite,
+  renderTrackBootstrapWritePlan,
+  resolveBootstrapSources,
+  summarizeTrackBootstrap,
+  writeTrackBootstrap,
+} from "../src/bootstrap.js";
 import type { TrackBootstrapCommandRunner } from "../src/bootstrap.js";
+import { loadTrackRoadmap } from "../src/roadmap.js";
+import { loadTrackState } from "../src/state.js";
 
 const gitRunner: TrackBootstrapCommandRunner = {
   async run(command, args) {
@@ -212,4 +221,110 @@ test("bootstrapTrack treats harness files and agent files as planning evidence",
     ]
   );
   assert.equal(result.warnings.length, 0);
+});
+
+test("planTrackBootstrapWrite supports dry-run planning without writing files", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-write-plan-"));
+  await writeFile(path.join(tempDir, "README.md"), "# Writable Bootstrap\n", "utf8");
+
+  const plan = await planTrackBootstrapWrite({ cwd: tempDir, dryRun: true, from: "readme" });
+
+  assert.equal(plan.ok, true);
+  assert.equal(plan.dryRun, true);
+  assert.equal(plan.files.roadmap.action, "create");
+  assert.equal(plan.files.state.action, "create");
+  assert.deepEqual(
+    plan.writes.map((file) => file.kind),
+    ["roadmap", "state"]
+  );
+  assert.match(renderTrackBootstrapWritePlan(plan), /TRACK BOOTSTRAP WRITE DRY RUN/);
+  await assert.rejects(() => readFile(path.join(tempDir, ".track", "roadmap.yaml"), "utf8"));
+  await assert.rejects(() => readFile(path.join(tempDir, ".track", "state.yaml"), "utf8"));
+});
+
+test("writeTrackBootstrap writes projected roadmap and state files", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-write-"));
+  await writeFile(path.join(tempDir, "README.md"), "# Writable Bootstrap\n\n## Roadmap\n\nShip it.\n", "utf8");
+
+  const result = await writeTrackBootstrap({ cwd: tempDir, from: "readme" });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(
+    result.written.map((file) => file.kind),
+    ["roadmap", "state"]
+  );
+  assert.match(renderTrackBootstrapWritePlan(result), /TRACK BOOTSTRAP WRITTEN/);
+
+  const roadmap = await loadTrackRoadmap(tempDir);
+  const state = await loadTrackState(tempDir);
+  assert.equal(roadmap.project.name, "Writable Bootstrap");
+  assert.equal(state.project.name, "Writable Bootstrap");
+  assert.equal(state.tasks?.[0]?.status, "doing");
+});
+
+test("writeTrackBootstrap refuses to overwrite existing Track files without force", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-conflict-"));
+  await writeFile(path.join(tempDir, "README.md"), "# Conflict Bootstrap\n", "utf8");
+  await mkdir(path.join(tempDir, ".track"), { recursive: true });
+  await writeFile(path.join(tempDir, ".track", "roadmap.yaml"), "existing roadmap\n", "utf8");
+  await writeFile(path.join(tempDir, ".track", "state.yaml"), "existing state\n", "utf8");
+
+  const plan = await planTrackBootstrapWrite({ cwd: tempDir, from: "readme" });
+
+  assert.equal(plan.ok, false);
+  assert.deepEqual(
+    plan.conflicts.map((file) => file.kind),
+    ["roadmap", "state"]
+  );
+  assert.match(renderTrackBootstrapWritePlan(plan), /TRACK BOOTSTRAP WRITE BLOCKED/);
+  await assert.rejects(() => writeTrackBootstrap({ cwd: tempDir, from: "readme" }), /would overwrite/);
+  assert.equal(await readFile(path.join(tempDir, ".track", "roadmap.yaml"), "utf8"), "existing roadmap\n");
+  assert.equal(await readFile(path.join(tempDir, ".track", "state.yaml"), "utf8"), "existing state\n");
+});
+
+test("writeTrackBootstrap force overwrites existing Track files", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-force-"));
+  await writeFile(path.join(tempDir, "README.md"), "# Forced Bootstrap\n", "utf8");
+  await mkdir(path.join(tempDir, ".track"), { recursive: true });
+  await writeFile(path.join(tempDir, ".track", "roadmap.yaml"), "existing roadmap\n", "utf8");
+  await writeFile(path.join(tempDir, ".track", "state.yaml"), "existing state\n", "utf8");
+
+  const result = await writeTrackBootstrap({ cwd: tempDir, force: true, from: "readme" });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(
+    result.written.map((file) => file.action),
+    ["overwrite", "overwrite"]
+  );
+  const state = await loadTrackState(tempDir);
+  assert.equal(state.project.name, "Forced Bootstrap");
+});
+
+test("writeTrackBootstrap writes harness adapter payload drafts", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "track-bootstrap-harness-write-"));
+  await mkdir(path.join(tempDir, ".agent"), { recursive: true });
+  await writeFile(
+    path.join(tempDir, ".agent", "track-bootstrap.json"),
+    JSON.stringify({
+      project: { id: "harness-write", name: "Harness Write", mode: "sprint" },
+      method: "gsd",
+      goal: "Ship harness write",
+      phases: [
+        {
+          id: "harness-execution",
+          title: "Harness execution",
+          checkpoints: [{ id: "validate-harness", title: "Validate with harness" }],
+        },
+      ],
+      tasks: [{ id: "run-agent-harness", title: "Run harness", checkpoint_id: "validate-harness", status: "doing" }],
+    }),
+    "utf8"
+  );
+
+  const result = await writeTrackBootstrap({ cwd: tempDir, from: "harness" });
+  const state = await loadTrackState(tempDir);
+
+  assert.equal(result.state.track.topology, "harness");
+  assert.equal(state.project.name, "Harness Write");
+  assert.equal(state.tasks?.[0]?.title, "Run harness");
 });

@@ -19,6 +19,7 @@
   - harness and agent workflow evidence reader
   - `.agent/track-bootstrap.json` adapter payload reader
   - `track bootstrap --dry-run` draft renderer
+  - `track bootstrap --write` no-overwrite flow
   - bootstrap evidence and warning model
   - no-overwrite write policy design
 - out:
@@ -32,7 +33,7 @@
   - no planning signal should produce method guidance, not roadmap confidence
   - `.agent/track-bootstrap.json` is explicit adapter data
   - markdown under `.agent/` is evidence only unless a structured payload exists
-  - write behavior should stay explicit after the draft is reviewable
+  - write behavior must stay explicit and no-overwrite by default
 
 ## 3. Record System
 
@@ -67,6 +68,7 @@
   - bootstrap separates evidence from inferred roadmap/state
   - bootstrap guides GSD/SDD/TDD/harness choices when planning evidence is missing
   - harness payload projection does not parse prose as source of truth
+  - `track bootstrap --write` refuses existing `.track/*` files without `--force`
   - local absolute paths stay out of public markdown
 
 ## 5. Guardrails
@@ -92,6 +94,7 @@
   - adapter evidence schema diverging from external-plan import schema
   - Track Builder guidance becoming a second state model instead of a planning UX
   - harness file detection accidentally becoming an implicit roadmap generator
+  - `--write` accidentally replacing existing state without explicit `--force`
 - required_doc_updates:
   - README
   - docs/track-init-bootstrap-roadmap.md

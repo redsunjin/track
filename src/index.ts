@@ -21,7 +21,15 @@ export { JiraRoadmapAdapter } from "./adapters/jira-adapter.js";
 export { LinearRoadmapAdapter } from "./adapters/linear-adapter.js";
 export { NotionRoadmapAdapter } from "./adapters/notion-adapter.js";
 export { createRoadmapAdapter, listRoadmapAdapterKinds, normalizeRoadmapAdapterKind, resolveRoadmapAdapterSourcePath } from "./adapters/registry.js";
-export { bootstrapTrack, resolveBootstrapSources, summarizeTrackBootstrap } from "./bootstrap.js";
+export {
+  assertTrackBootstrapWritePlanWritable,
+  bootstrapTrack,
+  planTrackBootstrapWrite,
+  renderTrackBootstrapWritePlan,
+  resolveBootstrapSources,
+  summarizeTrackBootstrap,
+  writeTrackBootstrap,
+} from "./bootstrap.js";
 export { buildTrackBuilderGuidance, hasTrackPlanningHeading, renderTrackBuilderGuidance, TRACK_BUILDER_METHODS } from "./builder.js";
 export { renderBuddy } from "./buddy.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
@@ -153,10 +161,16 @@ export type {
   TrackBootstrapCommandResult,
   TrackBootstrapCommandRunner,
   TrackBootstrapEvidence,
+  TrackBootstrapFileAction,
+  TrackBootstrapFileKind,
+  TrackBootstrapFilePlan,
   TrackBootstrapOptions,
   TrackBootstrapRequestedSource,
   TrackBootstrapResult,
   TrackBootstrapSourceKind,
+  TrackBootstrapWriteOptions,
+  TrackBootstrapWritePlan,
+  TrackBootstrapWriteResult,
 } from "./bootstrap.js";
 export type {
   BuildTrackBuilderGuidanceInput,

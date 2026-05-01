@@ -71,6 +71,10 @@ Current bootstrap usage:
 - `track bootstrap --from harness --dry-run`
 - `track bootstrap --from skill --json`
 - `track bootstrap --from package --json`
+- `track bootstrap --write`
+- `track bootstrap --write --force`
+
+`track bootstrap --write` refuses to overwrite existing `.track/roadmap.yaml` or `.track/state.yaml` unless `--force` is provided.
 
 ## CLI sound cues
 

@@ -9,11 +9,11 @@ track:
   title: Track plugin v2
   topology: sprint
   total_laps: 36
-  active_lap: 34
+  active_lap: 35
   health: green
-  next_action: Add bootstrap draft review and write flow
+  next_action: Define orchestration contract adapter
   blocked_reason: null
-  percent_complete: 91
+  percent_complete: 92
 laps:
   - id: lap-1
     title: Core schema and CLI
@@ -505,7 +505,7 @@ laps:
         weight: 2
   - id: lap-34
     title: Bootstrap source adapters
-    status: doing
+    status: done
     checkpoints:
       - id: cp-90
         title: Git README and package inference
@@ -517,15 +517,15 @@ laps:
         weight: 3
       - id: cp-92
         title: Bootstrap draft review and write flow
-        status: doing
+        status: done
         weight: 2
   - id: lap-35
     title: Workflow framework integration
-    status: todo
+    status: doing
     checkpoints:
       - id: cp-93
         title: Orchestration contract adapter
-        status: todo
+        status: doing
         weight: 3
       - id: cp-94
         title: Skill and framework collaboration docs
@@ -1035,12 +1035,12 @@ tasks:
   - id: task-097
     title: Add bootstrap draft review and write flow
     checkpoint_id: cp-92
-    status: doing
+    status: done
     owner: codex
   - id: task-098
     title: Define orchestration contract adapter
     checkpoint_id: cp-93
-    status: todo
+    status: doing
     owner: codex
   - id: task-099
     title: Document skill and framework collaboration
@@ -1858,3 +1858,13 @@ events:
     actor: codex
     timestamp: 2026-04-30T14:07:06.322Z
     summary: Started Add bootstrap draft review and write flow
+  - id: evt-2026-05-01T02:16:26.620Z-3sdwzf
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-01T02:16:26.620Z
+    summary: Completed Add bootstrap draft review and write flow
+  - id: evt-2026-05-01T02:16:29.995Z-w6omip
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-01T02:16:29.995Z
+    summary: Started Define orchestration contract adapter

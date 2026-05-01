@@ -2,14 +2,12 @@
 
 ## Active
 
-- `TRK-060` Bootstrap Source Adapters
+- `TRK-061` Workflow Framework Integration
 
-Current TRK-060 result: README/package/git/plan bootstrap draft, Track Builder missing-plan guidance, and harness/agent evidence bridge are implemented.
-Next TRK-060 focus: explicit review/write flow with no-overwrite behavior.
+Current TRK-061 focus: define the orchestration contract adapter that lets workflow frameworks feed Track through explicit data instead of competing state files.
 
 ## Queued
 
-- `TRK-061 Workflow Framework Integration`
 - `TRK-062 Pre-Publish User Acceptance`
 
 ## Parked
@@ -17,6 +15,16 @@ Next TRK-060 focus: explicit review/write flow with no-overwrite behavior.
 - `TRK-058 Public Release Execution` - parked until Track is dogfooded from a clean project and release owner approves actual npm publish
 
 ## Done
+
+### TRK-060 Bootstrap Source Adapters
+
+- completed:
+  - README/package/git/plan bootstrap draft implemented
+  - Track Builder missing-plan guidance implemented
+  - harness and agent workflow evidence bridge implemented
+  - `.agent/track-bootstrap.json` adapter payload projection implemented
+  - `track bootstrap --write` implemented with no-overwrite default and `--force` replacement
+  - public npm publish remains parked until clean-project UAT
 
 ### TRK-059 Track Init / Bootstrap Roadmap
 
