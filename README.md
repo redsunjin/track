@@ -96,6 +96,22 @@ Current usage:
 
 Reference: [docs/cli-sound-design.md](docs/cli-sound-design.md)
 
+## CLI language
+
+Track's default CLI language is English.
+The Korean MVP is opt-in for the core human-facing commands.
+
+Current usage:
+
+- `track status --lang ko`
+- `track next --lang ko`
+- `track init --dry-run --lang ko`
+- `track bootstrap --dry-run --lang ko`
+- `track check:harness --lang ko`
+- `TRACK_LANG=ko track status`
+
+JSON output and release/package command output remain stable and English for this MVP.
+
 ## Security defaults
 
 Track now ships with conservative defaults intended for open-source and local-agent use:

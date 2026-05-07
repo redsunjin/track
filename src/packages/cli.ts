@@ -1,4 +1,5 @@
 export { expandCommandAliases } from "../aliases.js";
+export { healthSignal, msg, normalizeTrackLanguage, renderLanguage, resolveTrackLanguage } from "../i18n.js";
 export { renderBuddy } from "../buddy.js";
 export {
   filterOpenClawWorkers,
@@ -26,3 +27,4 @@ export { runWatchLoop } from "../watch.js";
 export type { CaptureOpenClawTelemetryOptions, CaptureOpenClawTelemetryResult } from "../openclaw-live.js";
 export type { OpenClawPitwallFilter, OpenClawPitwallLoadOptions, OpenClawPitwallResult } from "../openclaw-pitwall.js";
 export type { TrackSoundCue, TrackSoundMode, TrackSoundOptions, TrackSoundPlaybackResult, TrackSoundTheme } from "../sound.js";
+export type { TrackLanguage, TrackLanguageOptions } from "../i18n.js";

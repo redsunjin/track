@@ -1,7 +1,9 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 
+import type { RenderOptions } from "./ansi.js";
 import { buildTrackBuilderGuidance, renderTrackBuilderGuidance } from "./builder.js";
+import { msg, renderLanguage } from "./i18n.js";
 import { saveTrackRoadmap } from "./roadmap.js";
 import { sanitizeInlineText, resolveTrackFilePath } from "./security.js";
 import { saveTrackState } from "./state.js";
@@ -116,28 +118,29 @@ export function assertTrackInitPlanWritable(plan: TrackInitPlan): void {
   throw new Error(`Track init would overwrite existing file(s): ${files}. Re-run with force to overwrite.`);
 }
 
-export function renderTrackInitPlan(plan: TrackInitPlan | TrackInitResult): string {
+export function renderTrackInitPlan(plan: TrackInitPlan | TrackInitResult, options?: RenderOptions): string {
+  const lang = renderLanguage(options);
   const wasWritten = "written" in plan && plan.written.length > 0;
   const status = !plan.ok
-    ? "TRACK INIT BLOCKED"
+    ? msg(lang, "initBlocked")
     : wasWritten
-      ? "TRACK INIT CREATED"
+      ? msg(lang, "initCreated")
       : plan.dryRun
-        ? "TRACK INIT DRY RUN"
-        : "TRACK INIT PLAN";
+        ? msg(lang, "initDryRun")
+        : msg(lang, "initPlan");
   const lines = [
     status,
-    `Project: ${plan.state.project.name}`,
-    `Template: ${plan.template}`,
-    `Roadmap: ${renderFileAction(plan.files.roadmap, plan.cwd)}`,
-    `State: ${renderFileAction(plan.files.state, plan.cwd)}`,
+    `${msg(lang, "project")}: ${plan.state.project.name}`,
+    `${msg(lang, "template")}: ${plan.template}`,
+    `${msg(lang, "roadmap")}: ${renderFileAction(plan.files.roadmap, plan.cwd)}`,
+    `${msg(lang, "state")}: ${renderFileAction(plan.files.state, plan.cwd)}`,
   ];
 
   if (!plan.ok) {
-    lines.push("Use force to overwrite existing Track files.");
+    lines.push(msg(lang, "forceOverwrite"));
   } else if (wasWritten) {
-    lines.push("Next: track status");
-    lines.push("Next: track map");
+    lines.push(msg(lang, "nextStatus"));
+    lines.push(msg(lang, "nextMap"));
   } else if (plan.dryRun) {
     lines.push("");
     lines.push(...renderTrackBuilderGuidance(buildTrackBuilderGuidance({ context: "init", hasPlanEvidence: false })));

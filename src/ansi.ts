@@ -16,6 +16,7 @@ const ANSI_PATTERN = /\u001b\[[0-9;]*m/g;
 
 export interface RenderOptions {
   color?: boolean;
+  lang?: "en" | "ko";
 }
 
 export interface SignalPalette {

@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 
+import type { RenderOptions } from "./ansi.js";
 import { intermediateToExternalPlan } from "./adapters/bridge.js";
 import type { IntermediateRoadmapSchema } from "./adapter-schema.js";
 import {
@@ -11,6 +12,7 @@ import {
   type TrackBuilderGuidance,
 } from "./builder.js";
 import { projectExternalPlan } from "./external-plan.js";
+import { field, msg, renderLanguage } from "./i18n.js";
 import {
   collectOrchestrationValidationCommands,
   TRACK_ORCHESTRATION_CONTRACT_FILE,
@@ -312,25 +314,26 @@ export function resolveBootstrapSources(raw: string | undefined): TrackBootstrap
   return normalized;
 }
 
-export function summarizeTrackBootstrap(result: TrackBootstrapResult): string {
+export function summarizeTrackBootstrap(result: TrackBootstrapResult, options?: RenderOptions): string {
+  const lang = renderLanguage(options);
   const phaseCount = result.roadmap.roadmap.phases.length;
   const checkpointCount = result.roadmap.roadmap.phases.reduce((count, phase) => count + (phase.checkpoints?.length ?? 0), 0);
   const taskCount = result.state.tasks?.length ?? 0;
   const summary = summarizeTrack(result.state);
   const lines = [
-    "TRACK BOOTSTRAP DRAFT",
-    `PROJECT  ${result.state.project.name}`,
-    `SOURCES  ${result.sources.join(", ")}`,
-    `DRAFT    ${phaseCount} phase(s), ${checkpointCount} checkpoint(s), ${taskCount} task(s)`,
-    `NEXT     ${summary.nextAction}`,
+    msg(lang, "trackBootstrapDraft"),
+    `${field(lang, "project")} ${result.state.project.name}`,
+    `${field(lang, "sources")} ${result.sources.join(", ")}`,
+    `${field(lang, "draft")} ${phaseCount} phase(s), ${checkpointCount} checkpoint(s), ${taskCount} task(s)`,
+    `${field(lang, "next")} ${summary.nextAction}`,
     "",
-    "Evidence:",
+    `${msg(lang, "evidence")}:`,
     ...result.evidence.map((entry) => `- ${entry.label}: ${entry.detail}${entry.file ? ` (${entry.file})` : ""}`),
   ];
 
   if (result.warnings.length) {
     lines.push("");
-    lines.push("Warnings:");
+    lines.push(`${msg(lang, "warnings")}:`);
     for (const warning of result.warnings) {
       lines.push(`- ${warning}`);
     }
@@ -343,36 +346,40 @@ export function summarizeTrackBootstrap(result: TrackBootstrapResult): string {
   }
 
   lines.push("");
-  lines.push("This is a draft. Review the evidence before writing .track files.");
+  lines.push(msg(lang, "draftReview"));
   return lines.join("\n");
 }
 
-export function renderTrackBootstrapWritePlan(plan: TrackBootstrapWritePlan | TrackBootstrapWriteResult): string {
+export function renderTrackBootstrapWritePlan(
+  plan: TrackBootstrapWritePlan | TrackBootstrapWriteResult,
+  options?: RenderOptions
+): string {
+  const lang = renderLanguage(options);
   const wasWritten = "written" in plan && plan.written.length > 0;
   const presentEvidenceCount = plan.evidence.filter((entry) => entry.present).length;
   const status = !plan.ok
-    ? "TRACK BOOTSTRAP WRITE BLOCKED"
+    ? msg(lang, "trackBootstrapWriteBlocked")
     : wasWritten
-      ? "TRACK BOOTSTRAP WRITTEN"
+      ? msg(lang, "trackBootstrapWritten")
       : plan.dryRun
-        ? "TRACK BOOTSTRAP WRITE DRY RUN"
-        : "TRACK BOOTSTRAP WRITE PLAN";
+        ? msg(lang, "trackBootstrapWriteDryRun")
+        : msg(lang, "trackBootstrapWritePlan");
   const lines = [
     status,
-    `Project: ${plan.state.project.name}`,
-    `Sources: ${plan.sources.join(", ")}`,
-    `Roadmap: ${renderFileAction(plan.files.roadmap, plan.cwd)}`,
-    `State: ${renderFileAction(plan.files.state, plan.cwd)}`,
-    `Evidence: ${presentEvidenceCount}/${plan.evidence.length} present, ${plan.warnings.length} warning(s)`,
+    `${msg(lang, "project")}: ${plan.state.project.name}`,
+    `${msg(lang, "sources")}: ${plan.sources.join(", ")}`,
+    `${msg(lang, "roadmap")}: ${renderFileAction(plan.files.roadmap, plan.cwd)}`,
+    `${msg(lang, "state")}: ${renderFileAction(plan.files.state, plan.cwd)}`,
+    `${msg(lang, "evidence")}: ${presentEvidenceCount}/${plan.evidence.length} present, ${plan.warnings.length} warning(s)`,
   ];
 
   if (!plan.ok) {
     lines.push("Use --force to overwrite existing Track files.");
   } else if (wasWritten) {
-    lines.push("Next: track status");
-    lines.push("Next: track map");
+    lines.push(msg(lang, "nextStatus"));
+    lines.push(msg(lang, "nextMap"));
   } else if (plan.dryRun) {
-    lines.push("Next: rerun with --write to create Track files.");
+    lines.push(msg(lang, "writeNext"));
   }
 
   return lines.join("\n");

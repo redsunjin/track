@@ -312,6 +312,7 @@ export const TRACK_PACKAGE_BOUNDARIES: TrackPackageBoundary[] = [
     owns: [
       "src/cli.ts",
       "src/render.ts",
+      "src/i18n.ts",
       "src/buddy.ts",
       "src/aliases.ts",
       "src/watch.ts",

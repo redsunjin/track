@@ -20,6 +20,7 @@ import { checkHarnessConsistency, renderHarnessCheck } from "./harness.js";
 import { buildTrackControlSnapshot } from "./control.js";
 import { importExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 import { generateTrackMap, renderTrackMap } from "./generator.js";
+import { resolveTrackLanguage } from "./i18n.js";
 import { initTrack, renderTrackInitPlan } from "./init.js";
 import { TrackMCPServer, runStdioServer } from "./mcp.js";
 import {
@@ -75,6 +76,7 @@ async function main(): Promise<void> {
   const actor = readFlag(args, "--actor") ?? "track";
   const intervalMs = parseInterval(readFlag(args, "--interval"));
   const color = readColorPreference(args);
+  const lang = resolveTrackLanguage(readFlag(args, "--lang"), process.env);
   const allowWrite = args.includes("--allow-write");
   const dryRun = args.includes("--dry-run");
   const force = args.includes("--force");
@@ -185,7 +187,7 @@ async function main(): Promise<void> {
       return;
     }
 
-    process.stdout.write(`${renderTrackInitPlan(result)}\n`);
+    process.stdout.write(`${renderTrackInitPlan(result, { lang })}\n`);
     playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
     return;
   }
@@ -207,7 +209,7 @@ async function main(): Promise<void> {
         return;
       }
 
-      process.stdout.write(`${renderTrackBootstrapWritePlan(result)}\n`);
+      process.stdout.write(`${renderTrackBootstrapWritePlan(result, { lang })}\n`);
       playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
       return;
     }
@@ -223,7 +225,7 @@ async function main(): Promise<void> {
       return;
     }
 
-    process.stdout.write(`${summarizeTrackBootstrap(result)}\n`);
+    process.stdout.write(`${summarizeTrackBootstrap(result, { lang })}\n`);
     playTrackSound(soundCueFromSummary(summarizeTrack(result.state)), sound);
     return;
   }
@@ -456,7 +458,7 @@ async function main(): Promise<void> {
 
     const importedSummary = summarizeTrack(result.state);
     process.stdout.write(`${summarizeExternalPlanImport(result)}\n`);
-    process.stdout.write(`${renderStatus(importedSummary, { color })}\n`);
+    process.stdout.write(`${renderStatus(importedSummary, { color, lang })}\n`);
     playTrackSound(soundCueFromSummary(importedSummary), sound);
     return;
   }
@@ -655,7 +657,7 @@ async function main(): Promise<void> {
     if (json) {
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     } else {
-      process.stdout.write(`${renderHarnessCheck(result)}\n`);
+      process.stdout.write(`${renderHarnessCheck(result, { lang })}\n`);
     }
     if (!result.ok) {
       process.exitCode = 1;
@@ -671,7 +673,7 @@ async function main(): Promise<void> {
       return;
     }
 
-    process.stdout.write(`${renderStatus(snapshot.summary, { color })}\n`);
+    process.stdout.write(`${renderStatus(snapshot.summary, { color, lang })}\n`);
     for (const action of snapshot.nextActions.slice(0, 3)) {
       process.stdout.write(`ACTION   ${action.title}\n`);
     }
@@ -698,7 +700,7 @@ async function main(): Promise<void> {
     }
 
     process.stdout.write(`${result.event.summary}\n`);
-    process.stdout.write(`${renderStatus(result.summary, { color })}\n`);
+    process.stdout.write(`${renderStatus(result.summary, { color, lang })}\n`);
     playTrackSound(soundCueFromEvent(result.event, result.summary), sound);
     return;
   }
@@ -744,7 +746,7 @@ async function main(): Promise<void> {
       async () => {
         const liveState = await loadTrackState(process.cwd(), file);
         liveSummary = summarizeTrack(liveState);
-        return command === "next" ? renderNext(liveSummary, { color }) : renderStatus(liveSummary, { color });
+        return command === "next" ? renderNext(liveSummary, { color, lang }) : renderStatus(liveSummary, { color, lang });
       },
       {
         intervalMs,
@@ -763,11 +765,11 @@ async function main(): Promise<void> {
 
   switch (command) {
     case "status":
-      process.stdout.write(`${renderStatus(summary, { color })}\n`);
+      process.stdout.write(`${renderStatus(summary, { color, lang })}\n`);
       playTrackSound(soundCueFromSummary(summary), sound);
       return;
     case "next":
-      process.stdout.write(`${renderNext(summary, { color })}\n`);
+      process.stdout.write(`${renderNext(summary, { color, lang })}\n`);
       playTrackSound(soundCueFromSummary(summary), sound);
       return;
     default:

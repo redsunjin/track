@@ -22,6 +22,8 @@ test("checkHarnessConsistency passes when control-plane files align", async () =
   assert.deepEqual(result.nextSessionPlan, { id: "TRK-033", title: "Harness Guardrails" });
   assert.equal(result.worksheet?.path, path.join("docs", "worksheets", "HW-006-harness-guardrails.md"));
   assert.match(renderHarnessCheck(result), /HARNESS OK/);
+  assert.match(renderHarnessCheck(result, { lang: "ko" }), /하네스 정상/);
+  assert.match(renderHarnessCheck(result, { lang: "ko" }), /워크시트/);
 });
 
 test("checkHarnessConsistency fails when the plan and worksheet drift from TODO", async () => {

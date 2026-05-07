@@ -36,6 +36,7 @@ export {
   TRACK_ORCHESTRATION_CONTRACT_FILE,
   trackOrchestrationContractToIntermediateSchema,
 } from "./orchestration-contract.js";
+export { healthSignal, msg, normalizeTrackLanguage, renderLanguage, resolveTrackLanguage } from "./i18n.js";
 export { renderBuddy } from "./buddy.js";
 export { importExternalPlan, loadExternalPlan, projectExternalPlan, summarizeExternalPlanImport } from "./external-plan.js";
 export { generateTrackMap, renderTrackMap } from "./generator.js";
@@ -181,6 +182,7 @@ export type {
   TrackOrchestrationContractOptions,
   TrackOrchestrationContractPayload,
 } from "./orchestration-contract.js";
+export type { TrackLanguage, TrackLanguageOptions } from "./i18n.js";
 export type {
   BuildTrackBuilderGuidanceInput,
   TrackBuilderGuidance,

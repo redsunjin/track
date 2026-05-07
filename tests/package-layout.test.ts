@@ -71,6 +71,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof (root as Record<string, unknown>).writeTrackBootstrap, "function");
   assert.equal(typeof (root as Record<string, unknown>).buildTrackBuilderGuidance, "function");
   assert.equal(typeof (root as Record<string, unknown>).trackOrchestrationContractToIntermediateSchema, "function");
+  assert.equal(typeof (root as Record<string, unknown>).resolveTrackLanguage, "function");
   assert.equal(typeof core.summarizeTrack, "function");
   assert.equal(typeof runtime.loadTrackState, "function");
   assert.equal(typeof runtime.initTrack, "function");
@@ -78,6 +79,7 @@ test("package subpath exports resolve the release package entrypoints", async ()
   assert.equal(typeof (runtime as Record<string, unknown>).writeTrackBootstrap, "function");
   assert.equal(typeof (runtime as Record<string, unknown>).buildTrackBuilderGuidance, "function");
   assert.equal(typeof (runtime as Record<string, unknown>).trackOrchestrationContractToIntermediateSchema, "function");
+  assert.equal(typeof (cli as Record<string, unknown>).resolveTrackLanguage, "function");
   assert.equal(typeof mcp.TrackMCPServer, "function");
   assert.equal(typeof agents.exportAgentPack, "function");
   assert.equal(typeof botBridge.renderMonitorBotSummary, "function");
@@ -247,12 +249,12 @@ test("release notes draft summarizes package install, CLI, verification, and rec
   assert.ok(result.cliCommands.includes("track package readiness"));
   assert.ok(result.importSubpaths.includes("./core"));
   assert.ok(result.verificationCommands.includes("npm run package:install-smoke"));
-  assert.ok(result.recentSlices.some((slice) => slice.id === "TRK-055"));
+  assert.ok(result.recentSlices.some((slice) => slice.id === "TRK-063"));
   assert.equal(result.releaseCandidate.status, "tag-dry-run-ready");
   assert.match(rendered, /# @redsunjin\/track@0\.1\.0 Release Notes Draft/);
   assert.match(rendered, /npm install @redsunjin\/track/);
   assert.match(rendered, /track package rc-tag/);
-  assert.match(rendered, /TRK-055 Publishable RC Gate Tightening/);
+  assert.match(rendered, /TRK-063 CLI Korean Localization MVP/);
   assert.match(rendered, /Final publish still requires release-owner npm authentication/);
 });
 

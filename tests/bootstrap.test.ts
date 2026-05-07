@@ -85,6 +85,8 @@ test("bootstrapTrack projects README package and git evidence into a draft", asy
   assert.equal(result.warnings.length, 0);
   assert.match(summarizeTrackBootstrap(result), /TRACK BOOTSTRAP DRAFT/);
   assert.match(summarizeTrackBootstrap(result), /branch feature\/bootstrap/);
+  assert.match(summarizeTrackBootstrap(result, { lang: "ko" }), /TRACK 부트스트랩 초안/);
+  assert.match(summarizeTrackBootstrap(result, { lang: "ko" }), /근거/);
 });
 
 test("bootstrapTrack can draft from a missing-source repo with warnings", async () => {
@@ -238,6 +240,7 @@ test("planTrackBootstrapWrite supports dry-run planning without writing files", 
     ["roadmap", "state"]
   );
   assert.match(renderTrackBootstrapWritePlan(plan), /TRACK BOOTSTRAP WRITE DRY RUN/);
+  assert.match(renderTrackBootstrapWritePlan(plan, { lang: "ko" }), /TRACK 부트스트랩 쓰기 미리보기/);
   await assert.rejects(() => readFile(path.join(tempDir, ".track", "roadmap.yaml"), "utf8"));
   await assert.rejects(() => readFile(path.join(tempDir, ".track", "state.yaml"), "utf8"));
 });

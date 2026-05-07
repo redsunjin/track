@@ -1070,3 +1070,35 @@ roadmap:
             dependencies: 4
             coordination: 4
             risk: 4
+    - id: phase-37
+      title: CLI Korean localization MVP
+      goal: Add a small Korean output lane for core Track CLI views without changing JSON contracts.
+      kind: ui
+      checkpoints:
+        - id: cp-99
+          title: Korean status and next output
+          kind: ui
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-100
+          title: Korean init bootstrap and harness output
+          kind: ui
+          difficulty:
+            effort: 2
+            uncertainty: 2
+            dependencies: 2
+            coordination: 1
+            risk: 2
+        - id: cp-101
+          title: Localization docs and verification
+          kind: build
+          difficulty:
+            effort: 1
+            uncertainty: 1
+            dependencies: 1
+            coordination: 1
+            risk: 1

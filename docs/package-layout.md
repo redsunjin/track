@@ -60,6 +60,19 @@ Current extension-oriented subpaths:
 
 These are intentionally treated as extension surfaces, not yet part of the formal publishable package split above.
 
+## CLI Localization MVP
+
+The CLI package includes a small language helper for human-facing terminal labels.
+English remains the default.
+Korean labels are opt-in through:
+
+```bash
+track status --lang ko
+TRACK_LANG=ko track next
+```
+
+This MVP intentionally does not translate JSON output or package/release gate output.
+
 ## Guardrail
 
 Run:

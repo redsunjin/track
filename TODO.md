@@ -4,7 +4,7 @@
 
 - `TRK-062` Pre-Publish User Acceptance
 
-Current TRK-062 focus: release-owner go/no-go review. Clean-project UAT has passed; actual npm publish remains parked until explicit approval.
+Current TRK-062 focus: release-owner go/no-go remains pending after clean-project UAT passed.
 
 ## Queued
 
@@ -15,6 +15,15 @@ Current TRK-062 focus: release-owner go/no-go review. Clean-project UAT has pass
 - `TRK-058 Public Release Execution` - parked until Track is dogfooded from a clean project and release owner approves actual npm publish
 
 ## Done
+
+### TRK-063 CLI Korean Localization MVP
+
+- completed:
+  - `--lang ko` and `TRACK_LANG=ko` language selection added
+  - Korean labels added for `status`, `next`, `init`, `bootstrap`, and `check:harness`
+  - default English output and JSON contracts preserved
+  - README, runtime matrix, package layout docs, and tests updated
+  - public npm publish remains parked until release-owner approval
 
 ### TRK-061 Workflow Framework Integration
 

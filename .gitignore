@@ -7,3 +7,5 @@ coverage/
 .track/*.lock
 .track/*.tmp
 .track/events.ndjson
+.track/openclaw-monitor.json
+.tmp-track-check/

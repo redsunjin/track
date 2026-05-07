@@ -8,7 +8,7 @@ track:
   id: track-v2
   title: Track plugin v2
   topology: sprint
-  total_laps: 36
+  total_laps: 37
   active_lap: 36
   health: green
   next_action: Run public publish go-no-go review
@@ -549,7 +549,23 @@ laps:
         weight: 2
       - id: cp-98
         title: Public publish go-no-go review
-        status: doing
+        status: todo
+        weight: 1
+  - id: lap-37
+    title: CLI Korean localization MVP
+    status: done
+    checkpoints:
+      - id: cp-99
+        title: Korean status and next output
+        status: done
+        weight: 2
+      - id: cp-100
+        title: Korean init bootstrap and harness output
+        status: done
+        weight: 2
+      - id: cp-101
+        title: Localization docs and verification
+        status: done
         weight: 1
 tasks:
   - id: task-001
@@ -1065,8 +1081,23 @@ tasks:
   - id: task-103
     title: Run public publish go-no-go review
     checkpoint_id: cp-98
-    status: doing
+    status: todo
     owner: release-owner
+  - id: task-104
+    title: Add Korean CLI output MVP
+    checkpoint_id: cp-99
+    status: done
+    owner: codex
+  - id: task-106
+    title: Add Korean init bootstrap and harness output
+    checkpoint_id: cp-100
+    status: done
+    owner: codex
+  - id: task-105
+    title: Document localization usage
+    checkpoint_id: cp-101
+    status: done
+    owner: codex
 flags: []
 events:
   - id: evt-001
@@ -1918,3 +1949,28 @@ events:
     actor: codex
     timestamp: 2026-05-01T05:55:14.461Z
     summary: Started Run public publish go-no-go review
+  - id: evt-2026-05-08T00:00:00.000Z-ko-mvp
+    type: roadmap.slice_selected
+    actor: codex
+    timestamp: 2026-05-08T00:00:00.000Z
+    summary: Selected TRK-063 CLI Korean localization MVP as the next active slice
+  - id: evt-2026-05-08T00:00:01.000Z-ko-mvp
+    type: task.started
+    actor: codex
+    timestamp: 2026-05-08T00:00:01.000Z
+    summary: Started Add Korean CLI output MVP
+  - id: evt-2026-05-07T23:14:51.000Z-ko-mvp-104
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-07T23:14:51.000Z
+    summary: Completed Add Korean CLI output MVP
+  - id: evt-2026-05-07T23:14:52.000Z-ko-mvp-106
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-07T23:14:52.000Z
+    summary: Completed Add Korean init bootstrap and harness output
+  - id: evt-2026-05-07T23:14:53.000Z-ko-mvp-105
+    type: task.completed
+    actor: codex
+    timestamp: 2026-05-07T23:14:53.000Z
+    summary: Completed Document localization usage

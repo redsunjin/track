@@ -38,6 +38,8 @@ test("planTrackInit supports dry-run style file planning without writing files",
   assert.match(renderTrackInitPlan(plan), /TRACK INIT DRY RUN/);
   assert.match(renderTrackInitPlan(plan), /TRACK BUILDER/);
   assert.match(renderTrackInitPlan(plan), /GSD/);
+  assert.match(renderTrackInitPlan(plan, { lang: "ko" }), /TRACK 초기화 미리보기/);
+  assert.match(renderTrackInitPlan(plan, { lang: "ko" }), /프로젝트/);
   await assert.rejects(() => readFile(path.join(tempDir, ".track", "roadmap.yaml"), "utf8"));
   await assert.rejects(() => readFile(path.join(tempDir, ".track", "state.yaml"), "utf8"));
 });
@@ -78,6 +80,7 @@ test("initTrack refuses to overwrite existing files without force", async () => 
     ["roadmap", "state"]
   );
   assert.match(renderTrackInitPlan(plan), /TRACK INIT BLOCKED/);
+  assert.match(renderTrackInitPlan(plan, { lang: "ko" }), /TRACK 초기화 차단/);
 
   await assert.rejects(() => initTrack({ cwd: tempDir, projectName: "Conflict Project" }), /would overwrite/);
   assert.equal(await readFile(roadmapPath, "utf8"), "existing roadmap\n");

@@ -1,6 +1,8 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
+import type { RenderOptions } from "./ansi.js";
+import { field, msg, renderLanguage } from "./i18n.js";
 import { loadTrackRoadmap } from "./roadmap.js";
 import { loadTrackState } from "./state.js";
 
@@ -58,23 +60,26 @@ export async function checkHarnessConsistency(cwd: string): Promise<HarnessCheck
   };
 }
 
-export function renderHarnessCheck(result: HarnessCheckResult): string {
-  const lines = [result.ok ? "HARNESS OK" : "HARNESS FAIL"];
+export function renderHarnessCheck(result: HarnessCheckResult, options?: RenderOptions): string {
+  const lang = renderLanguage(options);
+  const lines = [result.ok ? msg(lang, "harnessOk") : msg(lang, "harnessFail")];
 
-  lines.push(formatSliceLine("ACTIVE", result.activeSlice));
-  lines.push(formatSliceLine("PLAN", result.nextSessionPlan));
+  lines.push(formatSliceLine(field(lang, "active").trimEnd(), result.activeSlice));
+  lines.push(formatSliceLine(msg(lang, "plan").toUpperCase(), result.nextSessionPlan));
   lines.push(
-    `WORKSHEET ${result.worksheet ? result.worksheet.path : "missing"}${
+    `${field(lang, "worksheet")} ${result.worksheet ? result.worksheet.path : "missing"}${
       result.worksheet && !result.worksheet.officialActiveLoop ? " (official_active_loop != yes)" : ""
     }`
   );
   lines.push(
-    `RUNTIME   ${result.runtimeStatus === "ok" ? "roadmap/state checks clean" : "roadmap/state validation failed"}`
+    `${msg(lang, "runtime").toUpperCase().padEnd(10, " ")}${
+      result.runtimeStatus === "ok" ? "roadmap/state checks clean" : "roadmap/state validation failed"
+    }`
   );
 
   if (result.issues.length) {
     lines.push("");
-    lines.push("Issues:");
+    lines.push(`${msg(lang, "issues")}:`);
     for (const issue of result.issues) {
       lines.push(`- ${issue}`);
     }
